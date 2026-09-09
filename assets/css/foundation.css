@@ -1,0 +1,133 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   foundation.css — 変数・リセット・基本タイポグラフィ
+   ========================================================= */
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   1. Foundation
+   2. Layout   (header / footer / nav)
+   3. Project  (hero / concept / stories / onair)
+   4. Component
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Foundation
+   --------------------------------------------------------- */
+
+:root {
+  --c-red: #a2302c;
+  --c-red-deep: #6e1c19;
+  --c-ink: #211c1b;
+  --c-ink-soft: #4a423f;
+  --c-mute: #857a75;
+  --c-paper: #ffffff;
+  --c-paper-2: #f2eee9;
+  --c-line: #d8cec6;
+  --c-line-thin: #e8e2db;
+
+  --f-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --f-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* 欧文の見出し専用。極太コンデンス（Forbes の大見出しに寄せる） */
+  --f-display: "Anton", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+
+  --w-max: 1180px;
+  --pad-x: 6vw;
+  --header-h: 96px;
+
+  /* TOKYO MX ロゴ（tokyo-mx.svg）から抜き出した実配色 */
+  --mx-purple: #49418d;
+  --mx-blue: #1ea2d9;
+  --mx-cyan: #2a91c6;
+  --mx-green: #a2c554;
+  --mx-yellow: #f3d046;
+  --mx-orange: #e58b3b;
+  --mx-vermilion: #db5434;
+  --mx-pink: #d64f8d;
+
+  /* TOKYO MX のロゴ配色。見出しの罫・フッター・ボタンなどで使う */
+  --rainbow: linear-gradient(
+    90deg,
+    var(--mx-purple) 0%,
+    var(--mx-blue) 18%,
+    var(--mx-green) 36%,
+    var(--mx-yellow) 52%,
+    var(--mx-orange) 68%,
+    var(--mx-vermilion) 84%,
+    var(--mx-pink) 100%
+  );
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  font-family: var(--f-mincho);
+  font-size: 16px;
+  line-height: 2;
+  letter-spacing: 0.06em;
+  font-feature-settings: "palt";
+  overflow-wrap: anywhere;
+}
+
+h1, h2, h3, p, dl, dd, figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-red);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  :root {
+      --pad-x: 22px;
+      --header-h: 68px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+      scroll-behavior: auto;
+    }
+
+  *,
+    *::before,
+    *::after {
+      animation-duration: 0.001s !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.001s !important;
+    }
+}

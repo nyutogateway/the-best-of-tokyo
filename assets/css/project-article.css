@@ -1,0 +1,547 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   project-article.css — 記事ページ（記事FV / 章 / Q&A / 写真帯 / 締めの言葉）
+   ========================================================= */
+
+.p-article {
+  position: relative;
+  padding: calc(var(--header-h) + clamp(40px, 7vw, 90px)) var(--pad-x) 0;
+}
+
+/* 日輪マークを薄く敷く。position: fixed なので、読み進めても画面に留まる */
+.p-article::before {
+  position: fixed;
+  top: 50%;
+  left: 13%;
+  z-index: -1;
+  width: min(64vh, 44vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("../img/mark.svg") no-repeat center / contain;
+  opacity: 0.055;
+  pointer-events: none;
+  content: "";
+}
+
+.p-article__inner {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.p-article__head {
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(320px, 34%, 400px) 1fr;
+  gap: clamp(28px, 4.5vw, 56px);
+  align-items: start;
+  padding-bottom: clamp(40px, 6vw, 66px);
+}
+
+.p-article__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.p-article__visual {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--c-paper-2);
+}
+
+.p-article__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.p-article__title {
+  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.8;
+  letter-spacing: 0.1em;
+}
+
+.p-article__name {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--c-line-thin);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.p-article__romaji {
+  display: block;
+  margin-top: 6px;
+  color: var(--c-mute);
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+}
+
+.p-article__company {
+  margin-top: 12px;
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.p-article__profile {
+  margin-top: 22px;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+  line-height: 2.15;
+}
+
+.p-article__intro .c-textLink {
+  margin-top: 20px;
+}
+
+.p-chapter {
+  padding: clamp(50px, 7vw, 84px) 0 0;
+  display: flow-root;
+}
+
+.p-chapter__label {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--c-red);
+  font-family: var(--f-display);
+  font-size: 14px;
+  letter-spacing: 0.22em;
+}
+
+.p-chapter__label::before,
+.p-chapter__label::after {
+  flex: 1;
+  height: 1px;
+  background: var(--c-line);
+  content: "";
+}
+
+.p-chapter__title {
+  margin-top: clamp(30px, 4.6vw, 52px);
+  font-size: clamp(1.2rem, 2.3vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.95;
+  letter-spacing: 0.13em;
+  text-align: center;
+}
+
+.p-qa {
+  margin-top: 34px;
+}
+
+.p-qa__item + .p-qa__item {
+  margin-top: 30px;
+}
+
+/* grid のままだと float を避けて箱ごと横にずれるだけで、
+   画像の下に文章が回り込まない。通常のブロック＋記号は絶対配置にしている */
+.p-qa__q,
+.p-qa__a {
+  position: relative;
+  display: block;
+  padding-left: 46px;
+  margin-top: 16px;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  line-height: 2.35;
+}
+
+.p-qa__q {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.95;
+}
+
+.p-qa__mark {
+  position: absolute;
+  top: 0.28em;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-family: var(--f-gothic);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.p-qa__q .p-qa__mark {
+  background: var(--c-red);
+  color: #fff;
+}
+
+.p-qa__a .p-qa__mark {
+  border: 1px solid var(--c-line);
+  color: var(--c-red);
+}
+
+/* 章の写真は本文に回り込ませる。
+   Q/A の丸バッジは段落ボックスの左端に絶対配置しているので、
+   段落自体はブロックのままでよく、行だけが写真を避けて流れる */
+.p-figure {
+  float: right;
+  width: 50%;
+  /* 本文（.p-qa）の書き出しと写真の天を合わせる */
+  margin: 34px 0 22px clamp(24px, 3.4vw, 44px);
+}
+
+.p-figure img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.p-figure figcaption {
+  margin-top: 10px;
+  color: var(--c-mute);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  line-height: 1.8;
+}
+
+/* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文） */
+.p-chapter--message {
+  margin-top: clamp(56px, 8vw, 96px);
+}
+
+.p-chapter__text {
+  margin-top: clamp(26px, 4vw, 44px);
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  line-height: 2.35;
+}
+
+/* 同じグループの他の掲載者（記事末尾の導線） --------------- */
+
+.p-related {
+  --g: var(--c-red);
+  --g-ink: var(--c-red-deep);
+  margin-top: clamp(56px, 8vw, 96px);
+}
+
+.p-related--g1 {
+  --g: #db5434;
+  --g-ink: #a63317;
+}
+
+.p-related--g2 {
+  --g: #cf7522;
+  --g-ink: #9c5c17;
+}
+
+.p-related--g3 {
+  --g: #b8902a;
+  --g-ink: #846315;
+}
+
+.p-related--g4 {
+  --g: #8aa32e;
+  --g-ink: #63771d;
+}
+
+.p-related--g5 {
+  --g: #4f9c62;
+  --g-ink: #357247;
+}
+
+.p-related--g6 {
+  --g: #2f9a92;
+  --g-ink: #1f6f69;
+}
+
+.p-related--g7 {
+  --g: #2a91c6;
+  --g-ink: #1c6d97;
+}
+
+.p-related--g8 {
+  --g: #1f7bc0;
+  --g-ink: #155a8e;
+}
+
+.p-related--g9 {
+  --g: #4a56a6;
+  --g-ink: #353f80;
+}
+
+.p-related--g10 {
+  --g: #49418d;
+  --g-ink: #383170;
+}
+
+.p-related__head {
+  position: relative;
+  margin-bottom: clamp(24px, 3.4vw, 38px);
+  padding-bottom: 14px;
+}
+
+.p-related__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--g);
+  content: "";
+}
+
+.p-related__en {
+  font-weight: 400;
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 3.2vw, 2.3rem);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.p-related__list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.8vw, 24px);
+}
+
+.p-related__card {
+  display: block;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .p-related__card:hover {
+      transform: translateY(-6px);
+    }
+}
+
+.p-related__visual {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--c-paper-2);
+}
+
+.p-related__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* TOPのカードと同じ、虹色が左から拭うホバー（黒文字が乗る明るい側だけを使う） */
+.p-related__visual::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    var(--mx-green) 0%,
+    var(--mx-yellow) 30%,
+    var(--mx-orange) 55%,
+    var(--mx-pink) 80%,
+    var(--mx-blue) 100%
+  );
+  opacity: 0.78;
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(16px, 1.8vw, 26px);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  transition: clip-path 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  content: "READ";
+}
+
+@media (hover: hover) {
+  .p-related__card:hover .p-related__visual::after {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+.p-related__card:hover .p-related__visual img {
+  transform: scale(1.05);
+}
+
+.p-related__body {
+  display: block;
+  padding: 18px 2px 0;
+}
+
+/* 静かに置く。写真には重ねず、字間を広げた小さなラベルとして */
+.p-related__romaji {
+  display: block;
+  color: var(--g-ink, var(--c-red-deep));
+  font-family: var(--f-display);
+  font-size: 12.5px;
+  letter-spacing: 0.2em;
+  line-height: 1.75;
+  text-transform: uppercase;
+}
+
+.p-related__name {
+  display: block;
+  margin-top: 12px;
+  font-size: clamp(17px, 1.4vw, 20px);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.p-related__card:hover .p-related__name {
+  color: var(--g-ink);
+}
+
+.p-related__company {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-line-thin);
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.p-article__foot {
+  padding: clamp(50px, 7vw, 80px) 0 clamp(70px, 10vw, 120px);
+  text-align: center;
+}
+
+.p-marquee {
+  width: 100vw;
+  margin: clamp(50px, 7vw, 84px) 0 0 calc(50% - 50vw);
+  overflow: hidden;
+}
+
+.p-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 56s linear infinite;
+}
+
+/* カーソルを乗せただけでは止めない。キーボード操作中だけ止める */
+.p-marquee:focus-within .p-marquee__track {
+  animation-play-state: paused;
+}
+
+.p-marquee__set {
+  display: flex;
+}
+
+/* 1画面に5枚。幅を 20vw に固定して枚数をそろえる（写真の縦横比に左右されない） */
+.p-marquee__set img {
+  width: 20vw;
+  height: clamp(150px, 14vw, 260px);
+  max-width: none;
+  object-fit: cover;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* タブレット（1023px以下） */
+@media (max-width: 1023px) {
+  /* 回り込みに必要な幅がないので、写真は本文の上に全幅で置く */
+  .p-figure {
+      float: none;
+      width: min(100%, 620px);
+      margin: 0 auto 26px;
+    }
+
+  .p-article__head {
+      grid-template-columns: clamp(240px, 38%, 320px) 1fr;
+      gap: clamp(22px, 3.4vw, 40px);
+    }
+
+  .p-related__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  .p-marquee__set img {
+      width: 34vw;
+    }
+}
+
+@media (max-width: 767px) {
+  .p-article::before {
+      left: 50%;
+      width: 92vw;
+      opacity: 0.04;
+    }
+  .p-marquee__set img {
+      width: 46vw;
+      height: 32vw;
+    }
+
+  .p-article__head {
+      grid-template-columns: 1fr;
+    }
+
+  .p-article__visual {
+      max-width: 280px;
+    }
+
+  .p-qa__q,
+    .p-qa__a {
+      padding-left: 38px;
+    }
+
+  .p-related__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  .p-figure {
+      float: none;
+      width: 100%;
+      margin: 0 0 24px;
+    }
+
+  .p-qa__mark {
+      width: 26px;
+      height: 26px;
+      font-size: 11px;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .p-marquee {
+      overflow-x: auto;
+    }
+
+  .p-marquee__track {
+      animation: none;
+    }
+
+  .p-marquee__set:last-child {
+      display: none;
+    }
+}

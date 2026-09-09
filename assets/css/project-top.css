@@ -1,0 +1,1319 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   project-top.css — TOPページ
+
+   1. FV（ヒーロー）
+   2. ABOUT（企画について）
+   3. STORIES（中扉・グループ・カード）
+   4. INDEX（掲載者・企業一覧）
+   5. BROADCASTER（放送局のご紹介）
+   6. タブレット（1023px以下）
+   7. SP（767px以下）
+   8. 動きを止める設定（prefers-reduced-motion）
+   ========================================================= */
+
+/* 1. FV（ヒーロー） -------------------------------------- */
+
+.p-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr clamp(260px, 43vw, 760px);
+  align-items: stretch;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.p-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  /* コピーは写真の側へ寄せ、ロゴとリードは左端に置いて対角に配置する */
+  justify-content: space-between;
+  gap: clamp(28px, 5vw, 72px);
+  padding: calc(var(--header-h) + 24px) clamp(26px, 4vw, 68px) clamp(44px, 6vw, 80px) var(--pad-x);
+}
+
+.p-hero__copy {
+  order: 2;
+  /* ロゴの塊と写真のあいだ、白い余白の中心に置く（上下も中央） */
+  align-self: center;
+  margin-inline: auto;
+  writing-mode: vertical-rl;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.4vw, 40px);
+  font-size: clamp(1.35rem, min(4.2vw, 5vh), 3.3rem);
+  font-weight: 600;
+  line-height: 1.34;
+  letter-spacing: 0.16em;
+}
+
+/* どの幅でも1行のまま。折り返させず、幅に合わせて字を縮める */
+.p-hero__line {
+  white-space: nowrap;
+  clip-path: inset(0 0 100% 0);
+  animation: lineIn 1.5s cubic-bezier(0.16, 0.8, 0.2, 1) 0.35s forwards;
+}
+
+.p-hero__line--2 {
+  animation-delay: 0.75s;
+}
+
+.p-hero__meta {
+  order: 1;
+  align-self: center;
+  max-width: 500px;
+  opacity: 0;
+  animation: fadeUp 1.3s ease 1.35s forwards;
+}
+
+.p-hero__wordmark img {
+  width: min(410px, 74vw);
+}
+
+.p-hero__meta::after {
+  display: block;
+  width: 84px;
+  height: 3px;
+  margin-top: clamp(24px, 3vw, 34px);
+  background: var(--rainbow);
+  content: "";
+}
+
+/* 「インタビ／ューメディア」のような割れ方を避け、指定した位置だけで折る */
+.p-hero__text {
+  margin-top: 28px;
+  overflow-wrap: normal;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  line-height: 2.2;
+}
+
+/* 掲載者のポートレートを右半分に敷き、2列を上下それぞれの向きに流す。
+   同じ並びを2セット持たせ、半分ぶん動かして繋ぎ目をなくしている */
+.p-hero__tiles {
+  position: relative;
+  margin-top: var(--header-h);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 1.6s ease 0.5s forwards;
+  /* 文字組みとの境目を硬い直線にせず、左へ溶かす */
+  mask-image: linear-gradient(to right, transparent 0, #000 16%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%);
+}
+
+/* 写真が文字組み側へ溶けていく帯にだけ、局の配色を薄く重ねる */
+.p-hero__tiles::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--rainbow);
+  mix-blend-mode: multiply;
+  opacity: 0.62;
+  mask-image: linear-gradient(to right, #000 0, transparent 46%);
+  -webkit-mask-image: linear-gradient(to right, #000 0, transparent 46%);
+  pointer-events: none;
+  content: "";
+}
+
+/* ロゴの塊の中心にマークを重ね、その奥に敷く */
+.p-hero::before {
+  position: absolute;
+  top: 52%;
+  left: 20%;
+  width: min(70vh, 46vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("../img/mark.svg") no-repeat center / contain;
+  opacity: 0.1;
+  content: "";
+}
+
+/* 写真の上下も画面の外へ抜けるように白でぼかす */
+.p-hero::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: clamp(260px, 43vw, 760px);
+  background:
+    linear-gradient(to bottom, var(--c-paper) 0, transparent 15%),
+    linear-gradient(to top, var(--c-paper) 0, transparent 12%);
+  pointer-events: none;
+  content: "";
+}
+
+/* 3枚ずつ送って止まる。1列12枚（6枚×2セット）なので3枚 = 25%、
+   2回送ると1セットぶん（50%）進んで元の見た目に戻る */
+.p-hero__col {
+  display: block;
+  animation: heroStepUp 12s cubic-bezier(0.2, 0.9, 0.2, 1) infinite;
+}
+
+/* 2列は同じ周期。上と下へ同時に「タン」と送る */
+.p-hero__col--down {
+  animation-name: heroStepDown;
+}
+
+/* 1画面にちょうど3枚。写真の高さは画面の高さから決める */
+.p-hero__col img {
+  display: block;
+  width: 100%;
+  height: calc((100svh - var(--header-h)) / 3);
+  object-fit: cover;
+  /* わずかに沈めて、文字側とのコントラストを作る */
+  filter: saturate(0.94) brightness(0.98);
+}
+
+@keyframes heroStepUp {
+  0%,
+  46% {
+    transform: translateY(0);
+  }
+
+  50%,
+  96% {
+    transform: translateY(-25%);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes heroStepDown {
+  0%,
+  46% {
+    transform: translateY(-50%);
+  }
+
+  50%,
+  96% {
+    transform: translateY(-25%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes lineIn {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 2. ABOUT（企画について） ----------------------------- */
+
+/* ロゴ帯とセットで1画面（100vh）に収まるよう、余白は画面の高さ基準 */
+.p-concept {
+  padding: clamp(76px, 10vh, 150px) var(--pad-x) clamp(52px, 7vh, 104px);
+}
+
+.p-concept__inner {
+  display: grid;
+  grid-template-columns: clamp(180px, 22vw, 280px) 1fr;
+  gap: clamp(24px, 5vw, 70px);
+  max-width: var(--w-max);
+  margin-inline: auto;
+}
+
+.p-concept__en {
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(2.6rem, 5.4vw, 4.1rem);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.p-concept__title {
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  line-height: 1.6;
+}
+
+.p-concept__head::after {
+  display: block;
+  width: 86px;
+  height: 3px;
+  margin-top: 26px;
+  background: var(--rainbow);
+  content: "";
+}
+
+/* 本文は<br>ではなく行ごとのブロック。1行ずつ出す演出のため */
+.p-concept__line {
+  display: block;
+}
+
+.p-concept__lead {
+  font-size: clamp(1.15rem, 2.1vw, 1.62rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.95;
+}
+
+.p-concept__manifesto {
+  margin-top: clamp(22px, 3.2vh, 40px);
+  font-size: clamp(0.94rem, 1.4vw, 1.08rem);
+  letter-spacing: 0.08em;
+  line-height: 2.35;
+}
+
+.p-concept__closing {
+  margin-top: clamp(22px, 3.2vh, 40px);
+  padding-top: clamp(20px, 2.6vh, 34px);
+  border-top: 1px solid var(--c-line);
+  font-size: clamp(1rem, 1.55vw, 1.18rem);
+  font-weight: 600;
+  line-height: 2.1;
+}
+
+/* 3. STORIES（中扉・グループ・カード） ----------------- */
+
+.p-concept__closing em {
+  color: var(--c-red-deep);
+  font-style: normal;
+}
+
+.p-stories {
+  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(52px, 7.5vw, 96px);
+  overflow-x: clip;
+}
+
+/* 5行。1行にグループを2つ重ねて置き、数秒ごとに塊ごと入れ替える */
+.p-stories__inner {
+  display: grid;
+  row-gap: clamp(46px, 6vw, 88px);
+  max-width: var(--w-max);
+  margin-inline: auto;
+}
+
+.p-grouprow {
+  display: grid;
+}
+
+.p-grouprow > .p-group {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0.5s;
+}
+
+.p-grouprow > .p-group.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* JSが初期化するまで（または動かない場合）は、先頭のグループを出しておく */
+.p-grouprow:not(.is-ready) > .p-group:first-child {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* 次に出るグループを名指しするボタン */
+.p-group__next {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(8px, 1vw, 14px);
+  padding: 8px 2px 8px 14px;
+  border: 0;
+  background: none;
+  color: var(--c-mute);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.p-group__nextLead {
+  font-family: var(--f-display);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  opacity: 0.75;
+}
+
+.p-group__nextNo {
+  color: var(--c-ink-soft);
+  font-family: var(--f-display);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+.p-group__nextName {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--c-ink-soft);
+  font-family: var(--f-display);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.p-group__nextJa {
+  color: var(--c-mute);
+  font-family: var(--f-gothic);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+}
+
+.p-group__arrow {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  align-self: center;
+  transform: rotate(45deg);
+  transition: translate 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.p-group__next:hover {
+  color: var(--g-ink);
+}
+
+@media (hover: hover) {
+  .p-group__next:hover .p-group__arrow {
+      translate: 3px 0;
+    }
+}
+
+/* 動きを止める設定のときは、重ねずに縦に並べてすべて見せる */
+@media (prefers-reduced-motion: reduce) {
+  .p-grouprow {
+      row-gap: clamp(46px, 6vw, 88px);
+    }
+
+  .p-grouprow > .p-group {
+      grid-area: auto;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition: none;
+    }
+
+  .p-group__next {
+      display: none;
+    }
+}
+
+/* 誌面の中扉。左に STORIES / 50 / 日本語見出しを積み、右に業種の一覧。
+   下の1本の罫で、見出しから一覧までを1つの塊として括る */
+/* 中扉は業種の一覧だけ。下の1本の罫でカードの並びと区切る */
+.p-stories__masthead {
+  max-width: var(--w-max);
+  margin: 0 auto clamp(40px, 5vw, 70px);
+  padding-top: 0;
+  padding-bottom: clamp(24px, 3vw, 40px);
+  border-bottom: 1px solid var(--c-ink);
+}
+
+.p-stories__display {
+  text-align: left;
+}
+
+.p-stories__unit {
+  margin-bottom: clamp(14px, 1.8vw, 22px);
+  color: var(--c-mute);
+  font-family: var(--f-display);
+  font-size: clamp(0.78rem, 1vw, 0.95rem);
+  letter-spacing: 0.34em;
+  line-height: 1;
+}
+
+.p-stories__text {
+  padding-top: clamp(6px, 1vw, 14px);
+}
+
+.p-stories__title {
+  font-size: clamp(1.7rem, 4.2vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.55;
+}
+
+/* 「50人」だけ朱に。墨一色の見出しに一点だけ色を入れる */
+.p-stories__title em {
+  color: var(--c-red-deep);
+  font-style: normal;
+}
+
+.p-group {
+  min-width: 0;
+}
+
+/* 袋文字がページ幅を広げないように */
+
+.p-group__head {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.5vw, 28px);
+  margin-bottom: 30px;
+}
+
+/* グループごとの色。TOKYO MX のロゴ配色を10業種に割り当てている。
+   --g は面、--g-ink は文字用に暗くした対。タブ・見出し・目次で同じ定義を使う */
+.p-stories,
+.p-index {
+  --g1: #db5434;
+  --g1-ink: #a63317;
+  --g2: #cf7522;
+  --g2-ink: #9c5c17;
+  --g3: #b8902a;
+  --g3-ink: #846315;
+  --g4: #8aa32e;
+  --g4-ink: #63771d;
+  --g5: #4f9c62;
+  --g5-ink: #357247;
+  --g6: #2f9a92;
+  --g6-ink: #1f6f69;
+  --g7: #2a91c6;
+  --g7-ink: #1c6d97;
+  --g8: #1f7bc0;
+  --g8-ink: #155a8e;
+  --g9: #4a56a6;
+  --g9-ink: #353f80;
+  --g10: #49418d;
+  --g10-ink: #383170;
+}
+
+.p-group,
+.p-spotnav li,
+.p-index__group {
+  --g: var(--c-red);
+  --g-ink: var(--c-red-deep);
+}
+
+.p-grouprow:nth-child(1) > .p-group:nth-child(1),
+.p-spotnav li:nth-child(1),
+.p-index__group:nth-of-type(1) {
+  --g: var(--g1);
+  --g-ink: var(--g1-ink);
+}
+
+.p-grouprow:nth-child(1) > .p-group:nth-child(2),
+.p-spotnav li:nth-child(2),
+.p-index__group:nth-of-type(2) {
+  --g: var(--g2);
+  --g-ink: var(--g2-ink);
+}
+
+.p-grouprow:nth-child(2) > .p-group:nth-child(1),
+.p-spotnav li:nth-child(3),
+.p-index__group:nth-of-type(3) {
+  --g: var(--g3);
+  --g-ink: var(--g3-ink);
+}
+
+.p-grouprow:nth-child(2) > .p-group:nth-child(2),
+.p-spotnav li:nth-child(4),
+.p-index__group:nth-of-type(4) {
+  --g: var(--g4);
+  --g-ink: var(--g4-ink);
+}
+
+.p-grouprow:nth-child(3) > .p-group:nth-child(1),
+.p-spotnav li:nth-child(5),
+.p-index__group:nth-of-type(5) {
+  --g: var(--g5);
+  --g-ink: var(--g5-ink);
+}
+
+.p-grouprow:nth-child(3) > .p-group:nth-child(2),
+.p-spotnav li:nth-child(6),
+.p-index__group:nth-of-type(6) {
+  --g: var(--g6);
+  --g-ink: var(--g6-ink);
+}
+
+.p-grouprow:nth-child(4) > .p-group:nth-child(1),
+.p-spotnav li:nth-child(7),
+.p-index__group:nth-of-type(7) {
+  --g: var(--g7);
+  --g-ink: var(--g7-ink);
+}
+
+.p-grouprow:nth-child(4) > .p-group:nth-child(2),
+.p-spotnav li:nth-child(8),
+.p-index__group:nth-of-type(8) {
+  --g: var(--g8);
+  --g-ink: var(--g8-ink);
+}
+
+.p-grouprow:nth-child(5) > .p-group:nth-child(1),
+.p-spotnav li:nth-child(9),
+.p-index__group:nth-of-type(9) {
+  --g: var(--g9);
+  --g-ink: var(--g9-ink);
+}
+
+.p-grouprow:nth-child(5) > .p-group:nth-child(2),
+.p-spotnav li:nth-child(10),
+.p-index__group:nth-of-type(10) {
+  --g: var(--g10);
+  --g-ink: var(--g10-ink);
+}
+
+.p-spotnav {
+  margin-top: 0;
+}
+
+.p-spotnav ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: clamp(30px, 5vw, 80px);
+}
+
+/* 1行ずつの目次。番号だけがグループ色を持つ */
+.p-spotnav a {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(14px, 1.8vw, 26px);
+  padding: 15px 2px;
+  border-bottom: 1px solid var(--c-line-thin);
+  color: var(--c-mute);
+  transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+.p-spotnav a:hover {
+  color: var(--c-ink);
+}
+
+@supports (background: color-mix(in srgb, red 50%, white)) {
+  .p-spotnav a:hover {
+      background: color-mix(in srgb, var(--g) 9%, #fff);
+    }
+}
+
+@media (hover: hover) {
+  .p-spotnav a:hover {
+      padding-left: 8px;
+      color: var(--c-ink);
+    }
+}
+
+.p-spotnav__label {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  font-family: var(--f-display);
+  font-size: clamp(0.62rem, 0.9vw, 0.76rem);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.p-spotnav__ja {
+  color: var(--c-mute);
+  font-family: var(--f-gothic);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+}
+
+.p-spotnav__no {
+  order: -1;
+  min-width: 2em;
+  color: var(--g-ink);
+  font-family: var(--f-display);
+  font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.p-group__title {
+  display: grid;
+  flex: 1;
+  grid-template-areas:
+    "no label"
+    "no rule";
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  min-width: 0;
+  column-gap: clamp(14px, 2vw, 24px);
+  row-gap: 6px;
+  font-weight: 400;
+}
+
+.p-group__label {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(10px, 1.4vw, 18px);
+  grid-area: label;
+  align-self: end;
+  color: var(--g-ink);
+  font-family: var(--f-display);
+  font-size: clamp(13px, 1.2vw, 17px);
+  letter-spacing: 0.14em;
+}
+
+.p-group__ja {
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+.p-group__no {
+  grid-area: no;
+  align-self: center;
+  color: var(--g);
+  font-family: var(--f-display);
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  letter-spacing: 0;
+  line-height: 0.86;
+}
+
+.p-group__title::after {
+  grid-area: rule;
+  align-self: start;
+  height: 2px;
+  background: linear-gradient(90deg, var(--g), color-mix(in srgb, var(--g) 12%, transparent));
+  content: "";
+}
+
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .p-group__title::after {
+      background: var(--g);
+      opacity: 0.5;
+    }
+}
+
+.p-slider {
+  position: relative;
+}
+
+/* 5名を横一列に。動くのはカードではなくグループの塊ごと（.p-grouprow を参照） */
+.p-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(14px, 1.8vw, 30px);
+}
+
+/* カードは1グループ5名ぶん。ホバーで少し持ち上がる */
+.p-card {
+  display: block;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .p-card:hover {
+      transform: translateY(-6px);
+    }
+}
+
+.p-card__visual {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--c-paper-2);
+}
+
+.p-card__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ホバーで虹色が左から拭うように出る（Forbes JAPAN 30 UNDER 30 と同じ作り）。
+   地の虹は TOKYO MX ロゴの配色から、黒文字が乗る明るい側だけを使っている */
+.p-card__visual::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    var(--mx-green) 0%,
+    var(--mx-yellow) 30%,
+    var(--mx-orange) 55%,
+    var(--mx-pink) 80%,
+    var(--mx-blue) 100%
+  );
+  opacity: 0.78;
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(20px, 2.6vw, 40px);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  transition: clip-path 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  content: "READ";
+}
+
+@media (hover: hover) {
+  .p-card:hover .p-card__visual::after {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+.p-card:hover .p-card__visual img {
+  transform: scale(1.05);
+}
+
+.p-card__body {
+  display: block;
+  padding: 20px 2px 0;
+}
+
+/* 静かに置く。写真には重ねず、字間を広げた小さなラベルとして */
+.p-card__romaji {
+  display: block;
+  color: var(--g-ink, var(--c-red-deep));
+  font-family: var(--f-display);
+  font-size: 12.5px;
+  letter-spacing: 0.2em;
+  line-height: 1.75;
+  text-transform: uppercase;
+}
+
+.p-card__name {
+  display: block;
+  margin-top: 12px;
+  font-size: clamp(18px, 1.5vw, 21px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.p-card:hover .p-card__name {
+  color: var(--g-ink, var(--c-red));
+}
+
+/* 社名の行数でカードの高さが揃わなくなるため2行で打ち切る */
+.p-card__company {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-line-thin);
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+/* 4. INDEX（掲載者・企業一覧） ------------------------- */
+
+/* STORIES のあと。上は STORIES 側の余白に任せ、下は袋文字の帯までの間を取る */
+.p-index {
+  padding: 0 var(--pad-x) clamp(52px, 7.5vw, 96px);
+}
+
+.p-index__inner {
+  max-width: var(--w-max);
+  margin-inline: auto;
+}
+
+.p-index__head {
+  position: relative;
+  margin-bottom: clamp(30px, 4.5vw, 52px);
+  padding-bottom: 20px;
+}
+
+.p-index__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.p-index__label {
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.p-index__title {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+/* 業種ごとに開閉する（details / summary。JSなしで動く） */
+.p-index__group {
+  border-bottom: 1px solid var(--c-line-thin);
+}
+
+.p-index__group-title {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 18px 44px 18px 2px;
+  font-weight: 400;
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.p-index__group-title::-webkit-details-marker {
+  display: none;
+}
+
+/* 右端の＋。開くと−になる */
+.p-index__group-title::after {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 13px;
+  height: 13px;
+  background:
+    linear-gradient(var(--g) 0 0) center / 100% 1px no-repeat,
+    linear-gradient(var(--g) 0 0) center / 1px 100% no-repeat;
+  translate: 0 -50%;
+  transition: rotate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  content: "";
+}
+
+.p-index__group[open] .p-index__group-title::after {
+  background: linear-gradient(var(--g) 0 0) center / 100% 1px no-repeat;
+  rotate: 180deg;
+}
+
+@supports (background: color-mix(in srgb, red 50%, white)) {
+  .p-index__group-title:hover {
+      background: color-mix(in srgb, var(--g) 6%, #fff);
+    }
+}
+
+.p-index__group-label {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--g-ink);
+  font-family: var(--f-display);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+}
+
+.p-index__group-ja {
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+}
+
+.p-index__group-no {
+  color: var(--g);
+  font-family: var(--f-display);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.p-index__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: clamp(26px, 4vw, 64px);
+  padding-bottom: clamp(18px, 2.4vw, 30px);
+}
+
+/* 番号を外したぶん、行の色でグループを見せる。
+   左の細い罫がグループ色、下罫にも同じ色をごく薄く混ぜてある */
+.p-index__list a {
+  position: relative;
+  display: block;
+  padding: 11px 4px 11px 15px;
+  border-bottom: 1px solid var(--c-line-thin);
+  transition: background-color 0.3s ease;
+}
+
+.p-index__list a::before {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 2px;
+  background: var(--g);
+  opacity: 0.42;
+  transition: opacity 0.3s ease, top 0.3s ease, bottom 0.3s ease;
+  content: "";
+}
+
+.p-index__list a:hover::before {
+  top: 7px;
+  bottom: 7px;
+  opacity: 1;
+}
+
+.p-index__list a:hover {
+  background: var(--c-paper-2);
+}
+
+@supports (border-color: color-mix(in srgb, red 50%, white)) {
+  .p-index__list a {
+      border-bottom-color: color-mix(in srgb, var(--g) 26%, var(--c-line-thin));
+    }
+
+  .p-index__list a:hover {
+      background: color-mix(in srgb, var(--g) 7%, #fff);
+    }
+}
+
+.p-index__name {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.p-index__list a:hover .p-index__name {
+  color: var(--g-ink);
+}
+
+.p-index__company {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+}
+
+/* 5. BROADCASTER（放送局のご紹介） --------------------- */
+
+/* 上の袋文字の帯を、STORIES と BROADCASTER の中間に置くための余白 */
+.p-station {
+  padding: clamp(52px, 7.5vw, 96px) var(--pad-x) clamp(96px, 14vw, 180px);
+}
+
+.p-station__inner {
+  max-width: var(--w-max);
+  margin-inline: auto;
+}
+
+/* 見出しは INDEX / ABOUT と同じ「大型欧文＋小さな日本語＋虹色の罫」 */
+.p-station__head {
+  position: relative;
+  margin-bottom: clamp(30px, 4.5vw, 52px);
+  padding-bottom: 20px;
+}
+
+.p-station__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.p-station__en {
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.p-station__title {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+.p-station__box {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  align-items: start;
+  gap: clamp(30px, 5vw, 70px);
+  padding: clamp(34px, 5vw, 60px) clamp(30px, 5vw, 66px);
+  background: var(--c-ink);
+  color: #fff;
+}
+
+.p-station__logo a {
+  display: block;
+  padding: 18px 22px;
+  background: #fff;
+  transition: opacity 0.3s ease;
+}
+
+.p-station__logo a:hover {
+  opacity: 0.82;
+}
+
+.p-station__logo img {
+  width: 100%;
+}
+
+.p-station__name {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.p-station__text {
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
+  line-height: 2.1;
+}
+
+.p-station__data {
+  margin-top: clamp(24px, 3vw, 34px);
+}
+
+.p-station__data a {
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.p-station__data a:hover {
+  opacity: 0.7;
+}
+
+.p-station__data > div {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  padding: 13px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.p-station__data > div:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.p-station__data dt {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  line-height: 2.2;
+}
+
+.p-station__data dd {
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+/* 6. タブレット（1023px以下） --------------------------- */
+
+@media (max-width: 1023px) {
+  /* 5枚を横一列にすると1枚が狭すぎるので、3枚＋2枚の2段に */
+  .p-cards {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: clamp(22px, 3vw, 34px);
+    }
+
+  .p-hero__inner {
+      padding-right: clamp(16px, 2.4vw, 32px);
+    }
+
+  .p-hero::before {
+      width: min(56vh, 52vw);
+    }
+
+  .p-index__list {
+      column-gap: clamp(20px, 3vw, 40px);
+    }
+
+  .p-logos__item {
+      width: clamp(130px, 18vw, 170px);
+    }
+}
+
+/* 7. SP（767px以下） ------------------------------------ */
+
+@media (max-width: 767px) {
+  /* SPは写真を上、文字を下に積む。縦組みは幅が足りないので横組みに戻す */
+  .p-hero {
+      grid-template-columns: 1fr;
+      grid-template-rows: 42svh auto;
+      height: auto;
+      min-height: 100svh;
+    }
+
+  /* SPは写真の帯が42svhしかないので、正方形のままにする */
+  .p-hero__col img {
+      height: auto;
+      aspect-ratio: 1;
+    }
+
+  .p-hero__tiles {
+      grid-row: 1;
+      margin-top: 0;
+      mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+    }
+
+  /* SPは写真が下へ溶けるので、色も左からではなく下端に寄せる */
+  .p-hero__tiles::after {
+      opacity: 0.5;
+      mask-image: linear-gradient(to bottom, transparent 58%, #000 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 58%, #000 100%);
+    }
+
+  .p-hero::after {
+      display: none;
+    }
+
+  .p-hero__inner {
+      grid-row: 2;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 30px;
+      padding: 40px var(--pad-x) 64px;
+    }
+
+  .p-hero__copy {
+      order: 1;
+      /* 12文字＋字間0.16em が画面幅に収まる上限（余白を引いた 0.86vw 基準） */
+      font-size: min(5.6vw, 30px);
+      writing-mode: horizontal-tb;
+      gap: 6px;
+      font-size: clamp(1.5rem, 7.4vw, 2.2rem);
+      line-height: 1.7;
+    }
+
+  .p-hero__meta {
+      order: 2;
+      margin-top: 0;
+    }
+
+  .p-hero__text {
+      margin-top: 22px;
+      font-size: 14px;
+    }
+
+  .p-concept__inner {
+      grid-template-columns: 1fr;
+    }
+
+  .p-concept__body br {
+      display: none;
+    }
+
+  /* ループ用の複製はSPでは出さない（自動送りを止めているため不要） */
+  .p-cards > li:nth-child(n + 11) {
+      display: none;
+    }
+
+  .p-group__head {
+      margin-bottom: 22px;
+    }
+
+  .p-card__name {
+      font-size: 17px;
+    }
+
+  .p-stories__count {
+      gap: 10px;
+    }
+
+  /* SPは中扉を上下に積み、グループの一覧も1列に */
+  .p-stories__masthead {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+
+  .p-stories__inner {
+      grid-template-columns: 1fr;
+      row-gap: 44px;
+    }
+
+  .p-cards {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 14px;
+    }
+
+  /* 見出しと NEXT が1行に収まらないので、和名を落として右端に寄せる */
+  .p-group__head {
+      flex-wrap: wrap;
+      gap: 6px 10px;
+    }
+
+  .p-group__next {
+      margin-left: auto;
+      padding-left: 0;
+    }
+
+  .p-group__nextJa {
+      display: none;
+    }
+
+  .p-spotnav ul {
+      grid-template-columns: 1fr;
+    }
+
+  .p-index__list {
+      grid-template-columns: 1fr;
+    }
+
+  .p-station__box {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      text-align: left;
+    }
+
+  .p-station__data > div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+}
+
+/* 8. 動きを止める設定 ----------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .p-hero__tiles,
+    .p-hero__meta {
+      opacity: 1;
+    }
+
+  .p-hero__col {
+      animation: none;
+    }
+
+  .p-hero__line {
+      clip-path: none;
+    }
+}

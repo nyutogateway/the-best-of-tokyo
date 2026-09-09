@@ -1,0 +1,455 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   layout.css — ヘッダー / グローバルナビ / フッター
+   ========================================================= */
+
+.l-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: var(--header-h);
+}
+
+/* 紙面色の地は疑似要素に持たせる。
+   backdrop-filter を .l-header 自身に掛けると、この要素が
+   position: fixed の子（SPメニュー）の基準になってしまい、
+   メニューがヘッダーの高さに閉じ込められて開かなくなる */
+.l-header::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 1px 0 var(--c-line-thin);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  content: "";
+}
+
+.l-header--solid::before,
+.l-header.is-scrolled::before {
+  opacity: 1;
+}
+
+.l-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 100%;
+  padding: 0 var(--pad-x);
+}
+
+.l-header__logo img {
+  width: auto;
+  height: clamp(34px, 3vw, 42px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.l-header--solid .l-header__logo img,
+.l-header.is-scrolled .l-header__logo img {
+  opacity: 1;
+}
+
+/* PCでは英字だけを横並びに。日本語・グループ番号・局ロゴはSPメニュー専用 */
+.l-nav__logo,
+.l-nav__spots,
+.l-nav__station,
+.l-nav__ja {
+  display: none;
+}
+
+.l-nav__list {
+  display: flex;
+  gap: clamp(18px, 2.6vw, 40px);
+  font-family: var(--f-display);
+  font-size: clamp(14px, 1.15vw, 16px);
+  letter-spacing: 0.1em;
+}
+
+.l-nav__list a {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.l-nav__list a::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--c-red);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s ease;
+  content: "";
+}
+
+.l-nav__list a:hover {
+  color: var(--c-red);
+}
+
+.l-nav__list a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.l-header__toggle {
+  display: none;
+}
+
+/* footer ------------------------------------------------- */
+
+.l-footer {
+  position: relative;
+  padding: clamp(56px, 8vw, 96px) var(--pad-x) 40px;
+  background: var(--c-ink);
+  color: #fff;
+  text-align: center;
+}
+
+.l-footer::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.l-footer__inner {
+  max-width: var(--w-max);
+  margin-inline: auto;
+}
+
+.l-footer__logo img {
+  width: min(360px, 76vw);
+  margin-inline: auto;
+}
+
+.l-footer__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 34px;
+  margin-top: 40px;
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+
+.l-footer__nav a:hover {
+  opacity: 0.6;
+}
+
+.l-footer__copy {
+  margin-top: 44px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.62);
+  font-family: var(--f-gothic);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.l-footer__station {
+  margin-bottom: 40px;
+}
+
+.l-footer__station img {
+  width: 232px;
+  margin-inline: auto;
+  padding: 14px 18px;
+  background: #fff;
+}
+
+@media (max-width: 767px) {
+  .l-header__logo img {
+      height: 28px;
+    }
+
+  .l-header__toggle {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      padding: 10px 0 10px 10px;
+      border: 0;
+      background: none;
+      color: var(--c-ink);
+      cursor: pointer;
+    }
+
+  /* 2本線。開くと × になる */
+  .l-header__bar {
+      position: relative;
+      display: block;
+      width: 26px;
+      height: 12px;
+    }
+
+  .l-header__bar::before,
+    .l-header__bar::after {
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 1px;
+      background: currentColor;
+      transition: top 0.3s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+      content: "";
+    }
+
+  .l-header__bar::before {
+      top: 0;
+    }
+
+  .l-header__bar::after {
+      top: 11px;
+    }
+
+  .l-header__toggle[aria-expanded="true"] {
+      color: #fff;
+    }
+
+  .l-header__toggle[aria-expanded="true"] .l-header__bar::before {
+      top: 5px;
+      transform: rotate(45deg);
+    }
+
+  .l-header__toggle[aria-expanded="true"] .l-header__bar::after {
+      top: 5px;
+      transform: rotate(-45deg);
+    }
+
+  .l-nav {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      overflow-y: auto;
+      background: var(--c-ink);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+  /* 上端に局の配色を1本 */
+  .l-nav::before {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 3px;
+      background: var(--rainbow);
+      content: "";
+    }
+
+  .is-navOpen {
+      overflow: hidden;
+    }
+
+  .l-nav.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+  .l-nav__inner {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: calc(var(--header-h) + 22px) var(--pad-x) 40px;
+      color: #fff;
+    }
+
+  .l-nav__logo {
+      display: block;
+      margin-bottom: 30px;
+    }
+
+  .l-nav__logo img {
+      width: 190px;
+      opacity: 0.9;
+    }
+
+  .l-nav__list {
+      flex-direction: column;
+      gap: 0;
+      color: #fff;
+      text-align: left;
+    }
+
+  .l-nav__list li + li {
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+  .l-nav__list a {
+      display: grid;
+      align-items: baseline;
+      grid-template-columns: 1fr auto;
+      gap: 4px 14px;
+      padding: 17px 2px;
+    }
+
+  .l-nav__list a::after {
+      display: none;
+    }
+
+  .l-nav__en {
+      font-family: var(--f-display);
+      font-size: 27px;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+    }
+
+  .l-nav__ja {
+      display: block;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--f-gothic);
+      font-size: 11.5px;
+      letter-spacing: 0.14em;
+      text-align: right;
+    }
+
+  .l-nav__spots {
+      display: block;
+      margin-top: 34px;
+    }
+
+  .l-nav__spotsLabel {
+      color: rgba(255, 255, 255, 0.5);
+      font-family: var(--f-display);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+
+  .l-nav__spots ul {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+  .l-nav__spots a {
+      display: block;
+      padding: 11px 0;
+      font-family: var(--f-display);
+      font-size: 17px;
+      text-align: center;
+    }
+
+  .l-nav__spots li:nth-child(1) a {
+      background: #db5434;
+    }
+
+  .l-nav__spots li:nth-child(2) a {
+      background: #cf7522;
+    }
+
+  .l-nav__spots li:nth-child(3) a {
+      background: #b8902a;
+    }
+
+  .l-nav__spots li:nth-child(4) a {
+      background: #8aa32e;
+    }
+
+  .l-nav__spots li:nth-child(5) a {
+      background: #4f9c62;
+    }
+
+  .l-nav__spots li:nth-child(6) a {
+      background: #2f9a92;
+    }
+
+  .l-nav__spots li:nth-child(7) a {
+      background: #2a91c6;
+    }
+
+  .l-nav__spots li:nth-child(8) a {
+      background: #1f7bc0;
+    }
+
+  .l-nav__spots li:nth-child(9) a {
+      background: #4a56a6;
+    }
+
+  .l-nav__spots li:nth-child(10) a {
+      background: #49418d;
+    }
+
+  .l-nav__station {
+      display: block;
+      margin-top: auto;
+      padding-top: 40px;
+    }
+
+  .l-nav__station img {
+      width: 150px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+  /* 開いたときに上から順に出す */
+  .l-nav.is-open .l-nav__logo,
+    .l-nav.is-open .l-nav__list li,
+    .l-nav.is-open .l-nav__spots,
+    .l-nav.is-open .l-nav__station {
+      animation: navIn 0.5s ease backwards;
+    }
+
+  .l-nav.is-open .l-nav__list li:nth-child(1) {
+      animation-delay: 0.06s;
+    }
+
+  .l-nav.is-open .l-nav__list li:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+  .l-nav.is-open .l-nav__list li:nth-child(3) {
+      animation-delay: 0.18s;
+    }
+
+  .l-nav.is-open .l-nav__list li:nth-child(4) {
+      animation-delay: 0.24s;
+    }
+
+  .l-nav.is-open .l-nav__list li:nth-child(5) {
+      animation-delay: 0.3s;
+    }
+
+  .l-nav.is-open .l-nav__spots {
+      animation-delay: 0.36s;
+    }
+
+  .l-nav.is-open .l-nav__station {
+      animation-delay: 0.42s;
+    }
+
+  .l-footer__nav ul {
+      gap: 12px 24px;
+    }
+}
+
+@keyframes navIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l-nav.is-open .l-nav__logo,
+    .l-nav.is-open .l-nav__list li,
+    .l-nav.is-open .l-nav__spots,
+    .l-nav.is-open .l-nav__station {
+      animation: none;
+    }
+}

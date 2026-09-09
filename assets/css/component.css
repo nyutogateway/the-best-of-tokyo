@@ -1,0 +1,243 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   component.css — 汎用パーツ（スキップリンク・戻るボタン・テキストリンク）
+   ========================================================= */
+
+.c-skip {
+  position: absolute;
+  top: -100px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 18px;
+  background: var(--c-ink);
+  color: #fff;
+  font-family: var(--f-gothic);
+  font-size: 13px;
+}
+
+.c-skip:focus {
+  top: 12px;
+}
+
+.c-back {
+  display: inline-block;
+  min-width: 260px;
+  padding: 17px 40px;
+  border: 1px solid var(--c-ink);
+  font-family: var(--f-gothic);
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+.c-back:hover {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .c-back,
+    .p-form__submit {
+      min-width: 0;
+      width: 100%;
+    }
+}
+
+.c-textLink {
+  display: inline-block;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--c-red);
+  color: var(--c-red-deep);
+  font-family: var(--f-gothic);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.c-textLink:hover {
+  opacity: 0.65;
+}
+
+/* スクロール連動のフェードイン ------------------------------
+   JSが動いたときだけ .js が付くので、JS無効でも中身は消えない。
+   対象の指定は main.js 側。 */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* ゆっくり立ち上げて、最後に静かに止める。跳ねは入れない */
+.js [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1.05s cubic-bezier(0.16, 0.8, 0.24, 1),
+    transform 1.15s cubic-bezier(0.16, 0.8, 0.24, 1);
+}
+
+/* 同じ親の中の並び順ぶんだけ遅らせる（main.js が data-reveal に番号を入れる） */
+.js [data-reveal="1"].is-revealed {
+  transition-delay: 0.09s;
+}
+
+.js [data-reveal="2"].is-revealed {
+  transition-delay: 0.18s;
+}
+
+.js [data-reveal="3"].is-revealed {
+  transition-delay: 0.27s;
+}
+
+.js [data-reveal="4"].is-revealed {
+  transition-delay: 0.36s;
+}
+
+.js [data-reveal="5"].is-revealed {
+  transition-delay: 0.45s;
+}
+
+.js [data-reveal="6"].is-revealed {
+  transition-delay: 0.54s;
+}
+
+.js [data-reveal="7"].is-revealed {
+  transition-delay: 0.63s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+    .js [data-reveal].is-revealed {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+}
+
+/* 画面には出さず、読み上げにだけ残す */
+.c-visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 掲載企業のロゴ帯 ---------------------------------------
+   ABOUT の上下で左右へ流れる。ロゴは掲載企業23社ぶん（assets/img/logos/logo-01〜23.png）。
+   2セットぶん並べて -50% まで動かし、継ぎ目なく回している */
+
+.p-logos {
+  border-block: 1px solid var(--c-line-thin);
+}
+
+/* FV の写真と帯がぶつかって見えるので、上の帯だけ間を空ける */
+.p-hero + .p-logos {
+  margin-top: clamp(56px, 8vh, 120px);
+}
+
+.p-logos__viewport {
+  overflow: hidden;
+  /* 両端は地に溶かして、切れ目を見せない */
+  mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+
+.p-logos__track {
+  display: flex;
+  width: max-content;
+  animation: logoFlow 64s linear infinite;
+}
+
+.p-logos--rev .p-logos__track {
+  animation-direction: reverse;
+}
+
+.p-logos__item {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: clamp(150px, 14vw, 210px);
+  height: clamp(70px, 8.8vh, 104px);
+  padding-inline: clamp(14px, 1.8vw, 26px);
+}
+
+/* 横長・正方形が混ざるので、枠の中に収まる最大寸法で置く */
+.p-logos__item img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: clamp(44px, 5.6vh, 68px);
+}
+
+@keyframes logoFlow {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 締めの装飾帯 -------------------------------------------
+   STORIES の最後、BROADCASTER の手前に1本だけ流す袋文字。
+   情報は持たせず、読み終わりの余韻として置いている（aria-hidden） */
+
+.p-ticker {
+  padding: clamp(24px, 3.4vh, 44px) 0;
+}
+
+.p-ticker__viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+}
+
+.p-ticker__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: tickerFlow 58s linear infinite;
+}
+
+.p-ticker__item {
+  flex: none;
+  color: transparent;
+  font-family: var(--f-display);
+  font-size: clamp(4.2rem, 9.6vw, 9.5rem);
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  white-space: nowrap;
+  -webkit-text-stroke: 1.8px var(--mx-purple);
+}
+
+/* 縁の色は語ごとに変える。1周は4語なので、2セット目も同じ順に並ぶ */
+.p-ticker__item:nth-child(8n + 3) {
+  -webkit-text-stroke-color: var(--mx-blue);
+}
+
+.p-ticker__item:nth-child(8n + 5) {
+  -webkit-text-stroke-color: var(--mx-orange);
+}
+
+.p-ticker__item:nth-child(8n + 7) {
+  -webkit-text-stroke-color: var(--mx-pink);
+}
+
+/* 語と語のあいだの小さな色玉。局の配色をひと粒だけ置く */
+.p-ticker__mark {
+  flex: none;
+  width: clamp(10px, 1vw, 14px);
+  height: clamp(10px, 1vw, 14px);
+  margin-inline: clamp(26px, 3.4vw, 56px);
+  background: var(--rainbow);
+  border-radius: 50%;
+}
+
+@keyframes tickerFlow {
+  to {
+    transform: translateX(-50%);
+  }
+}
