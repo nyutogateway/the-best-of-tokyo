@@ -1,6 +1,11 @@
 /**
  * THE BEST OF TOKYO
- * ヘッダーの状態切り替え / モバイルメニュー / 掲載者スライダー（依存ライブラリなし）
+ * 依存ライブラリなし。次の5つだけを受け持つ。
+ *   1. ヘッダーの状態切り替え
+ *   2. モバイルメニューの開閉
+ *   3. スクロール連動のフェードイン（並び順に段階的に出す）
+ *   4. グループの塊ごとの入れ替え（1行に2グループ）
+ *   5. 目次の開閉と、ページ内リンクの中央寄せ
  */
 (function () {
   'use strict';
@@ -71,6 +76,8 @@
     '.p-article__head',
     '.p-chapter',
     '.p-marquee',
+    '.p-related__head',
+    '.p-related__list > li',
     '.p-article__foot',
     '.p-page__head',
     '.p-page__lead',
@@ -121,7 +128,6 @@
     });
   }
 
-  /* 掲載者カードのスライダー（送り幅はカードのピッチから実測する） */
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   /* グループは行ごとに、一定時間で塊ごと入れ替わる。
@@ -191,20 +197,124 @@
     panel.parentNode.dispatchEvent(new CustomEvent('jumpto', { detail: panel }));
   };
 
+  /* 目次の開閉をなめらかに。<details> の即時開閉を、高さの動きに置き換える */
+  Array.prototype.forEach.call(document.querySelectorAll('.p-index__group'), function (details) {
+    var summary = details.querySelector('summary');
+    var panel = details.querySelector('.p-index__list');
+
+    if (!summary || !panel) {
+      return;
+    }
+
+    var DURATION = 420;
+    var EASING = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+    var running = null;
+
+    summary.addEventListener('click', function (e) {
+      if (reduceMotion.matches || typeof panel.animate !== 'function') {
+        return;
+      }
+
+      e.preventDefault();
+
+      if (running) {
+        running.cancel();
+      }
+
+      if (details.open) {
+        /* fill: forwards で閉じ切った状態を保持したまま details を閉じる。
+           保持しないと、閉じる直前の1フレームだけ元の高さに戻ってカクつく */
+        var closing = panel.animate(
+          [
+            { height: panel.offsetHeight + 'px', opacity: 1 },
+            { height: '0px', opacity: 0 }
+          ],
+          { duration: DURATION, easing: EASING, fill: 'forwards' }
+        );
+        running = closing;
+        closing.onfinish = function () {
+          details.open = false;
+          closing.cancel();
+          running = null;
+        };
+      } else {
+        details.open = true;
+        running = panel.animate(
+          [
+            { height: '0px', opacity: 0 },
+            { height: panel.offsetHeight + 'px', opacity: 1 }
+          ],
+          { duration: DURATION, easing: EASING }
+        );
+        running.onfinish = function () {
+          running = null;
+        };
+      }
+    });
+  });
+
+  /* ページ内リンクは、飛び先が画面の中心に来るように送る。
+     画面より背の高い相手は中心に置けないので、ヘッダーのぶんだけ下げて頭を出す */
+  var scrollToTarget = function (el) {
+    var rect = el.getBoundingClientRect();
+    var headerH = header ? header.offsetHeight : 0;
+    var view = window.innerHeight;
+    var top;
+
+    if (rect.height + 40 < view - headerH) {
+      top = window.scrollY + rect.top - (view - rect.height) / 2;
+    } else {
+      top = window.scrollY + rect.top - headerH - 24;
+    }
+
+    window.scrollTo({
+      top: Math.max(0, Math.round(top)),
+      behavior: reduceMotion.matches ? 'auto' : 'smooth'
+    });
+  };
+
+  var goToHash = function (hash) {
+    if (!hash || hash.charAt(0) !== '#' || hash.length < 2) {
+      return null;
+    }
+    var el = document.getElementById(hash.slice(1));
+    if (!el) {
+      return null;
+    }
+    if (hash.indexOf('#spot') === 0) {
+      jumpToGroup(hash.slice(1));
+    }
+    scrollToTarget(el);
+    return el;
+  };
+
   document.addEventListener('click', function (e) {
-    var link = e.target.closest && e.target.closest('a[href*="#spot"]');
-    if (link) {
-      jumpToGroup(link.getAttribute('href').split('#')[1]);
+    var link = e.target.closest && e.target.closest('a[href]');
+    if (!link) {
+      return;
+    }
+
+    var href = link.getAttribute('href');
+    if (!href || href.charAt(0) !== '#') {
+      return;
+    }
+
+    if (goToHash(href)) {
+      e.preventDefault();
+      if (window.history && history.pushState) {
+        history.pushState(null, '', href);
+      }
     }
   });
 
-  if (location.hash.indexOf('#spot') === 0) {
-    jumpToGroup(location.hash.slice(1));
+  /* 別ページから飛んできたときも同じ位置に置き直す */
+  if (location.hash) {
+    window.setTimeout(function () {
+      goToHash(location.hash);
+    }, 60);
   }
 
   window.addEventListener('hashchange', function () {
-    if (location.hash.indexOf('#spot') === 0) {
-      jumpToGroup(location.hash.slice(1));
-    }
+    goToHash(location.hash);
   });
 })();

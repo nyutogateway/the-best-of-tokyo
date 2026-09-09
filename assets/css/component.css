@@ -116,18 +116,6 @@
     }
 }
 
-/* 画面には出さず、読み上げにだけ残す */
-.c-visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
 /* 掲載企業のロゴ帯 ---------------------------------------
    ABOUT の上下で左右へ流れる。ロゴは掲載企業23社ぶん（assets/img/logos/logo-01〜23.png）。
    2セットぶん並べて -50% まで動かし、継ぎ目なく回している */

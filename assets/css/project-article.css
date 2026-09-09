@@ -21,8 +21,16 @@
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
   opacity: 0.055;
+  /* 画面に留まったまま、ゆっくり回り続ける */
+  animation: markSpin 120s linear infinite;
   pointer-events: none;
   content: "";
+}
+
+@keyframes markSpin {
+  to {
+    rotate: 360deg;
+  }
 }
 
 .p-article__inner {
@@ -116,7 +124,7 @@
   gap: 18px;
   color: var(--c-red);
   font-family: var(--f-display);
-  font-size: 14px;
+  font-size: clamp(16px, 1.4vw, 19px);
   letter-spacing: 0.22em;
 }
 
@@ -205,6 +213,7 @@
   object-fit: cover;
 }
 
+
 .p-figure figcaption {
   margin-top: 10px;
   color: var(--c-mute);
@@ -218,11 +227,12 @@
   margin-top: clamp(56px, 8vw, 96px);
 }
 
+/* 締めの言葉。本文より一段大きく組む */
 .p-chapter__text {
   margin-top: clamp(26px, 4vw, 44px);
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  line-height: 2.35;
+  font-size: clamp(17px, 1.4vw, 19px);
+  letter-spacing: 0.06em;
+  line-height: 2.3;
 }
 
 /* 同じグループの他の掲載者（記事末尾の導線） --------------- */
@@ -341,7 +351,7 @@
   transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* TOPのカードと同じ、虹色が左から拭うホバー（黒文字が乗る明るい側だけを使う） */
+/* TOPのカードと同じ、グループ色の拭い */
 .p-related__visual::after {
   position: absolute;
   top: 0;
@@ -351,22 +361,16 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    45deg,
-    var(--mx-green) 0%,
-    var(--mx-yellow) 30%,
-    var(--mx-orange) 55%,
-    var(--mx-pink) 80%,
-    var(--mx-blue) 100%
-  );
-  opacity: 0.78;
-  color: var(--c-ink);
+  background: var(--g, var(--c-red));
+  opacity: 0.84;
+  color: #fff;
   font-family: var(--f-display);
-  font-size: clamp(16px, 1.8vw, 26px);
-  letter-spacing: 0.02em;
+  font-size: clamp(15px, 1.7vw, 24px);
+  letter-spacing: 0.06em;
   line-height: 1;
-  clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-  transition: clip-path 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* 右上の角から左下へ向かって覆う */
+  clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
+  transition: clip-path 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
   content: "READ";
 }
 
@@ -411,9 +415,7 @@
 }
 
 .p-related__company {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: block;
   overflow: hidden;
   margin-top: 8px;
   padding-top: 8px;
@@ -422,6 +424,17 @@
   font-family: var(--f-gothic);
   font-size: 11.5px;
   line-height: 1.7;
+}
+
+/* 社名2行＋役職1行ぶんの高さを確保して、4枚の高さを揃える */
+.p-related__corp {
+  display: block;
+  min-height: 3.4em;
+}
+
+.p-related__role {
+  display: block;
+  min-height: 1.7em;
 }
 
 .p-article__foot {
@@ -451,10 +464,12 @@
 }
 
 /* 1画面に5枚。幅を 20vw に固定して枚数をそろえる（写真の縦横比に左右されない） */
+/* 高さを決めて、幅は 4:3 から出す */
 .p-marquee__set img {
-  width: 20vw;
-  height: clamp(150px, 14vw, 260px);
+  width: auto;
+  height: clamp(170px, 16vw, 300px);
   max-width: none;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
 }
 
@@ -473,7 +488,8 @@
   .p-figure {
       float: none;
       width: min(100%, 620px);
-      margin: 0 auto 26px;
+      /* 見出しにくっつかないよう、上にも余白を取る */
+      margin: clamp(24px, 3.4vw, 36px) auto clamp(26px, 3.4vw, 36px);
     }
 
   .p-article__head {
@@ -486,7 +502,7 @@
     }
 
   .p-marquee__set img {
-      width: 34vw;
+      height: clamp(150px, 20vw, 210px);
     }
 }
 
@@ -497,8 +513,7 @@
       opacity: 0.04;
     }
   .p-marquee__set img {
-      width: 46vw;
-      height: 32vw;
+      height: clamp(130px, 30vw, 190px);
     }
 
   .p-article__head {
@@ -521,7 +536,7 @@
   .p-figure {
       float: none;
       width: 100%;
-      margin: 0 0 24px;
+      margin: 24px 0 26px;
     }
 
   .p-qa__mark {

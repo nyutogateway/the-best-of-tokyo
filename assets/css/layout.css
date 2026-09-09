@@ -126,6 +126,18 @@
   margin-inline: auto;
 }
 
+/* ロゴはどちらもリンク。囲みの <a> は画像と同じ幅で置く */
+.l-footer__station a,
+.l-footer__logo a {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.l-footer__station a:hover,
+.l-footer__logo a:hover {
+  opacity: 0.72;
+}
+
 .l-footer__logo img {
   width: min(360px, 76vw);
   margin-inline: auto;
