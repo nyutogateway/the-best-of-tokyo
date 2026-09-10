@@ -180,8 +180,15 @@
 }
 
 @media (max-width: 767px) {
+  /* SPはFVの写真が画面の上まで来るので、ヘッダーは常に紙面色を敷いて
+     ロゴとボタンが写真に埋もれないようにする */
+  .l-header::before {
+      opacity: 1;
+    }
+
   .l-header__logo img {
       height: 28px;
+      opacity: 1;
     }
 
   .l-header__toggle {
@@ -196,12 +203,14 @@
       cursor: pointer;
     }
 
-  /* 2本線。開くと × になる */
+  /* 3本線。開くと × になる（中央の1本は背景で描き、開いたら消す） */
   .l-header__bar {
       position: relative;
       display: block;
       width: 26px;
-      height: 12px;
+      height: 14px;
+      background: linear-gradient(currentColor 0 0) center / 100% 1px no-repeat;
+      transition: background-size 0.25s ease;
     }
 
   .l-header__bar::before,
@@ -220,7 +229,11 @@
     }
 
   .l-header__bar::after {
-      top: 11px;
+      top: 13px;
+    }
+
+  .l-header__toggle[aria-expanded="true"] .l-header__bar {
+      background-size: 0 1px;
     }
 
   .l-header__toggle[aria-expanded="true"] {
@@ -228,12 +241,12 @@
     }
 
   .l-header__toggle[aria-expanded="true"] .l-header__bar::before {
-      top: 5px;
+      top: 6px;
       transform: rotate(45deg);
     }
 
   .l-header__toggle[aria-expanded="true"] .l-header__bar::after {
-      top: 5px;
+      top: 6px;
       transform: rotate(-45deg);
     }
 
