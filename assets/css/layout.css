@@ -81,7 +81,7 @@
   bottom: 0;
   left: 0;
   height: 1px;
-  background: var(--c-red);
+  background: var(--c-accent);
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.35s ease;
@@ -89,7 +89,7 @@
 }
 
 .l-nav__list a:hover {
-  color: var(--c-red);
+  color: var(--c-ink);
 }
 
 .l-nav__list a:hover::after {
@@ -365,44 +365,10 @@
       text-align: center;
     }
 
-  .l-nav__spots li:nth-child(1) a {
-      background: #db5434;
-    }
-
-  .l-nav__spots li:nth-child(2) a {
-      background: #cf7522;
-    }
-
-  .l-nav__spots li:nth-child(3) a {
-      background: #b8902a;
-    }
-
-  .l-nav__spots li:nth-child(4) a {
-      background: #8aa32e;
-    }
-
-  .l-nav__spots li:nth-child(5) a {
-      background: #4f9c62;
-    }
-
-  .l-nav__spots li:nth-child(6) a {
-      background: #2f9a92;
-    }
-
-  .l-nav__spots li:nth-child(7) a {
-      background: #2a91c6;
-    }
-
-  .l-nav__spots li:nth-child(8) a {
-      background: #1f7bc0;
-    }
-
-  .l-nav__spots li:nth-child(9) a {
-      background: #4a56a6;
-    }
-
-  .l-nav__spots li:nth-child(10) a {
-      background: #49418d;
+  /* 業種は色で分けない。番号には金を使わず、白の数字と金の細い枠 */
+  .l-nav__spots a {
+      border: 1px solid rgba(201, 164, 90, 0.55);
+      color: #fff;
     }
 
   .l-nav__station {

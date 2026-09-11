@@ -66,10 +66,11 @@
   var revealTargets = [
     '.p-concept__head',
     '.p-concept__line',
-    '.p-stories__meta',
+    '.p-stories__head',
     '.p-spotnav li',
     '.p-index__head',
     '.p-index__group',
+    '.p-station__head',
     '.p-station__logo',
     '.p-station__body',
     '.p-station__note',
@@ -88,6 +89,10 @@
   ].join(',');
 
   var revealed = document.querySelectorAll(revealTargets);
+
+  /* グループの行は、行そのものはフェードさせず、画面に入ったことだけを知らせる
+     （カードの写真の幕が上がる合図。CSS側で .p-grouprow.is-revealed を見ている） */
+  var watchedRows = document.querySelectorAll('.p-grouprow');
 
   /* .js が付いて初めて初期状態（非表示）が効く。ここまで到達しなければ素で見える */
   document.documentElement.classList.add('js');
@@ -112,6 +117,9 @@
     Array.prototype.forEach.call(revealed, function (el) {
       el.classList.add('is-revealed');
     });
+    Array.prototype.forEach.call(watchedRows, function (el) {
+      el.classList.add('is-revealed');
+    });
   } else {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -124,6 +132,9 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     Array.prototype.forEach.call(revealed, function (el) {
+      io.observe(el);
+    });
+    Array.prototype.forEach.call(watchedRows, function (el) {
       io.observe(el);
     });
   }
@@ -152,6 +163,9 @@
       });
     };
 
+    /* 触っている行は止める。読んでいる最中に中身が変わらないように */
+    var held = false;
+
     var start = function () {
       if (timer) {
         window.clearInterval(timer);
@@ -160,11 +174,30 @@
         return;
       }
       timer = window.setInterval(function () {
-        if (!document.hidden) {
+        if (!document.hidden && !held) {
           show(current + 1);
         }
       }, ROW_WAIT);
     };
+
+    var hold = function () {
+      held = true;
+    };
+
+    var release = function () {
+      held = false;
+    };
+
+    row.addEventListener('pointerenter', hold);
+    row.addEventListener('pointerleave', release);
+    row.addEventListener('focusin', hold);
+    row.addEventListener('focusout', release);
+
+    /* 触れている間は止め、指を離してしばらくしてから再開する */
+    row.addEventListener('touchstart', hold, { passive: true });
+    row.addEventListener('touchend', function () {
+      window.setTimeout(release, 4000);
+    });
 
     row.classList.add('is-ready');
     show(0);

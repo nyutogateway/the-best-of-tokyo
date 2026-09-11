@@ -49,8 +49,8 @@
 .c-textLink {
   display: inline-block;
   padding-bottom: 3px;
-  border-bottom: 1px solid var(--c-red);
-  color: var(--c-red-deep);
+  border-bottom: 1px solid var(--c-accent);
+  color: var(--c-ink);
   font-family: var(--f-gothic);
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -59,6 +59,74 @@
 .c-textLink:hover {
   opacity: 0.65;
 }
+
+/* セクション見出しの英字（ABOUT / STORIES / INDEX / BROADCASTER / CONTACT ほか）。
+   黒文字の周りに、光る金の縁を回す。
+   縁は1色では黄土色にしか見えないので、明暗のあるグラデーションで描く。
+   高級感を優先して、縁は細く、光の山は1つ。動きは付けない。
+   仕組み：同じ文字（data-text）を疑似要素で後ろに重ね、太い透明の縁ごと
+   グラデーションで塗る（background-clip: text）。本物の黒文字はその上に乗る */
+.p-concept__en,
+.p-stories__label,
+.p-index__label,
+.p-station__en,
+.p-page__en,
+.p-related__en {
+  position: relative;
+  isolation: isolate;
+  color: var(--c-ink);
+}
+
+.p-concept__en::before,
+.p-stories__label::before,
+.p-index__label::before,
+.p-station__en::before,
+.p-page__en::before,
+.p-related__en::before {
+  position: absolute;
+  /* background-clip: text は箱の内側しか塗らない。Anton の字面と縁は箱からはみ出すので、
+     塗る範囲だけ外へ広げ、同じ幅の padding で文字の位置を戻す */
+  inset: -0.3em -0.15em;
+  z-index: -1;
+  padding: 0.3em 0.15em;
+  /* 明るい金だけで組む。茶色寄りの暗い金（黄土色に見える）は使わない */
+  background: linear-gradient(
+    110deg,
+    #e6c25a 0%,
+    #f2d77e 20%,
+    #fff3c8 38%,
+    #fffdf4 46%,
+    #f6e2a0 54%,
+    #edcd6c 72%,
+    #e6c25a 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  /* 縁は髪の毛ほどに細く（外に見えるのは約1.25px）。ぼかしの光も動きも付けない */
+  -webkit-text-stroke: 2.5px transparent;
+  content: attr(data-text);
+}
+
+/* 白地の見出しは、上の淡い金だと地に溶けて縁が見えない。
+   茶色に寄せず黄みの強い金にして、縁も少し太らせる（外に見えるのは約2px） */
+.p-index__label::before,
+.p-station__en::before,
+.p-page__en::before,
+.p-related__en::before {
+  background: linear-gradient(
+    110deg,
+    #d9a21c 0%,
+    #eabb34 28%,
+    #f6d772 50%,
+    #eabb34 72%,
+    #d9a21c 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke-width: 4px;
+}
+
 
 /* スクロール連動のフェードイン ------------------------------
    JSが動いたときだけ .js が付くので、JS無効でも中身は消えない。
@@ -76,41 +144,65 @@
   transition:
     opacity 1.05s cubic-bezier(0.16, 0.8, 0.24, 1),
     transform 1.15s cubic-bezier(0.16, 0.8, 0.24, 1);
+  transition-delay: var(--reveal-delay, 0s);
 }
 
-/* 同じ親の中の並び順ぶんだけ遅らせる（main.js が data-reveal に番号を入れる） */
-.js [data-reveal="1"].is-revealed {
-  transition-delay: 0.09s;
+/* 同じ親の中の並び順ぶんだけ遅らせる（main.js が data-reveal に番号を入れる）。
+   遅れは変数で持たせ、中の見出しや写真の動きも同じ遅れに揃える */
+.js [data-reveal="1"] {
+  --reveal-delay: 0.09s;
 }
 
-.js [data-reveal="2"].is-revealed {
-  transition-delay: 0.18s;
+.js [data-reveal="2"] {
+  --reveal-delay: 0.18s;
 }
 
-.js [data-reveal="3"].is-revealed {
-  transition-delay: 0.27s;
+.js [data-reveal="3"] {
+  --reveal-delay: 0.27s;
 }
 
-.js [data-reveal="4"].is-revealed {
-  transition-delay: 0.36s;
+.js [data-reveal="4"] {
+  --reveal-delay: 0.36s;
 }
 
-.js [data-reveal="5"].is-revealed {
-  transition-delay: 0.45s;
+.js [data-reveal="5"] {
+  --reveal-delay: 0.45s;
 }
 
-.js [data-reveal="6"].is-revealed {
-  transition-delay: 0.54s;
+.js [data-reveal="6"] {
+  --reveal-delay: 0.54s;
 }
 
-.js [data-reveal="7"].is-revealed {
-  transition-delay: 0.63s;
+.js [data-reveal="7"] {
+  --reveal-delay: 0.63s;
+}
+
+/* 大見出しの英字は、切り抜いた枠の中を下からせり上がる。
+   下げた量と同じだけ下端を切り取り、動きと一緒に切り取りを戻すので、
+   本来の位置の外には字が出ない。見出しのブロックが出るのと同時に動く */
+.js [data-reveal] :is(.p-concept__en, .p-stories__label, .p-index__label, .p-station__en, .p-page__en, .p-related__en) {
+  clip-path: inset(-0.4em -0.3em 100% -0.3em);
+  transform: translateY(100%);
+}
+
+.js [data-reveal].is-revealed :is(.p-concept__en, .p-stories__label, .p-index__label, .p-station__en, .p-page__en, .p-related__en) {
+  clip-path: inset(-0.4em -0.3em -0.4em -0.3em);
+  transform: none;
+  transition:
+    clip-path 1.3s cubic-bezier(0.7, 0, 0.2, 1) var(--reveal-delay, 0s),
+    transform 1.3s cubic-bezier(0.7, 0, 0.2, 1) var(--reveal-delay, 0s);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal],
     .js [data-reveal].is-revealed {
       opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+  .js [data-reveal] :is(.p-concept__en, .p-stories__label, .p-index__label, .p-station__en, .p-page__en, .p-related__en) {
+      clip-path: none;
       transform: none;
       transition: none;
     }

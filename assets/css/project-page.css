@@ -20,7 +20,9 @@
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
-  opacity: 0.07;
+  filter: brightness(0);
+  /* フォームや本文の後ろに透けるので、気配が残る程度まで薄く */
+  opacity: 0.04;
   /* 画面に留まったまま、ゆっくり回り続ける */
   animation: markSpin 120s linear infinite;
   pointer-events: none;
@@ -101,7 +103,7 @@
 .p-page__heading {
   margin-bottom: 14px;
   padding-left: 14px;
-  border-left: 2px solid var(--c-red);
+  border-left: 2px solid var(--c-accent);
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -124,7 +126,7 @@
 }
 
 .p-page__list li::marker {
-  color: var(--c-red);
+  color: var(--c-accent);
   font-size: 13px;
 }
 
@@ -171,7 +173,7 @@
 }
 
 .p-form__required {
-  background: var(--c-red);
+  background: var(--c-ink);
   color: #fff;
 }
 
@@ -206,8 +208,8 @@
 .p-form__input:focus,
 .p-form__select:focus,
 .p-form__textarea:focus {
-  border-color: var(--c-red);
-  box-shadow: 0 0 0 3px rgba(162, 48, 44, 0.1);
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px rgba(201, 164, 90, 0.18);
   outline: none;
 }
 
@@ -215,7 +217,7 @@
 .p-form__input:user-invalid,
 .p-form__select:user-invalid,
 .p-form__textarea:user-invalid {
-  border-color: var(--c-red);
+  border-color: var(--c-accent);
 }
 
 /* 同意のチェック */
@@ -231,7 +233,7 @@
   flex: none;
   width: 18px;
   height: 18px;
-  accent-color: var(--c-red);
+  accent-color: var(--c-ink);
 }
 
 /* 送信ボタン。地は朱のまま、ホバーで墨がゆっくり左から差し込み、
@@ -244,7 +246,7 @@
   padding: 20px 44px;
   overflow: hidden;
   border: 0;
-  background: var(--c-red);
+  background: var(--c-ink);
   color: #fff;
   font-family: var(--f-gothic);
   font-size: 13px;
@@ -257,7 +259,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--c-ink);
+  background: #3b3330;
   transform: scaleX(0);
   transform-origin: 0 50%;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -306,4 +308,34 @@
       width: 92vw;
       opacity: 0.05;
     }
+
+  /* SPの文字は全体的に一段小さく */
+  .p-page__title {
+      font-size: 14px;
+    }
+
+  .p-page__lead {
+      font-size: 14px;
+    }
+
+  .p-page__heading {
+      font-size: 15px;
+    }
+
+  .p-page__block p,
+    .p-page__block li {
+      font-size: 14px;
+    }
+
+  .p-form__label,
+    .p-form__checkLabel {
+      font-size: 12.5px;
+    }
+
+  .p-form__input,
+    .p-form__select,
+    .p-form__textarea {
+      font-size: 14px;
+    }
+
 }

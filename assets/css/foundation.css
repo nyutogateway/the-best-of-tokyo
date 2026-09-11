@@ -27,6 +27,8 @@
   --c-paper-2: #f2eee9;
   --c-line: #d8cec6;
   --c-line-thin: #e8e2db;
+  /* 見出しの縁取りに使う金 */
+  --c-gold: #d2a52e;
 
   --f-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --f-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -47,7 +49,7 @@
   --mx-vermilion: #db5434;
   --mx-pink: #d64f8d;
 
-  /* TOKYO MX のロゴ配色。見出しの罫・フッター・ボタンなどで使う */
+  /* TOKYO MX のロゴ配色。見出しの罫・フッター・ボタンなどで使う（虹色は残す） */
   --rainbow: linear-gradient(
     90deg,
     var(--mx-purple) 0%,
@@ -57,6 +59,19 @@
     var(--mx-orange) 68%,
     var(--mx-vermilion) 84%,
     var(--mx-pink) 100%
+  );
+
+  /* 線・下線・フォーカスなどに使う金（白地でも見える明るさ） */
+  --c-accent: #c9a45a;
+
+  /* 金の線・金の文字に使うグラデーション。明るい金だけで組み、暗い黄土色は使わない */
+  --gold-grad: linear-gradient(
+    90deg,
+    #d4b060 0%,
+    #efd99a 30%,
+    #fbf0cf 50%,
+    #efd99a 70%,
+    #d4b060 100%
   );
 }
 
@@ -87,6 +102,11 @@ h1, h2, h3, p, dl, dd, figure {
   margin: 0;
 }
 
+/* 見出しは文節で折り返す（「地域密/着」のような切れ方を防ぐ）。未対応ブラウザは通常の折り返し */
+h1, h2, h3 {
+  word-break: auto-phrase;
+}
+
 ul,
 ol {
   margin: 0;
@@ -107,7 +127,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--c-red);
+  outline: 2px solid var(--c-accent);
   outline-offset: 3px;
 }
 
@@ -115,6 +135,12 @@ a {
   :root {
       --pad-x: 22px;
       --header-h: 68px;
+    }
+
+  /* 画面が狭いぶん、本文の基準を1段下げる */
+  body {
+      font-size: 15px;
+      line-height: 1.95;
     }
 }
 

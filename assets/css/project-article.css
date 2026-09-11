@@ -20,7 +20,9 @@
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
-  opacity: 0.055;
+  filter: brightness(0);
+  /* 本文の後ろに透けるので、気配が残る程度まで薄く */
+  opacity: 0.035;
   /* 画面に留まったまま、ゆっくり回り続ける */
   animation: markSpin 120s linear infinite;
   pointer-events: none;
@@ -67,6 +69,31 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* 写真は、その塊が出るときに幕が上がるように下から現れ、少し寄った状態からゆっくり引く
+   （TOPのカードと同じ動き）。寄りは scale で持たせ、ホバーの transform とぶつからないようにしている。
+   本文の写真（.p-figure）は枠の外へはみ出せないので、幕だけにしている */
+.js [data-reveal] :is(.p-article__visual, .p-related__visual),
+.js [data-reveal] .p-figure img {
+  clip-path: inset(100% 0 0 0);
+}
+
+.js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
+  scale: 1.14;
+}
+
+.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual),
+.js [data-reveal].is-revealed .p-figure img {
+  clip-path: inset(0);
+  transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.1s);
+}
+
+.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual) img {
+  scale: 1;
+  transition:
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    scale 1.9s cubic-bezier(0.16, 0.8, 0.24, 1) calc(var(--reveal-delay, 0s) + 0.1s);
 }
 
 .p-article__title {
@@ -122,7 +149,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  color: var(--c-red);
+  color: var(--c-accent);
   font-family: var(--f-display);
   font-size: clamp(16px, 1.4vw, 19px);
   letter-spacing: 0.22em;
@@ -131,8 +158,8 @@
 .p-chapter__label::before,
 .p-chapter__label::after {
   flex: 1;
-  height: 1px;
-  background: var(--c-line);
+  height: 2px;
+  background: var(--gold-grad);
   content: "";
 }
 
@@ -188,13 +215,13 @@
 }
 
 .p-qa__q .p-qa__mark {
-  background: var(--c-red);
+  background: var(--c-ink);
   color: #fff;
 }
 
 .p-qa__a .p-qa__mark {
-  border: 1px solid var(--c-line);
-  color: var(--c-red);
+  border: 1px solid var(--c-accent);
+  color: var(--c-ink);
 }
 
 /* 章の写真は本文に回り込ませる。
@@ -223,8 +250,20 @@
 }
 
 /* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文） */
+/* 締めの言葉は ABOUT と同じ墨のベタ面に白抜き。記事の中の山場として立てる */
 .p-chapter--message {
   margin-top: clamp(56px, 8vw, 96px);
+  padding: clamp(40px, 6vw, 76px) clamp(24px, 5vw, 68px);
+  background: var(--c-ink);
+  color: #fff;
+}
+
+.p-chapter--message .p-chapter__label {
+  color: #efd99a;
+}
+
+.p-chapter--message .p-chapter__text {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* 締めの言葉。本文より一段大きく組む */
@@ -243,54 +282,19 @@
   margin-top: clamp(56px, 8vw, 96px);
 }
 
-.p-related--g1 {
-  --g: #db5434;
-  --g-ink: #a63317;
-}
-
-.p-related--g2 {
-  --g: #cf7522;
-  --g-ink: #9c5c17;
-}
-
-.p-related--g3 {
-  --g: #b8902a;
-  --g-ink: #846315;
-}
-
-.p-related--g4 {
-  --g: #8aa32e;
-  --g-ink: #63771d;
-}
-
-.p-related--g5 {
-  --g: #4f9c62;
-  --g-ink: #357247;
-}
-
-.p-related--g6 {
-  --g: #2f9a92;
-  --g-ink: #1f6f69;
-}
-
-.p-related--g7 {
-  --g: #2a91c6;
-  --g-ink: #1c6d97;
-}
-
-.p-related--g8 {
-  --g: #1f7bc0;
-  --g-ink: #155a8e;
-}
-
-.p-related--g9 {
-  --g: #4a56a6;
-  --g-ink: #353f80;
-}
-
+/* 業種ごとの色は TOP と同じく金と墨に揃えている（クラス名は業種の番号のまま残す） */
+.p-related--g1,
+.p-related--g2,
+.p-related--g3,
+.p-related--g4,
+.p-related--g5,
+.p-related--g6,
+.p-related--g7,
+.p-related--g8,
+.p-related--g9,
 .p-related--g10 {
-  --g: #49418d;
-  --g-ink: #383170;
+  --g: var(--c-accent);
+  --g-ink: var(--c-ink);
 }
 
 .p-related__head {
@@ -351,7 +355,7 @@
   transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* TOPのカードと同じ、グループ色の拭い */
+/* TOPのカードと同じ、虹色の拭い（右上から左下へ） */
 .p-related__visual::after {
   position: absolute;
   top: 0;
@@ -361,9 +365,17 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  background: var(--g, var(--c-red));
-  opacity: 0.84;
-  color: #fff;
+  /* 虹色は TOKYO MX の配色のうち、黒文字が乗る明るい側だけ */
+  background: linear-gradient(
+    45deg,
+    var(--mx-green) 0%,
+    var(--mx-yellow) 30%,
+    var(--mx-orange) 55%,
+    var(--mx-pink) 80%,
+    var(--mx-blue) 100%
+  );
+  opacity: 0.8;
+  color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(15px, 1.7vw, 24px);
   letter-spacing: 0.06em;
@@ -414,9 +426,12 @@
   color: var(--g-ink);
 }
 
+/* 社名2行＋役職1行ぶんの高さを塊全体で確保して、4枚の高さを揃える
+   （社名の側で2行ぶん取ると、1行の社名と役職の間が空いて間延びする） */
 .p-related__company {
   display: block;
   overflow: hidden;
+  min-height: calc(5.1em + 9px);
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--c-line-thin);
@@ -426,15 +441,9 @@
   line-height: 1.7;
 }
 
-/* 社名2行＋役職1行ぶんの高さを確保して、4枚の高さを揃える */
-.p-related__corp {
-  display: block;
-  min-height: 3.4em;
-}
-
+.p-related__corp,
 .p-related__role {
   display: block;
-  min-height: 1.7em;
 }
 
 .p-article__foot {
@@ -544,6 +553,52 @@
       height: 26px;
       font-size: 11px;
     }
+
+  /* SPの文字は全体的に一段小さく */
+  .p-article__name {
+      font-size: 20px;
+    }
+
+  .p-article__romaji {
+      font-size: 12px;
+    }
+
+  .p-article__company {
+      font-size: 13px;
+    }
+
+  .p-article__profile {
+      font-size: 13px;
+    }
+
+  .p-chapter__label {
+      font-size: 14px;
+    }
+
+  .p-qa__q {
+      font-size: 15.5px;
+    }
+
+  .p-qa__a {
+      font-size: 15px;
+    }
+
+  .p-chapter__text {
+      font-size: 15.5px;
+    }
+
+  .p-related__name {
+      font-size: 15px;
+    }
+
+  .p-related__romaji {
+      font-size: 11.5px;
+    }
+
+  .p-related__company {
+      font-size: 11px;
+    }
+
 }
 
 
@@ -558,5 +613,14 @@
 
   .p-marquee__set:last-child {
       display: none;
+    }
+
+  .js [data-reveal] :is(.p-article__visual, .p-related__visual),
+    .js [data-reveal] .p-figure img {
+      clip-path: none;
+    }
+
+  .js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
+      scale: none;
     }
 }
