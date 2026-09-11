@@ -103,11 +103,13 @@
 
 /* footer ------------------------------------------------- */
 
+/* フッターは白地。直前の BROADCASTER が墨の帯なので、白で締めて墨と白の交互をそろえる。
+   上端の虹色の線はそのまま境目に使う */
 .l-footer {
   position: relative;
   padding: clamp(56px, 8vw, 96px) var(--pad-x) 40px;
-  background: var(--c-ink);
-  color: #fff;
+  background: var(--c-paper);
+  color: var(--c-ink);
   text-align: center;
 }
 
@@ -161,8 +163,8 @@
 .l-footer__copy {
   margin-top: 44px;
   padding-top: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.62);
+  border-top: 1px solid var(--c-line-thin);
+  color: var(--c-mute);
   font-family: var(--f-gothic);
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -172,11 +174,29 @@
   margin-bottom: 40px;
 }
 
+/* 局のロゴは白地の画像なので、白いフッターでは細い罫で囲んで輪郭を出す */
 .l-footer__station img {
   width: 232px;
   margin-inline: auto;
   padding: 14px 18px;
+  border: 1px solid var(--c-line-thin);
   background: #fff;
+}
+
+/* 墨のフッター（記事ページで使う）。フッターは直前の面と反対の色にする：
+   TOP・下層は墨の面のあとなので白、記事は白い本文と MORE STORIES のあとなので墨 */
+.l-footer--ink {
+  background: var(--c-ink);
+  color: #fff;
+}
+
+.l-footer--ink .l-footer__copy {
+  border-top-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.l-footer--ink .l-footer__station img {
+  border-color: transparent;
 }
 
 @media (max-width: 767px) {

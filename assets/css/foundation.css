@@ -27,8 +27,6 @@
   --c-paper-2: #f2eee9;
   --c-line: #d8cec6;
   --c-line-thin: #e8e2db;
-  /* 見出しの縁取りに使う金 */
-  --c-gold: #d2a52e;
 
   --f-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --f-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -36,6 +34,9 @@
   --f-display: "Anton", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
 
   --w-max: 1180px;
+  /* 墨の帯どうしの間（ロゴ帯の上下・ABOUT の上下・STORIES の上）で使う余白。
+     どこも同じ値にして、帯の上下の余白感をそろえる */
+  --band-gap: clamp(56px, 8vw, 110px);
   --pad-x: 6vw;
   --header-h: 96px;
 

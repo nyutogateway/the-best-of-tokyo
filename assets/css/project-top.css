@@ -208,11 +208,11 @@
   animation-delay: 3.2s, 3.2s;
 }
 
-/* 1画面にちょうど3枚。写真の高さは画面の高さから決める */
+/* 1画面にちょうど4枚。升目の高さは画面の高さから決める */
 .p-hero__col img {
   display: block;
   width: 100%;
-  height: calc((100svh - var(--header-h)) / 3);
+  height: calc((100svh - var(--header-h)) / 4);
   /* 企業ロゴを白い升目の中に収める。細い罫で升目を区切る */
   padding: 14% 16%;
   background: #fff;
@@ -255,7 +255,7 @@
 /* SP（横組み）のコピーは、切り抜いた枠の中を下からせり上がる */
 @keyframes lineRise {
   from {
-    clip-path: inset(-0.3em -0.2em 100% -0.2em);
+    clip-path: inset(0 -0.2em 100% -0.2em);
     translate: 0 100%;
   }
 
@@ -320,22 +320,27 @@
 /* 2. ABOUT（企画について） ----------------------------- */
 
 /* ロゴ帯とセットで1画面（100vh）に収まるよう、余白は画面の高さ基準 */
+/* 墨の面は、どこも画面幅いっぱいの帯にそろえる（ABOUT / STORIES / BROADCASTER）。
+   白地の中に箱で置くと、帯の STORIES と形が揃わず統一感が出ないため。
+   上下の余白も STORIES と同じ値。上だけ見出しと本文1行目の行送りぶん差し引いてある */
 .p-concept {
-  /* 上下を同じ値にすると、見出しと本文1行目の行送り（約18px）ぶん
-     上だけ広く見えるので、上をその分だけ差し引いてある */
-  padding: clamp(44px, 6.2vh, 102px) var(--pad-x) clamp(60px, 8vh, 120px);
+  /* 上下のロゴ帯と同じ余白（--band-gap）を上下に取る。
+     画面の高さで中央に置くと、画面の縦幅によってロゴ帯との間だけが伸び縮みし、
+     升目の上は狭く下は広い、という偏りが出るため高さの下限は付けない
+     （ロゴ帯＋ABOUT＋ロゴ帯で、PCではおおむね1画面ぶんになる） */
+  padding: var(--band-gap) var(--pad-x);
+  background: var(--c-ink);
+  color: #fff;
 }
 
-/* 左に見出し、右に本文の2欄組み。面は墨のベタで、文字は白抜き */
+/* 左に見出し、右に本文の2欄組み。文字は白抜き */
 .p-concept__inner {
   display: grid;
   grid-template-columns: clamp(180px, 22vw, 280px) 1fr;
   gap: clamp(24px, 5vw, 70px);
+  width: 100%;
   max-width: var(--w-max);
   margin-inline: auto;
-  padding: clamp(40px, 6vw, 84px) clamp(26px, 5vw, 72px);
-  background: var(--c-ink);
-  color: #fff;
 }
 
 .p-concept__head {
@@ -348,7 +353,7 @@
   color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(2.3rem, 4.8vw, 3.6rem);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
@@ -406,14 +411,65 @@
 
 /* 3. STORIES（中扉・グループ・カード） ----------------- */
 
+/* 「一生モノの言葉」。1色の金だと墨地で黄土色に沈むので、見出しの縁と同じ明るい金のグラデーションで光らせる */
 .p-concept__closing em {
-  color: var(--c-gold);
+  background: linear-gradient(110deg, #e6c25a 0%, #f2d77e 25%, #fff3c8 48%, #f6e2a0 62%, #edcd6c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-style: normal;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
+/* STORIES は章ごと墨の面にする（見出しからカードの並びまで）。
+   白地に黒い文字と細い線だけだと寂しいため。写真が墨に映え、文字は白、区切りは金の細線 */
 .p-stories {
-  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(52px, 7.5vw, 96px);
+  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
   overflow-x: clip;
+  background: var(--c-ink);
+  color: #fff;
+}
+
+/* 墨地に合わせた文字色・罫の色（白地向けの指定を、ここでまとめて上書きする） */
+.p-stories .p-group__no {
+  color: #fff;
+}
+
+.p-stories .p-group__ja,
+.p-stories .p-group__next,
+.p-stories .p-group__nextJa {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.p-stories .p-group__nextNo,
+.p-stories .p-group__nextName {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.p-stories .p-group__next:hover {
+  color: #fff;
+}
+
+.p-stories .p-card__romaji {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.p-stories .p-card:hover .p-card__name {
+  color: #efd99a;
+}
+
+.p-stories .p-card__company {
+  border-top-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.p-stories .p-card__visual {
+  background: #2c2625;
+}
+
+.p-stories .p-group__foot {
+  border-top-color: rgba(255, 255, 255, 0.14);
 }
 
 /* 5行。1行にグループを2つ重ねて置き、数秒ごとに塊ごと入れ替える */
@@ -640,17 +696,14 @@
   color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(2.3rem, 4.8vw, 3.6rem);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
-/* 見出しと業種の一覧をまとめる枠。ABOUT と同じ墨のベタ面に白抜き・金 */
+/* 見出しと業種の一覧をまとめる枠。章全体が墨の面なので、枠自体には面を敷かない */
 .p-stories__masthead {
   max-width: var(--w-max);
-  margin: 0 auto clamp(40px, 5vw, 70px);
-  padding: clamp(36px, 5.4vw, 72px) clamp(24px, 5vw, 68px) clamp(24px, 3.6vw, 44px);
-  background: var(--c-ink);
-  color: #fff;
+  margin: 0 auto clamp(48px, 6vw, 84px);
 }
 
 .p-stories__title {
@@ -674,8 +727,31 @@
 }
 
 /* グループごとの色。以前は業種ごとに TOKYO MX の配色を割り当てていたが、
-   黒と金の世界観と二つに割れて見えるため、全グループを金（面・線）と墨（文字）に揃えている */
-.p-stories,
+   黒と金の世界観と二つに割れて見えるため、全グループを金（面・線）に揃えている。
+   文字の色は、墨地の STORIES では白、白地の INDEX では墨 */
+.p-stories {
+  --g1: var(--c-accent);
+  --g1-ink: #fff;
+  --g2: var(--c-accent);
+  --g2-ink: #fff;
+  --g3: var(--c-accent);
+  --g3-ink: #fff;
+  --g4: var(--c-accent);
+  --g4-ink: #fff;
+  --g5: var(--c-accent);
+  --g5-ink: #fff;
+  --g6: var(--c-accent);
+  --g6-ink: #fff;
+  --g7: var(--c-accent);
+  --g7-ink: #fff;
+  --g8: var(--c-accent);
+  --g8-ink: #fff;
+  --g9: var(--c-accent);
+  --g9-ink: #fff;
+  --g10: var(--c-accent);
+  --g10-ink: #fff;
+}
+
 .p-index {
   --g1: var(--c-accent);
   --g1-ink: var(--c-ink);
@@ -1040,9 +1116,10 @@
 
 /* 4. INDEX（掲載者・企業一覧） ------------------------- */
 
-/* STORIES のあと。上は STORIES 側の余白に任せ、下は袋文字の帯までの間を取る */
+/* STORIES（墨の面）のあと。上の余白は INDEX 側で取り、下は袋文字の帯（.p-ticker）の余白に任せる
+   （両方で取ると、帯の上だけ余白が広くなる） */
 .p-index {
-  padding: 0 var(--pad-x) clamp(52px, 7.5vw, 96px);
+  padding: clamp(56px, 8vw, 110px) var(--pad-x) 0;
 }
 
 .p-index__inner {
@@ -1070,7 +1147,7 @@
   color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(2.3rem, 4.8vw, 3.6rem);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
@@ -1237,11 +1314,21 @@
 /* 5. BROADCASTER（放送局のご紹介） --------------------- */
 
 /* 上の袋文字の帯を、STORIES と BROADCASTER の中間に置くための余白 */
+/* ABOUT / STORIES と同じ、画面幅いっぱいの墨の帯。下はそのままフッター（墨）へ続き、
+   フッター上端の虹色の線が境目になる */
 .p-station {
-  padding: clamp(52px, 7.5vw, 96px) var(--pad-x) clamp(96px, 14vw, 180px);
+  /* ABOUT と同じく、最低でも画面の高さを取り、中身は上下の中央に置く */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
+  background: var(--c-ink);
+  color: #fff;
 }
 
 .p-station__inner {
+  width: 100%;
   max-width: var(--w-max);
   margin-inline: auto;
 }
@@ -1267,7 +1354,7 @@
   color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(2.3rem, 4.8vw, 3.6rem);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
@@ -1283,9 +1370,6 @@
   grid-template-columns: 300px 1fr;
   align-items: start;
   gap: clamp(30px, 5vw, 70px);
-  padding: clamp(34px, 5vw, 60px) clamp(30px, 5vw, 66px);
-  background: var(--c-ink);
-  color: #fff;
 }
 
 .p-station__logo a {
@@ -1467,7 +1551,7 @@
 
   /* 横組みなので、コピーは上から覆いを外すのではなく、枠の中を下からせり上げる */
   .p-hero__line {
-      clip-path: inset(-0.3em -0.2em 100% -0.2em);
+      clip-path: inset(0 -0.2em 100% -0.2em);
       animation-name: lineRise;
     }
 

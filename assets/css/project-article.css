@@ -5,12 +5,19 @@
    project-article.css — 記事ページ（記事FV / 章 / Q&A / 写真帯 / 締めの言葉）
    ========================================================= */
 
+/* 記事は「白（頭）→ 墨（本文・MESSAGE）→ 白（MORE STORIES〜一覧へ戻る）→ 墨（フッター）」。
+   記事全体の地を墨にし、頭と締めだけを画面幅いっぱいの白い面にしている。
+   上の余白は白い頭（.p-article__head）の中で取る。
+   isolation で重なりの基準をここに作り、日輪マーク（z-index: -1）が墨の地の上・白い面の下に来るようにする */
 .p-article {
   position: relative;
-  padding: calc(var(--header-h) + clamp(40px, 7vw, 90px)) var(--pad-x) 0;
+  isolation: isolate;
+  padding: 0 var(--pad-x);
+  background: var(--c-ink);
+  color: #fff;
 }
 
-/* 日輪マークを薄く敷く。position: fixed なので、読み進めても画面に留まる */
+/* 日輪マークを薄く敷く。position: fixed なので、読み進めても画面に留まる。墨地なので白で */
 .p-article::before {
   position: fixed;
   top: 50%;
@@ -20,9 +27,9 @@
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
-  filter: brightness(0);
+  filter: brightness(0) invert(1);
   /* 本文の後ろに透けるので、気配が残る程度まで薄く */
-  opacity: 0.035;
+  opacity: 0.04;
   /* 画面に留まったまま、ゆっくり回り続ける */
   animation: markSpin 120s linear infinite;
   pointer-events: none;
@@ -40,13 +47,20 @@
   margin-inline: auto;
 }
 
+/* 記事の頭（写真・タイトル・名前）は画面幅いっぱいの白い面。
+   段組み（1080px）の中にあるので、影を広げて左右だけ残し（clip-path）、白を画面の端まで伸ばす */
 .p-article__head {
   position: relative;
   display: grid;
   grid-template-columns: clamp(320px, 34%, 400px) 1fr;
   gap: clamp(28px, 4.5vw, 56px);
   align-items: start;
+  padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
   padding-bottom: clamp(40px, 6vw, 66px);
+  background: var(--c-paper);
+  box-shadow: 0 0 0 100vmax var(--c-paper);
+  clip-path: inset(0 -100vmax);
+  color: var(--c-ink);
 }
 
 .p-article__head::after {
@@ -140,6 +154,35 @@
   margin-top: 20px;
 }
 
+/* 頭に金を効かせる：タイトルと名前の間の金の罫・ローマ字（金） */
+.p-article__head .p-article__name {
+  border-top-color: rgba(201, 164, 90, 0.55);
+}
+
+.p-article__head .p-article__romaji {
+  color: var(--c-accent);
+}
+
+/* 白い面（頭・一覧へ戻る）は、出る演出で面ごと透けると墨から白へ明滅するので、
+   面は最初から出しておき、中身だけをいつもの動きで出す（写真は幕の動きがあるので対象外） */
+.js :is(.p-article__head, .p-article__foot)[data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+.js :is(.p-article__head, .p-article__foot)[data-reveal] > :not(.p-article__visual) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.js :is(.p-article__head, .p-article__foot)[data-reveal].is-revealed > :not(.p-article__visual) {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1.05s cubic-bezier(0.16, 0.8, 0.24, 1) var(--reveal-delay, 0s),
+    transform 1.15s cubic-bezier(0.16, 0.8, 0.24, 1) var(--reveal-delay, 0s);
+}
+
 .p-chapter {
   padding: clamp(50px, 7vw, 84px) 0 0;
   display: flow-root;
@@ -214,14 +257,15 @@
   line-height: 1;
 }
 
+/* 本文は墨地。Q は金のベタに墨の文字、A は金の輪に白の文字 */
 .p-qa__q .p-qa__mark {
-  background: var(--c-ink);
-  color: #fff;
+  background: var(--c-accent);
+  color: var(--c-ink);
 }
 
 .p-qa__a .p-qa__mark {
   border: 1px solid var(--c-accent);
-  color: var(--c-ink);
+  color: #fff;
 }
 
 /* 章の写真は本文に回り込ませる。
@@ -243,27 +287,17 @@
 
 .p-figure figcaption {
   margin-top: 10px;
-  color: var(--c-mute);
+  color: rgba(255, 255, 255, 0.55);
   font-family: var(--f-gothic);
   font-size: 11.5px;
   line-height: 1.8;
 }
 
-/* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文） */
-/* 締めの言葉は ABOUT と同じ墨のベタ面に白抜き。記事の中の山場として立てる */
+/* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文）で、本文と同じ墨地に置く。
+   下の余白で、白の MORE STORIES との間を取る */
 .p-chapter--message {
   margin-top: clamp(56px, 8vw, 96px);
-  padding: clamp(40px, 6vw, 76px) clamp(24px, 5vw, 68px);
-  background: var(--c-ink);
-  color: #fff;
-}
-
-.p-chapter--message .p-chapter__label {
-  color: #efd99a;
-}
-
-.p-chapter--message .p-chapter__text {
-  color: rgba(255, 255, 255, 0.9);
+  padding-bottom: clamp(64px, 9vw, 110px);
 }
 
 /* 締めの言葉。本文より一段大きく組む */
@@ -276,10 +310,16 @@
 
 /* 同じグループの他の掲載者（記事末尾の導線） --------------- */
 
+/* MORE STORIES から一覧へ戻るまでが、記事の締めの白い面。
+   段組みの中にあるので、影を四方へ広げて左右だけ残し（clip-path）、白を画面の端まで伸ばす */
 .p-related {
   --g: var(--c-red);
   --g-ink: var(--c-red-deep);
-  margin-top: clamp(56px, 8vw, 96px);
+  padding-top: clamp(56px, 8vw, 96px);
+  background: var(--c-paper);
+  box-shadow: 0 0 0 100vmax var(--c-paper);
+  clip-path: inset(0 -100vmax);
+  color: var(--c-ink);
 }
 
 /* 業種ごとの色は TOP と同じく金と墨に揃えている（クラス名は業種の番号のまま残す） */
@@ -318,7 +358,7 @@
   color: var(--c-ink);
   font-family: var(--f-display);
   font-size: clamp(1.5rem, 3.2vw, 2.3rem);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
@@ -446,8 +486,13 @@
   display: block;
 }
 
+/* 一覧へ戻る。MORE STORIES から続く白い面の締め */
 .p-article__foot {
   padding: clamp(50px, 7vw, 80px) 0 clamp(70px, 10vw, 120px);
+  background: var(--c-paper);
+  box-shadow: 0 0 0 100vmax var(--c-paper);
+  clip-path: inset(0 -100vmax);
+  color: var(--c-ink);
   text-align: center;
 }
 
@@ -455,6 +500,18 @@
   width: 100vw;
   margin: clamp(50px, 7vw, 84px) 0 0 calc(50% - 50vw);
   overflow: hidden;
+}
+
+/* 写真の帯も、ほかの写真と同じく幕が上がるように下から現れる。
+   幕（clip-path）は帯そのもの（出る合図を受ける塊）ではなく中の列にかける。
+   塊そのものを切り取ると見える面積が0になり、画面に入ったことが検知されず出てこないため */
+.js .p-marquee[data-reveal] .p-marquee__track {
+  clip-path: inset(100% 0 0 0);
+}
+
+.js .p-marquee[data-reveal].is-revealed .p-marquee__track {
+  clip-path: inset(0);
+  transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.1s);
 }
 
 .p-marquee__track {
@@ -616,11 +673,18 @@
     }
 
   .js [data-reveal] :is(.p-article__visual, .p-related__visual),
-    .js [data-reveal] .p-figure img {
+    .js [data-reveal] .p-figure img,
+    .js .p-marquee[data-reveal] .p-marquee__track {
       clip-path: none;
     }
 
   .js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
       scale: none;
+    }
+
+  .js :is(.p-article__head, .p-article__foot)[data-reveal] > :not(.p-article__visual) {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
 }

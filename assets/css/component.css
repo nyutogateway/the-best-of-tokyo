@@ -103,28 +103,18 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  /* 縁は髪の毛ほどに細く（外に見えるのは約1.25px）。ぼかしの光も動きも付けない */
-  -webkit-text-stroke: 2.5px transparent;
+  /* 縁は細く（外に見えるのは約1px。線の半分が文字の外に出る）。
+     太くすると極太の字面と合わさってステッカーのように野暮ったく見えるため。ぼかしの光も動きも付けない */
+  -webkit-text-stroke: 2px transparent;
   content: attr(data-text);
 }
 
-/* 白地の見出しは、上の淡い金だと地に溶けて縁が見えない。
-   茶色に寄せず黄みの強い金にして、縁も少し太らせる（外に見えるのは約2px） */
+/* 白地の見出し（INDEX / 記事の MORE STORIES）も、墨の面の見出しとまったく同じ淡い金にそろえる
+   （黄みの強い金にすると、そこだけ別の金に見えて統一感が崩れるため）。
+   白地では淡い金が溶けやすいので、縁だけわずかに太らせる（外に見えるのは約1.25px） */
 .p-index__label::before,
-.p-station__en::before,
-.p-page__en::before,
 .p-related__en::before {
-  background: linear-gradient(
-    110deg,
-    #d9a21c 0%,
-    #eabb34 28%,
-    #f6d772 50%,
-    #eabb34 72%,
-    #d9a21c 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-width: 2.5px;
 }
 
 
@@ -181,7 +171,8 @@
    下げた量と同じだけ下端を切り取り、動きと一緒に切り取りを戻すので、
    本来の位置の外には字が出ない。見出しのブロックが出るのと同時に動く */
 .js [data-reveal] :is(.p-concept__en, .p-stories__label, .p-index__label, .p-station__en, .p-page__en, .p-related__en) {
-  clip-path: inset(-0.4em -0.3em 100% -0.3em);
+  /* 上端は 0 から始める（マイナスにすると、出る前に金の縁の上端だけが細く覗く） */
+  clip-path: inset(0 -0.3em 100% -0.3em);
   transform: translateY(100%);
 }
 
@@ -212,13 +203,19 @@
    ABOUT の上下で左右へ流れる。ロゴは掲載企業23社ぶん（assets/img/logos/logo-01〜23.png）。
    2セットぶん並べて -50% まで動かし、継ぎ目なく回している */
 
+/* ロゴ帯は墨。ABOUT・STORIES の墨の帯のあいだで、そこだけ白いと浮くため。
+   ロゴは白地の画像が多いので、1社ずつ白い升目に入れて墨の上に並べる（FV の升目と同じ扱い） */
 .p-logos {
-  border-block: 1px solid var(--c-line-thin);
+  background: var(--c-ink);
 }
 
-/* FV の写真と帯がぶつかって見えるので、上の帯だけ間を空ける */
+/* FV の写真と帯がぶつかって見えるので、上の帯だけ間を空ける。
+   上の帯は升目の上に墨の余白（--band-gap）を取り、升目の下は ABOUT の上の余白（同じ値）に任せる。
+   下の帯（ABOUT と STORIES のあいだ）は自前の余白を持たず、上下とも隣の帯の余白（同じ値）に任せる。
+   こうすると、どちらの帯も升目の上下の墨が同じ幅になる */
 .p-hero + .p-logos {
   margin-top: clamp(56px, 8vh, 120px);
+  padding-top: var(--band-gap);
 }
 
 .p-logos__viewport {
@@ -244,7 +241,9 @@
   place-items: center;
   width: clamp(150px, 14vw, 210px);
   height: clamp(70px, 8.8vh, 104px);
+  margin-inline: 7px;
   padding-inline: clamp(14px, 1.8vw, 26px);
+  background: #fff;
 }
 
 /* 横長・正方形が混ざるので、枠の中に収まる最大寸法で置く */
@@ -265,8 +264,10 @@
    STORIES の最後、BROADCASTER の手前に1本だけ流す袋文字。
    情報は持たせず、読み終わりの余韻として置いている（aria-hidden） */
 
+/* 上（INDEX の終わり）と下（BROADCASTER の墨の帯）の余白を同じにする。
+   INDEX 側には下の余白を持たせず、帯の上下の余白はここだけで取る */
 .p-ticker {
-  padding: clamp(24px, 3.4vh, 44px) 0;
+  padding: clamp(48px, 6vw, 88px) 0;
 }
 
 .p-ticker__viewport {
@@ -290,20 +291,8 @@
   letter-spacing: 0.03em;
   line-height: 1.1;
   white-space: nowrap;
-  -webkit-text-stroke: 1.8px var(--mx-purple);
-}
-
-/* 縁の色は語ごとに変える。1周は4語なので、2セット目も同じ順に並ぶ */
-.p-ticker__item:nth-child(8n + 3) {
-  -webkit-text-stroke-color: var(--mx-blue);
-}
-
-.p-ticker__item:nth-child(8n + 5) {
-  -webkit-text-stroke-color: var(--mx-orange);
-}
-
-.p-ticker__item:nth-child(8n + 7) {
-  -webkit-text-stroke-color: var(--mx-pink);
+  /* 縁は金。以前は語ごとに局の配色で縁取っていたが、黒と金の世界観から浮くため金にそろえた */
+  -webkit-text-stroke: 1.8px var(--c-accent);
 }
 
 /* 語と語のあいだの小さな色玉。局の配色をひと粒だけ置く */

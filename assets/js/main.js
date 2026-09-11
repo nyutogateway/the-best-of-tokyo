@@ -113,6 +113,45 @@
     el.setAttribute('data-reveal', String(step));
   });
 
+  /* 塊を出す。中に読み込み途中の写真があれば、読み込み（とデコード）を待ってから出す。
+     待たないと、幕が空の枠のまま上がり、あとから写真だけがパッと現れる。
+     回線が遅くても文字まで待たせないよう、最長 1.5 秒で打ち切る */
+  var REVEAL_WAIT_MAX = 1500;
+
+  /* loading="lazy" の写真は、幕（clip-path）の内側に隠れている間は画面外と見なされて
+     読み込みが始まらない。塊が画面に近づいた時点で eager に切り替え、先に読み込ませておく */
+  var loadNow = function (el) {
+    Array.prototype.forEach.call(el.querySelectorAll('img[loading="lazy"]'), function (img) {
+      img.loading = 'eager';
+    });
+  };
+
+  var reveal = function (el) {
+    loadNow(el);
+
+    var pending = Array.prototype.filter.call(el.querySelectorAll('img'), function (img) {
+      return !img.complete;
+    });
+
+    if (!pending.length || typeof Promise === 'undefined') {
+      el.classList.add('is-revealed');
+      return;
+    }
+
+    var done = false;
+    var show = function () {
+      if (!done) {
+        done = true;
+        el.classList.add('is-revealed');
+      }
+    };
+
+    Promise.all(pending.map(function (img) {
+      return typeof img.decode === 'function' ? img.decode().catch(function () {}) : Promise.resolve();
+    })).then(show);
+    window.setTimeout(show, REVEAL_WAIT_MAX);
+  };
+
   if (!('IntersectionObserver' in window)) {
     Array.prototype.forEach.call(revealed, function (el) {
       el.classList.add('is-revealed');
@@ -125,17 +164,29 @@
       entries.forEach(function (entry) {
         /* すでに通り過ぎている位置のものは待たせない */
         if (entry.isIntersecting || entry.boundingClientRect.bottom < 0) {
-          entry.target.classList.add('is-revealed');
+          reveal(entry.target);
           io.unobserve(entry.target);
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
+    /* 画面の下1画面ぶん手前に来たら、中の写真を先に読み込み始める */
+    var preload = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          loadNow(entry.target);
+          preload.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px 100% 0px' });
+
     Array.prototype.forEach.call(revealed, function (el) {
       io.observe(el);
+      preload.observe(el);
     });
     Array.prototype.forEach.call(watchedRows, function (el) {
       io.observe(el);
+      preload.observe(el);
     });
   }
 
