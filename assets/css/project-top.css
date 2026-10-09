@@ -1428,11 +1428,11 @@
     }
 }
 
+/* SPは切り替わったあとも出続けるので、縁は通常と同じ静かさに留める */
 .p-card.is-shown .p-card__visual {
   box-shadow:
-    inset 0 0 0 1px rgba(201, 164, 90, 0.62),
-    0 20px 38px rgba(0, 0, 0, 0.46),
-    0 0 26px rgba(255, 226, 160, 0.2);
+    inset 0 0 0 1px rgba(201, 164, 90, 0.4),
+    0 16px 32px rgba(0, 0, 0, 0.42);
 }
 
 /* **写真だけに効かせる**（`:not(.p-card__logo)` を外さないこと）。
@@ -1488,10 +1488,9 @@
     }
 }
 
-/* SPは hover が無いので、画面に入ったときに同じ拭いを走らせる */
-.p-card.is-shown .p-card__visual::after {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-}
+/* **虹色の拭いはSPでは出さない**。カーソルを乗せているあいだだけの演出なので、
+   出しっぱなしにすると写真が虹色に沈んだまま並ぶ。
+   SPで切り替えるのはロゴ → 写真まで */
 
 .p-card:hover .p-card__visual img:not(.p-card__logo) {
   transform: scale(1.05);
