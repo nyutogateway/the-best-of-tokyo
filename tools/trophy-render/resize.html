@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><pre id="out">pending</pre>
+<script>
+var im = new Image();
+im.onload = function () {
+  var W = 880, H = Math.round(880 * im.naturalHeight / im.naturalWidth);
+  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var g = c.getContext('2d');
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  g.drawImage(im, 0, 0, W, H);
+  var png = c.toDataURL('image/png');
+  var webp = c.toDataURL('image/webp', 0.95);
+  document.getElementById('out').textContent =
+    'OK ' + W + 'x' + H + ' png=' + png.length + ' webp=' + webp.length + '\n' + png + '\n@@@\n' + webp;
+};
+im.src = 'cup.png';
+</script>

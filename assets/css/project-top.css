@@ -16,10 +16,60 @@
 
 /* 1. FV（ヒーロー） -------------------------------------- */
 
+/* FVの光は5つ。**それぞれ「光だけを持つ要素」に入れて、opacity で出し入れする**
+   （濃さを変数で動かすと背景ごと毎フレーム 描き直しになり、幕開けが重くなる）。
+     ・光源のにじみ（右上・左上の隅）…… .p-hero__drape::before
+     ・主光（右上 → トロフィー）…………… .p-hero__inner::before
+     ・舞台の補助光（2本）………………… .p-hero__inner::after
+     ・升目の壁に乗る光だまり…………… .p-hero::after
+     ・壁の中を走る筋……………………… .p-hero__tiles::after
+   出てくるのは、コピー → ロゴ → 説明文 → 虹の線 → 升目、と出そろったあと（5.6秒）。
+   山は作らず一方向に上げるだけ。動きを止める設定のときは opacity: 1 で出す */
+
+/* FVの地は藍。上から藍 → 墨へ沈め、下のロゴ帯（墨）へ続ける。
+   その上に折り目（稜線＋影）を重ねる */
 .p-hero {
   position: relative;
+  /* 升目の壁の幅。グリッドの1列目に使う */
+  --hero-tiles-w: clamp(170px, 24vw, 420px);
+  /* ここに置くのは**動かないものだけ**（粒・床・斜めの陰り・地の紺）。
+     光は上に挙げた専用の要素に入れること */
+  background-image:
+    /* フィルムの粒。地の重ねのいちばん手前に置く（升目・文字はこの上の層なので粒は乗らない） */
+    var(--grain),
+    /* 床に落ちる光だまり。トロフィーの足元と、その手前に1つずつ */
+    radial-gradient(
+      36% 9% at 74% 95%,
+      rgba(255, 242, 210, 0.3) 0%,
+      rgba(255, 240, 200, 0.1) 44%,
+      transparent 76%
+    ),
+    radial-gradient(
+      26% 7% at 50% 97%,
+      rgba(255, 242, 210, 0.16) 0%,
+      transparent 72%
+    ),
+    /* 床の面。以前はここに地平の細い線（下から13%）も引いていたが、
+       線を境に上下で別の面に見えるとのご指摘で外した。
+       線をやめたぶん、面の変わり目は倍以上かけてなだらかに上げている */
+    linear-gradient(
+      to top,
+      rgba(255, 240, 205, 0.12) 0,
+      rgba(255, 240, 205, 0.07) 8%,
+      rgba(255, 240, 205, 0.03) 16%,
+      transparent 28%
+    ),
+    var(--fold),
+    linear-gradient(
+      180deg,
+      var(--c-indigo) 0%,
+      var(--c-indigo) 26%,
+      var(--c-indigo-deep) 82%,
+      var(--c-indigo-deep) 100%
+    );
   display: grid;
-  grid-template-columns: 1fr clamp(260px, 43vw, 760px);
+  /* 升目の壁を左、文字組みとトロフィーを右に置く */
+  grid-template-columns: var(--hero-tiles-w) 1fr;
   align-items: stretch;
   height: 100svh;
   min-height: 560px;
@@ -33,50 +83,113 @@
   align-items: stretch;
   /* コピーは写真の側へ寄せ、ロゴとリードは左端に置いて対角に配置する */
   justify-content: space-between;
-  gap: clamp(28px, 5vw, 72px);
-  padding: calc(var(--header-h) + 24px) clamp(26px, 4vw, 68px) clamp(44px, 6vw, 80px) var(--pad-x);
+  gap: clamp(16px, 2.2vw, 34px);
+  /* 上下の余白は、トロフィーの大きさに回すぶんだけ詰めてある
+     （この段の高さがそのまま --crest の上限になる。下の計算式もあわせて直すこと） */
+  grid-column: 2;
+  grid-row: 1;
+  padding: calc(var(--header-h) + 4px) var(--pad-x) clamp(24px, 3.4vw, 44px) clamp(26px, 4vw, 68px);
 }
 
-.p-hero__copy {
-  order: 2;
-  /* ロゴの塊と写真のあいだ、白い余白の中心に置く（上下も中央） */
-  align-self: center;
-  margin-inline: auto;
-  writing-mode: vertical-rl;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(18px, 2.4vw, 40px);
-  font-size: clamp(1.35rem, min(4.2vw, 5vh), 3.3rem);
-  font-weight: 600;
-  line-height: 1.34;
-  letter-spacing: 0.16em;
+/* 左のライト。画面の左上の隅（＝この要素の左上）からロゴの塊へ差し込む筋。
+   .p-hero__inner は左の段なので、この要素の左上は画面の左上と同じ位置になる。
+   筋はロゴを照らしたら消す（mask で光源からの距離を絞る）。
+   伸ばしっぱなしにすると右の筋と中央で交差するので、そこが要点。
+   z-index: -1 で文字の下・地の上に入る */
+.p-hero__inner::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 落ち着いたあとの濃さ。animation を切ったときもこの値で出る */
+  --beam-l: 0.34;
+  /* 主光。トロフィーへ向けて絞る（右上の隅 → 画面の中ほど）。
+     **扇を広げすぎないこと**：広げると、手前の縁がほぼ真下を向いて画面の右側を縦に流れ、
+     光が下へ引きずられているように見える */
+  background: conic-gradient(
+    from 0deg at 100% 0%,
+    transparent 203deg,
+    rgba(255, 241, 210, var(--beam-l)) 212deg,
+    rgba(255, 241, 210, calc(var(--beam-l) * 0.62)) 236deg,
+    rgba(255, 241, 210, calc(var(--beam-l) * 0.42)) 250deg,
+    transparent 258deg
+  );
+  /* 光源（左上の隅）からの距離で消す。ロゴは隅からおよそ4割の位置にあるので、
+     そこを過ぎてから弱め、6割で消えるようにしている */
+  /* 当てる先（トロフィー）を過ぎたら消す。**ここを伸ばすと光が下まで流れる** */
+  mask-image: radial-gradient(farthest-corner at 100% 0%, #000 0%, #000 42%, rgba(0, 0, 0, 0.5) 62%, transparent 82%);
+  -webkit-mask-image: radial-gradient(farthest-corner at 100% 0%, #000 0%, #000 42%, rgba(0, 0, 0, 0.5) 62%, transparent 82%);
+  /* 光の出し入れは opacity で。濃さの変数を動かすと、そのたびに描き直しになる */
+  opacity: 0;
+  animation: beamFade 3s cubic-bezier(0.22, 1, 0.36, 1) 4.3s forwards;
+  pointer-events: none;
+  content: "";
 }
 
-/* どの幅でも1行のまま。折り返させず、幅に合わせて字を縮める */
-/* 幕開けの順番：①コピー（1行目 0.3秒・2行目 0.75秒）→ ②ロゴ・説明文・虹の線（1.6秒〜）
-   → ③ロゴの升目（3秒〜）。前の塊が出きる少し手前で次を始め、間延びさせない。
-   コピーは1行ずつ、覆いが上から外れるように、少し降りながら現れる */
-.p-hero__line {
-  white-space: nowrap;
-  clip-path: inset(0 0 100% 0);
-  animation: lineIn 1.7s cubic-bezier(0.7, 0, 0.2, 1) 0.3s forwards;
+
+/* 舞台の補助光。左のライトより細く、角度を変えて一本だけ足す。
+   スポットが複数あると授賞式の舞台らしくなる */
+.p-hero__inner::after {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 舞台の補助光。主光より細く、角度を変えて足す。
+     スポットが2本あると舞台らしくなるが、3本以上は文字の地が白茶けるのでやめた */
+  --beam-s: 0.1;
+  background:
+    conic-gradient(
+      from 0deg at 86% -10%,
+      transparent 171deg,
+      rgba(255, 246, 224, var(--beam-s)) 179deg,
+      rgba(255, 246, 224, var(--beam-s)) 186deg,
+      transparent 194deg
+    ),
+    conic-gradient(
+      from 0deg at 70% -10%,
+      transparent 165deg,
+      rgba(255, 246, 224, calc(var(--beam-s) * 0.78)) 173deg,
+      rgba(255, 246, 224, calc(var(--beam-s) * 0.78)) 180deg,
+      transparent 188deg
+    );
+  /* 光源からの距離で消す（当てる先を過ぎたら引く） */
+  mask-image: radial-gradient(farthest-corner at 72% 0%, #000 0%, #000 32%, rgba(0, 0, 0, 0.4) 48%, transparent 66%);
+  -webkit-mask-image: radial-gradient(farthest-corner at 72% 0%, #000 0%, #000 32%, rgba(0, 0, 0, 0.4) 48%, transparent 66%);
+  opacity: 0;
+  animation: beamFade 3s cubic-bezier(0.22, 1, 0.36, 1) 4.6s forwards;
+  pointer-events: none;
+  content: "";
 }
 
-.p-hero__line--2 {
-  animation-delay: 0.75s;
-}
+
+
 
 .p-hero__meta {
-  order: 1;
+  position: relative;
+  order: 2;
   align-self: center;
-  max-width: 500px;
+  flex: 1 1 auto;
+  max-width: min(650px, 46vw);
 }
+
+
+/* 以前はロゴの上（メダル）から左右へ光の筋を広げていたが、光は左上と右上の2か所に
+   まとめたので外している（`.p-hero` の背景に置いた2つの光。光源が3つあると影の向きが濁るため）。
+   幕開けの最後の「ぴかーん」も、ロゴの裏で光らせるのではなく、
+   両翼の光そのものをあとから差し込ませる形にした（`beamsIn` / `beamTilesIn`） */
+
+
+
 
 /* ロゴは左から右へ、覆いを引くように現れる */
 .p-hero__wordmark img {
-  width: min(410px, 74vw);
+  width: 100%;
   clip-path: inset(-10% 100% -10% 0);
-  animation: wordIn 1.5s cubic-bezier(0.7, 0, 0.2, 1) 1.6s forwards;
+  animation: wordIn 1.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 /* 虹の線は最後に、左から伸びる */
@@ -84,136 +197,397 @@
   display: block;
   width: 84px;
   height: 3px;
-  margin-top: clamp(24px, 3vw, 34px);
+  margin-top: clamp(18px, 2.4vw, 28px);
   background: var(--rainbow);
   scale: 0 1;
   transform-origin: left;
-  animation: barIn 1.1s cubic-bezier(0.7, 0, 0.2, 1) 2.5s forwards;
+  animation: barIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards;
+  content: "";
+}
+
+/* トロフィー。**ロゴとは切り離して、いちばん右に単体で立たせている**
+   （以前はロゴを銘板に載せた一体の図柄だった）。
+   図柄は3Dレンダー（`assets/img/trophy.webp`。作り方は `tools/trophy-render/`）。
+   かたちは、いただいた実物の例（鏡面の星が斜めに立ち、円柱の台に根元が差し込まれている）に寄せた。
+   大きさは、横は段の取り合い、縦はFVの高さで決まる。
+   **画像の下端は余白**（図柄の下端は画像の高さの96.9%、余白は3.1%）。
+   接地影と足元の映り込みは、この余白を見込んで置いてある。
+   **レンダーの画角を変えたら、この2つの％も計算し直すこと** */
+.p-hero__trophy {
+  position: relative;
+  isolation: isolate;
+  order: 3;
+  align-self: center;
+  flex: 0 0 auto;
+  /* 余った幅を左右に等しく割り振って、**この段の真ん中に立たせる**
+     （画面の右端に寄せると、端に貼り付いて見える） */
+  margin-inline: auto;
+  width: min(262px, 16.5vw, calc(54svh - 100px));
+  aspect-ratio: 1100 / 1387;
+  background: url("../img/trophy.webp") no-repeat center top / contain;
+  /* **奥に置くための処理**。遠くのものは、空気に透けて地の色に寄り、明暗の幅が縮み、
+     ピントも少し甘くなる。これを3つ同時にやると「後ろにある」と読める：
+     ・`opacity` を少し落として地の紺と混ぜる（空気遠近）
+     ・`contrast` / `saturate` を下げて明暗と色味を詰める
+     落ち影もやわらかく1枚だけ。強い影は手前のものの合図なので、奥へ置くときは弱める */
+  /* **ぼかしは掛けない。明暗も彩度もほぼ落とさない**（鮮明に、とのご指示）。
+     奥行きは、やわらかい落ち影と、地の紺とのわずかな馴染みだけで出す */
+  filter:
+    saturate(1) contrast(1.02) brightness(1.02)
+    drop-shadow(0 14px 28px rgba(0, 0, 0, 0.34))
+    drop-shadow(0 0 24px rgba(255, 232, 178, 0.14));
+  opacity: 0.98;
+  /* 幕開けの最後、両翼の光と同じ時刻に**トロフィーへ光が当たる**。
+     暗く沈んで奥にいた状態から、照らされて浮かび上がる。
+     途中で少しだけ強く光らせて（55%）から落ち着かせると、光が「当たった」ように見える。
+     **filter は関数の並びが前後で同じでないと補間されない**（数が違うとパッと切り替わる）ので、
+     光らない状態でも金の光は 0 で置いてある */
+  animation: trophyLit 3s cubic-bezier(0.22, 1, 0.36, 1) 4.3s backwards;
+}
+
+/* 磨かれた床への映り込み。同じ画像を上下反転して足元にだけ薄く敷く。
+   **位置合わせがすべて**：図柄の下端（96.9%）から、画像の下の余白ぶん（3.1%）を
+   引いた高さに置くと、反転した図柄の下端が本体の下端とぴったり合う */
+.p-hero__trophy::before {
+  position: absolute;
+  z-index: -1;
+  top: 93.8%;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1100 / 1387;
+  scale: 1 -1;
+  background: url("../img/trophy.webp") no-repeat center top / contain;
+  opacity: 0.16;
+  filter: blur(3px);
+  mask-image: linear-gradient(to bottom, transparent 54%, rgba(0, 0, 0, 0.42) 74%, #000 90%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 54%, rgba(0, 0, 0, 0.42) 74%, #000 90%);
+  pointer-events: none;
+  content: "";
+}
+
+/* 足元の接地光と影 */
+.p-hero__trophy::after {
+  position: absolute;
+  z-index: -2;
+  /* 台は画像の中央ではなく、左から40%のところに立っている（星が右へ傾いているぶん） */
+  top: 93%;
+  left: 40.4%;
+  width: 72%;
+  height: 11%;
+  translate: -50% 0;
+  background:
+    radial-gradient(
+      closest-side,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.26) 46%,
+      transparent 74%
+    ),
+    radial-gradient(
+      closest-side,
+      rgba(255, 240, 200, 0.3) 0%,
+      rgba(255, 236, 190, 0.1) 44%,
+      transparent 76%
+    );
+  pointer-events: none;
   content: "";
 }
 
 /* 「インタビ／ューメディア」のような割れ方を避け、指定した位置だけで折る */
 .p-hero__text {
-  margin-top: 28px;
+  margin-top: 24px;
   overflow-wrap: normal;
-  font-size: 15px;
+  /* 3つ並びになったぶん段が狭いので、指定の位置だけで折れる大きさに落とす
+     （画面幅に連動させないと、1280前後で「ストーリーを、」が割れる） */
+  font-size: clamp(17px, 1.55vw, 22px);
   letter-spacing: 0.04em;
   line-height: 2.2;
   opacity: 0;
-  animation: fadeUp 1.2s ease 2.2s forwards;
+  animation: fadeUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
 }
 
 /* 掲載者のポートレートを右半分に敷き、2列を上下それぞれの向きに流す。
    同じ並びを2セット持たせ、半分ぶん動かして繋ぎ目をなくしている */
 .p-hero__tiles {
   position: relative;
+  /* 行も明示する。列だけ指定すると、あとから置かれるこの要素が2行目に送られる */
+  grid-column: 1;
+  grid-row: 1;
+  /* 幕開け（4.2秒）までは壁ごと出さない。
+     列は32枚ぶんの背丈があり、往復アニメの巻き戻し位置と入場のずらしが打ち消し合って
+     画面内に 列の一部が見えてしまうため、入場の直前までは表示そのものを止めておく */
+  opacity: 0;
+  animation: tilesShow 0.01s linear 2.8s forwards;
   margin-top: var(--header-h);
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* 4列。列ごとに上下へ交互に流す（1・3列目は上、2・4列目は下） */
+  grid-template-columns: repeat(4, 1fr);
+  /* 升目のあいだに地の墨を見せ、1枚ずつ独立した白い升目に見せる */
+  gap: 6px;
   overflow: hidden;
-  /* 文字組みとの境目を硬い直線にせず、左へ溶かす */
-  mask-image: linear-gradient(to right, transparent 0, #000 16%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%);
+  /* 文字組みとの境目は、以前は mask で白い升目を透かして消していたが、
+     白を透過させると地の藍と混ざって灰色ににじんだ。
+     いまは消さずに残し、`.p-hero::before` の影で落として地に沈めている */
 }
 
-/* 写真の溶け際に局の配色を重ねる指定。FVが企業ロゴになったので止めている */
-.p-hero__tiles::after {
-  display: none;
+/* 光が当たっていないところに掛けるスモーク。光源（右上の隅）から遠いほど濃くする。
+   升目より手前の層に置き、白い壁を奥へ沈ませる。縁を作らないよう、色の段は細かく刻んでいる */
+.p-hero__tiles::before {
   position: absolute;
   inset: 0;
   z-index: 1;
-  /* 左端に紫・青が来ると写真が青く転ぶので、暖色側から始まる向きにする */
-  background: linear-gradient(
-    90deg,
-    var(--mx-vermilion) 0%,
-    var(--mx-orange) 26%,
-    var(--mx-yellow) 48%,
-    var(--mx-green) 70%,
-    var(--mx-blue) 100%
+  background: radial-gradient(
+    farthest-corner at 0% 0%,
+    rgba(14, 25, 50, 0.02) 0%,
+    rgba(14, 25, 50, 0.26) 18%,
+    rgba(14, 25, 50, 0.46) 36%,
+    rgba(14, 25, 50, 0.62) 56%,
+    rgba(14, 25, 50, 0.74) 76%,
+    rgba(14, 25, 50, 0.82) 100%
   );
-  mix-blend-mode: multiply;
-  opacity: 0.3;
-  mask-image: linear-gradient(to right, #000 0, transparent 30%);
-  -webkit-mask-image: linear-gradient(to right, #000 0, transparent 30%);
   pointer-events: none;
   content: "";
 }
 
-/* 日輪マーク。ゆっくり回り続ける。
-   TOPでは FV の中だけに置く（画面に留めると、下のカードや一覧の後ろに透けて汚れに見えるため） */
+/* 右のライト。画面の右上の隅（＝升目の列の右上）から、升目の壁を照らす筋。
+   升目より手前の層（z-index: 1）に置く。地の背景に置くと升目に隠れて見えないため。
+   こちらも下まで伸ばさず、途中で消す（左の筋と交差させない）。
+   以前ここには写真の溶け際へ局の配色を重ねる指定があったが、FVが企業ロゴになって不要になったので置き換えた */
+.p-hero__tiles::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* 落ち着いたあとの濃さ。animation を切ったときもこの値で出る */
+  --beam-w: 0.22;
+  /* 光の縁は広くぼかす。狭いと、明るさの境目が升目1枚の中で終わってしまい、
+     隣の升目との差が段差（階段状の切り替わり）に見えるため */
+  background: conic-gradient(
+    from 0deg at 0% 0%,
+    transparent 114deg,
+    rgba(255, 252, 247, var(--beam-w)) 146deg,
+    rgba(255, 252, 247, var(--beam-w)) 164deg,
+    transparent 194deg
+  );
+  mask-image: radial-gradient(farthest-corner at 0% 0%, #000 0%, #000 26%, rgba(0, 0, 0, 0.55) 54%, rgba(0, 0, 0, 0.2) 74%, transparent 96%);
+  -webkit-mask-image: radial-gradient(farthest-corner at 0% 0%, #000 0%, #000 26%, rgba(0, 0, 0, 0.55) 54%, rgba(0, 0, 0, 0.2) 74%, transparent 96%);
+  opacity: 0;
+  animation: beamFade 3s cubic-bezier(0.22, 1, 0.36, 1) 4.3s forwards;
+  pointer-events: none;
+  content: "";
+}
+
+
+/* FVを四辺から影で囲う覆い。画面の縁に沿って同じ幅で内側へ落とす（四隅だけでなく上下左右とも）。
+   升目（写真）の上にも掛けたいので、地の background ではなく文字・写真の上の層に置く。
+   **動かさない**こと。ぼかしの広い影は描くのに時間がかかるので、
+   光のように毎フレーム動く指定と同じ要素に置いてはいけない */
 .p-hero::before {
   position: absolute;
-  z-index: -1;
-  top: 52%;
-  left: 20%;
-  width: min(70vh, 46vw);
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  background: url("../img/mark.svg") no-repeat center / contain;
-  /* FVのマークだけ黒で敷く（元の朱を明度0まで落とす） */
-  filter: brightness(0);
-  opacity: 0.075;
+  inset: 0;
+  z-index: 1;
+  box-shadow: inset 0 0 190px 46px rgba(0, 0, 0, 0.62);
+  background:
+    /* 升目の壁の上下を地に溶かす2枚。
+       以前は背景レイヤーのサイズで「壁の幅ぶん」に切っていたが、切った端がそのまま
+       縦の境目になって見えた（升目が出そろう前の3秒間は特にはっきり出る）。
+       いまは横にも広がる楕円にして、壁のあたりを濃く・左へ向かってなだらかに消している。
+       下の1枚は溶かす量を画面の高さの約29%から半分に減らした（右下が大きく空いて、
+       画面の下半分が左に偏って見えたため）。ただし**いちばん下は必ず塗りつぶすこと**：
+       ここが透けると、FVの下端で升目が切れた端が見えてしまう */
+    radial-gradient(52% 15% at 16% 0%, var(--c-indigo) 0%, var(--c-indigo) 34%, transparent 80%),
+    radial-gradient(56% 20% at 16% 100%, var(--c-indigo-deep) 0%, var(--c-indigo-deep) 40%, transparent 88%);
   pointer-events: none;
-  /* ゆっくり回し続ける。translate と rotate は別プロパティなので中心はずれない。
-     開いたときは、少し小さい状態から浮かび上がる */
-  animation:
-    markSpin 120s linear infinite,
-    markIn 2.6s cubic-bezier(0.16, 0.8, 0.24, 1) 0.6s backwards;
   content: "";
 }
 
-@keyframes markSpin {
+/* FV全体を影で囲う覆い。中央は素通しで、四辺と四隅へ向かって暗く落とす。
+   升目（写真）の上にも掛けたいので、地の background ではなく文字・写真の上の層に置く。
+   同じ覆いで升目の上下も地に溶かす（こちらは右の列の幅ぶんだけ。背景レイヤーの
+   サイズと位置で列に合わせている）。地が藍のグラデーションなので、上は藍・下は墨に合わせ、
+   下は次のロゴ帯へ続く切れ目になるので深く溶かして升目の切れ端を残さない */
+.p-hero::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* 升目の壁に乗せる光。**この要素は光だけを持つ**ので、幕開けは opacity で出せる
+     （動かない覆いを混ぜると、そのぶんまで毎フレーム描き直しになる。
+     四辺の影と、壁の上下を地に溶かす2枚は `.p-hero::before`）。
+     壁より手前の層なので、光が升目の上に乗る。
+     色は白寄り：金寄りの光だと白い升目がクリーム色に転び、企業ロゴの色がにごる。
+     **背景レイヤーのサイズで「壁の幅ぶん」に切ってはいけない**：切り口がそのまま
+     縦の境目になり、壁のところだけ明るい四角に見えて浮く。
+     画面全体の座標で書き、壁から離れるほどなだらかに消す */
+  --beam-t: 0.4;
+  background: radial-gradient(
+    20% 36% at 10% 34%,
+    rgba(255, 252, 247, var(--beam-t)) 0%,
+    rgba(255, 252, 247, calc(var(--beam-t) * 0.42)) 40%,
+    transparent 74%
+  );
+  opacity: 0;
+  animation: beamFade 3s cubic-bezier(0.22, 1, 0.36, 1) 4.3s forwards;
+  pointer-events: none;
+  content: "";
+}
+
+
+/* 授賞式の設え。光はこれ以上足さず、舞台の道具立てで格を上げる。
+   ・背面の緞帳（.p-hero__drape）…… 左の段のうしろに張るビロードの幕。裾はトロフィーの
+     足元の高さ（下から38%）で切り、そこから手前は床にする。こうするとトロフィーが
+     「幕の前・床の上」に立って見える（裾を画面の下端近くで切ると、トロフィーが宙に浮く）
+   （四隅の金の細い罫＝額と、床の段鼻＝金の細い横罫も入れていたが、
+     「金枠はいらない」「境目で領域が分かれて見える」とのご指示でどちらも外した）
+   どちらも明るい面は作らない。濃さを引くか、金の細い罫を引くだけにしている
+   （光源を増やすと影の向きが濁り、両翼のライトが効かなくなるため） */
+
+/* 幕の折り目は、明るい線ではなく暗い筋で作る。
+   幅の広いゆるやかな山が並ぶだけで、垂れ布に見える */
+.p-hero__drape {
+  position: absolute;
+  z-index: 0;
+  /* 画面の全幅に張る。升目の壁のぶんだけ空けると、そこに縦の境目（面の切り替わり）が出る。
+     升目が出そろう前の4.2秒間は特にはっきり見えてしまう */
+  inset: 0;
+  background:
+    /* 裾の陰。床に接するところを暗くして、布の重さを出す */
+    linear-gradient(to top, rgba(4, 8, 22, 0.42) 31%, transparent 44%),
+    /* 折り目。1山が画面幅の5.6％（1440でおよそ80px） */
+    repeating-linear-gradient(
+      to right,
+      rgba(5, 10, 26, 0) 0,
+      rgba(5, 10, 26, 0.1) 1.7%,
+      rgba(5, 10, 26, 0.2) 2.8%,
+      rgba(5, 10, 26, 0.09) 3.9%,
+      rgba(5, 10, 26, 0) 5.6%
+    ),
+    /* 袖（画面の左端）へ向かって落とす */
+    linear-gradient(to left, rgba(5, 10, 26, 0.34) 0, transparent 17%);
+  mask-image: linear-gradient(to top, transparent 30%, #000 38%);
+  -webkit-mask-image: linear-gradient(to top, transparent 30%, #000 38%);
+  pointer-events: none;
+}
+
+/* 光源そのもののにじみ。2つのライトの根元＝左上と右上の隅をふくらませる。
+   光の筋そのものは専用の要素（`.p-hero__inner::before` と `.p-hero__tiles::after`）にある。
+   **この要素は「光だけ」を持つ**。幕開けで opacity を上げるだけにすれば、
+   地の背景を描き直さずに光が差し込む */
+.p-hero__drape::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* ロゴの塊とトロフィーをまとめて照らす、大きな光だまり。
+       筋だけだと当たっている範囲が狭く、文字が暗いままになる */
+    radial-gradient(
+      46% 42% at 64% 46%,
+      rgba(255, 244, 218, 0.16) 0%,
+      rgba(255, 244, 218, 0.07) 46%,
+      transparent 78%
+    ),
+    radial-gradient(
+      46% 44% at 0% -6%,
+      rgba(255, 240, 208, 0.374) 0%,
+      rgba(255, 240, 208, 0.136) 42%,
+      transparent 74%
+    ),
+    radial-gradient(
+      42% 40% at 100% -6%,
+      rgba(255, 240, 208, 0.18) 0%,
+      rgba(255, 240, 208, 0.06) 42%,
+      transparent 74%
+    );
+  opacity: 0;
+  animation: beamFade 3s cubic-bezier(0.22, 1, 0.36, 1) 4.3s forwards;
+  content: "";
+}
+
+@keyframes trophyLit {
+  from {
+    opacity: 0.74;
+    filter:
+      saturate(0.8) contrast(0.9) brightness(0.76)
+      drop-shadow(0 14px 28px rgba(0, 0, 0, 0.2))
+      drop-shadow(0 0 24px rgba(255, 232, 178, 0));
+  }
+
+  55% {
+    opacity: 1;
+    filter:
+      saturate(1.04) contrast(1.04) brightness(1.12)
+      drop-shadow(0 14px 28px rgba(0, 0, 0, 0.32))
+      drop-shadow(0 0 30px rgba(255, 232, 178, 0.26));
+  }
+
   to {
-    rotate: 360deg;
+    opacity: 0.98;
+    filter:
+      saturate(1) contrast(1.02) brightness(1.02)
+      drop-shadow(0 14px 28px rgba(0, 0, 0, 0.34))
+      drop-shadow(0 0 24px rgba(255, 232, 178, 0.12));
   }
 }
 
-/* 写真の上下も画面の外へ抜けるように白でぼかす */
-.p-hero::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  width: clamp(260px, 43vw, 760px);
-  background:
-    linear-gradient(to bottom, var(--c-paper) 0, transparent 15%),
-    linear-gradient(to top, var(--c-paper) 0, transparent 12%);
-  pointer-events: none;
-  content: "";
+@keyframes beamFade {
+  to {
+    opacity: 1;
+  }
 }
+
 
 /* 止めずに、ずっと同じ速さで流し続ける。1列12枚（6枚×2セット）なので、
    1セットぶん（50%）進むと元の見た目に戻り、繋ぎ目なく回る */
 .p-hero__col {
   display: block;
   /* 幕開けの最後（コピー → ロゴ・説明文のあと）に、列ごと画面の外から「シャーッ」と滑り込む。
-     入ってくる向きは、そのあと流れる向きと同じ。入場は translate、流れは transform なのでぶつからない。
+     入場は translate、流れは transform なのでぶつからない。
      流れも入場と同時に始める（先に流しておくと、待っている間に列の端が画面に覗き、
-     入り終わった位置も毎回ずれる）。both で、始まるまでは流れの始点に止めておく */
+     入り終わった位置も毎回ずれる）。both で、始まるまでは流れの始点に止めておく。
+
+     【段差を出さないための決めごと】
+     流れは4列とも「同じ向き・同じ秒数・同じ開始時刻」にする。
+     ・向きを互い違いにすると、上へ行く列と下へ行く列の位置の差が時間とともに変わり続けるので、
+       升目の横の行が永久に揃わない（これが段差の主因だった）。
+     ・開始時刻を列ごとにずらすのも駄目。流れは infinite なので、ずれがそのまま残る
+       （0.1秒ずらすと 1752px ÷ 30秒 × 0.1秒 ≒ 6px、ちょうど升目の隙間ぶんの段差になる）。
+     入場の遅らせ（列ごとに0.1秒ずつ）はそのままで構わない。入場は translate で、
+     終われば 0 に戻るため、ずれが残らないため */
+  /* 一方向に流し続けず、上へ1セットぶん進んだら同じ速さで戻る往復にする（alternate）。
+     速さは一定（linear）。端では向きが切り替わる。
+
+     4列とも同じ向きに往復させる。向きを互い違いにすると、上へ行く列と下へ行く列の
+     位置の差が時間とともに変わり続け、升目の横の行が永久に揃わない（段差に見える） */
   animation:
-    heroFlowUp 40s linear 3s infinite both,
-    colInUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) 3s both;
+    heroFlowUp 20s linear 2.8s infinite alternate both,
+    colInUp 2.2s cubic-bezier(0.16, 1, 0.3, 1) 2.8s both;
 }
 
-/* 2列は同じ速さで、上と下へ逆向きに流す。入場は上から、1列目の0.1秒あと */
+/* 2列目は1列目と逆向きに往復する。**入場は4列とも下から**：
+   上から入る列と下から入る列を混ぜると、入場のあいだ壁が櫛のように歯抜けに見える
+   （入場をゆっくりにしたぶん、その時間が長く目につくようになった） */
 .p-hero__col--down {
-  animation-name: heroFlowDown, colInDown;
-  animation-delay: 3.1s, 3.1s;
+  animation-delay: 2.8s, 2.95s;
+  animation-direction: alternate-reverse, normal;
 }
 
-/* 3列目はSPだけで使う */
+/* 3列目。入場は2列目の0.1秒あと */
 .p-hero__col--third {
-  display: none;
-  animation-delay: 3.2s, 3.2s;
+  animation-delay: 2.8s, 3.1s;
 }
 
-/* 1画面にちょうど4枚。升目の高さは画面の高さから決める */
+/* 4列目も2列目と同じく逆向き。入場はいちばん最後 */
+.p-hero__col--fourth {
+  animation-delay: 2.8s, 3.25s;
+  animation-direction: alternate-reverse, normal;
+}
+
+/* 升目は正方形固定（列の幅＝1辺）。画面の縦幅で形が変わらないようにしている */
 .p-hero__col img {
   display: block;
   width: 100%;
-  height: calc((100svh - var(--header-h)) / 4);
-  /* 企業ロゴを白い升目の中に収める。細い罫で升目を区切る */
+  height: auto;
+  aspect-ratio: 560 / 620;
+  margin-bottom: 6px;
+  /* 企業ロゴを白い升目の中に収める。細い罫で升目を区切る。
+     外向きの影も落としていたが、**升目は128枚あり、影を描く負担が重かった**のでやめた
+     （壁はスモークと影の覆いで十分に沈む） */
   padding: 14% 16%;
   background: #fff;
   box-shadow: inset 0 0 0 1px var(--c-line-thin);
@@ -230,40 +604,8 @@
   }
 }
 
-@keyframes heroFlowDown {
-  from {
-    transform: translateY(-50%);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes lineIn {
-  from {
-    clip-path: inset(0 0 100% 0);
-    translate: 0 -0.4em;
-  }
-
-  to {
-    clip-path: inset(0 0 0 0);
-    translate: 0 0;
-  }
-}
 
 /* SP（横組み）のコピーは、切り抜いた枠の中を下からせり上がる */
-@keyframes lineRise {
-  from {
-    clip-path: inset(0 -0.2em 100% -0.2em);
-    translate: 0 100%;
-  }
-
-  to {
-    clip-path: inset(-0.3em -0.2em -0.3em -0.2em);
-    translate: 0 0;
-  }
-}
 
 @keyframes wordIn {
   to {
@@ -279,9 +621,15 @@
 
 /* 列は2セットぶん（画面の約4倍）の高さがあり、下り列は -50% の位置で止まっている。
    画面から完全に外すには列の高さの半分ずらす必要がある（上り・下りとも同じ距離＝同じ速さ） */
+@keyframes tilesShow {
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes colInUp {
   from {
-    translate: 0 50%;
+    translate: 0 110svh;
   }
 
   to {
@@ -289,22 +637,8 @@
   }
 }
 
-@keyframes colInDown {
-  from {
-    translate: 0 -50%;
-  }
+/* 上から入ってくる列（2・4列目）。往復の向きと合わせている */
 
-  to {
-    translate: 0 0;
-  }
-}
-
-@keyframes markIn {
-  from {
-    opacity: 0;
-    scale: 0.86;
-  }
-}
 
 @keyframes fadeUp {
   from {
@@ -329,7 +663,7 @@
      升目の上は狭く下は広い、という偏りが出るため高さの下限は付けない
      （ロゴ帯＋ABOUT＋ロゴ帯で、PCではおおむね1画面ぶんになる） */
   padding: var(--band-gap) var(--pad-x);
-  background: var(--c-ink);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
 }
 
@@ -427,7 +761,7 @@
 .p-stories {
   padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
   overflow-x: clip;
-  background: var(--c-ink);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
 }
 
@@ -465,7 +799,7 @@
 }
 
 .p-stories .p-card__visual {
-  background: #2c2625;
+  background: #1b2436;
 }
 
 .p-stories .p-group__foot {
@@ -754,25 +1088,25 @@
 
 .p-index {
   --g1: var(--c-accent);
-  --g1-ink: var(--c-ink);
+  --g1-ink: #efd99a;
   --g2: var(--c-accent);
-  --g2-ink: var(--c-ink);
+  --g2-ink: #efd99a;
   --g3: var(--c-accent);
-  --g3-ink: var(--c-ink);
+  --g3-ink: #efd99a;
   --g4: var(--c-accent);
-  --g4-ink: var(--c-ink);
+  --g4-ink: #efd99a;
   --g5: var(--c-accent);
-  --g5-ink: var(--c-ink);
+  --g5-ink: #efd99a;
   --g6: var(--c-accent);
-  --g6-ink: var(--c-ink);
+  --g6-ink: #efd99a;
   --g7: var(--c-accent);
-  --g7-ink: var(--c-ink);
+  --g7-ink: #efd99a;
   --g8: var(--c-accent);
-  --g8-ink: var(--c-ink);
+  --g8-ink: #efd99a;
   --g9: var(--c-accent);
-  --g9-ink: var(--c-ink);
+  --g9-ink: #efd99a;
   --g10: var(--c-accent);
-  --g10-ink: var(--c-ink);
+  --g10-ink: #efd99a;
 }
 
 .p-group,
@@ -1011,13 +1345,31 @@
   display: block;
   overflow: hidden;
   aspect-ratio: 1 / 1;
-  background: var(--c-paper-2);
+  background: #1b2436;
+  /* 写真を地にじかに置くと、切り抜きを並べたように見える。
+     細い金の罫で縁取り、影で少し持ち上げて「掛けた札」にする（MORE STORIES と同じ扱い） */
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.28),
+    0 16px 32px rgba(0, 0, 0, 0.42);
+  transition: box-shadow 0.45s ease;
+}
+
+@media (hover: hover) {
+  .p-card:hover .p-card__visual {
+      box-shadow:
+        inset 0 0 0 1px rgba(201, 164, 90, 0.6),
+        0 22px 42px rgba(0, 0, 0, 0.5);
+    }
 }
 
 .p-card__visual img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* 50人ぶんの写真は撮った場所も光もばらばらで、素のまま並べると
+     「寄せ集め」に見える。彩度をわずかに落とし、締まりを少し足して、
+     1つの面として読めるところまで寄せる（人物の写真なので、掛けるのはここまで） */
+  filter: saturate(0.94) contrast(1.04);
   transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
@@ -1203,7 +1555,7 @@
 
 @supports (background: color-mix(in srgb, red 50%, white)) {
   .p-index__group-title:hover {
-      background: color-mix(in srgb, var(--g) 6%, #fff);
+      background: color-mix(in srgb, var(--g) 16%, transparent);
     }
 }
 
@@ -1218,15 +1570,15 @@
 }
 
 .p-index__group-ja {
-  color: var(--c-ink-soft);
+  color: rgba(255, 255, 255, 0.6);
   font-family: var(--f-gothic);
   font-size: 11.5px;
   letter-spacing: 0.16em;
 }
 
 .p-index__group-no {
-  /* 番号には金を使わない */
-  color: var(--c-ink);
+  /* 番号には金を使わない。墨地なので白 */
+  color: #fff;
   font-family: var(--f-display);
   font-size: 1.5rem;
   line-height: 1;
@@ -1247,7 +1599,7 @@
   position: relative;
   display: block;
   padding: 11px 4px 11px 15px;
-  border-bottom: 1px solid var(--c-line-thin);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   transition: background-color 0.3s ease;
 }
 
@@ -1269,17 +1621,18 @@
   opacity: 1;
 }
 
+/* 墨地なので、乗せたときは白い薄膜で持ち上げる（暗い色を敷くと地に沈んで見えない） */
 .p-index__list a:hover {
-  background: var(--c-paper-2);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 @supports (border-color: color-mix(in srgb, red 50%, white)) {
   .p-index__list a {
-      border-bottom-color: color-mix(in srgb, var(--g) 26%, var(--c-line-thin));
+      border-bottom-color: color-mix(in srgb, var(--g) 26%, rgba(255, 255, 255, 0.14));
     }
 
   .p-index__list a:hover {
-      background: color-mix(in srgb, var(--g) 7%, #fff);
+      background: color-mix(in srgb, var(--g) 16%, transparent);
     }
 }
 
@@ -1299,7 +1652,7 @@
 .p-index__company {
   display: block;
   margin-top: 4px;
-  color: var(--c-ink-soft);
+  color: rgba(255, 255, 255, 0.62);
   font-family: var(--f-gothic);
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -1323,7 +1676,7 @@
   justify-content: center;
   min-height: 100svh;
   padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
-  background: var(--c-ink);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
 }
 
@@ -1365,15 +1718,15 @@
   letter-spacing: 0.22em;
 }
 
+/* 1カラム。ロゴ → 局名 → 本文 → データ → エリア図、と縦に積んで中央にそろえる */
 .p-station__box {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  align-items: start;
-  gap: clamp(30px, 5vw, 70px);
+  max-width: 820px;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .p-station__logo a {
-  display: block;
+  display: inline-block;
   padding: 18px 22px;
   background: #fff;
   transition: opacity 0.3s ease;
@@ -1388,53 +1741,89 @@
 }
 
 .p-station__name {
+  margin-top: clamp(24px, 3vw, 34px);
   font-size: clamp(1.05rem, 2vw, 1.3rem);
   font-weight: 600;
   letter-spacing: 0.1em;
 }
 
 .p-station__text {
-  margin-top: 16px;
+  max-width: 740px;
+  margin: 16px auto 0;
   color: rgba(255, 255, 255, 0.86);
   font-size: 15px;
   line-height: 2.1;
 }
 
+/* 放送エリアの模式図。**地図そのものではなく「見立て」**として置く
+   （正確な地形で描くと、実際の受信範囲と食い違ったときに誤解を生むため。
+   図の中でも、放送対象地域の東京都だけを金で起こしている） */
+.p-station__area {
+  margin: clamp(36px, 4.4vw, 54px) 0 0;
+}
+
+/* 図は紺地に溶けるベクターなので、白い面には載せない */
+.p-station__area img {
+  width: min(680px, 100%);
+  margin-inline: auto;
+}
+
+
+
 .p-station__data {
-  margin-top: clamp(24px, 3vw, 34px);
+  margin-top: 0;
 }
 
 .p-station__data a {
   padding-bottom: 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(201, 164, 90, 0.5);
+  color: #fff;
 }
 
 .p-station__data a:hover {
   opacity: 0.7;
 }
 
-.p-station__data > div {
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 16px;
-  padding: 13px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+/* 1カラムなので、データは横に並べる。
+   区切りは全幅の灰の罫ではなく、各項目の頭に短い金を1本ずつ */
+.p-station__data {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(28px, 5vw, 76px);
+  margin-top: clamp(28px, 3.4vw, 40px);
 }
 
-.p-station__data > div:last-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+.p-station__data > div {
+  position: relative;
+  padding: 16px 0 0;
 }
+
+.p-station__data > div::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 22px;
+  height: 1px;
+  background: rgba(201, 164, 90, 0.75);
+  translate: -50% 0;
+  content: "";
+}
+
+/* 最後の行の下の罫は引かない（見出しの頭の短い金だけで区切る） */
 
 .p-station__data dt {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.52);
   font-family: var(--f-gothic);
-  font-size: 11.5px;
-  letter-spacing: 0.12em;
-  line-height: 2.2;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  line-height: 2;
 }
 
 .p-station__data dd {
+  margin-top: 2px;
   font-size: 15px;
+  letter-spacing: 0.04em;
   line-height: 1.9;
 }
 
@@ -1469,10 +1858,6 @@
       padding-right: clamp(16px, 2.4vw, 32px);
     }
 
-  .p-hero::before {
-      width: min(56vh, 52vw);
-    }
-
   .p-index__list {
       column-gap: clamp(20px, 3vw, 40px);
     }
@@ -1488,8 +1873,14 @@
   /* SPは写真を上、文字を下に積む。縦組みは幅が足りないので横組みに戻す */
   .p-hero {
       grid-template-columns: 1fr;
+      /* SPは升目が画面の幅いっぱいなので、地の溶かしも全幅に広げる。
+         高さも影を当てる位置に使うので変数で持つ */
+      --hero-tiles-w: 100%;
+      --hero-tiles-h: min(92vw, 40svh);
       /* 正方形の写真が3段ぶん入る高さ（画面幅の1倍）＋ 溶かしぶん */
-      grid-template-rows: min(100vw, 44svh) auto;
+      /* 2行目は余りいっぱい。auto のままだと、縦組みのコピーを外して文字が減ったぶん、
+         下に大きな余白が残る */
+      grid-template-rows: var(--hero-tiles-h) 1fr;
       height: auto;
       min-height: 100svh;
       /* ヘッダーは常に地色を敷いているので、写真がその下から始まるようにする */
@@ -1499,7 +1890,7 @@
   /* SPは写真の帯が42svhしかないので、正方形のままにする */
   .p-hero__col img {
       height: auto;
-      aspect-ratio: 1;
+      aspect-ratio: 560 / 620;
     }
 
   /* SPは3列×3段。3列目を出して、写真は正方形のまま並べる */
@@ -1507,61 +1898,119 @@
       grid-row: 1;
       grid-template-columns: repeat(3, 1fr);
       margin-top: 0;
-      mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 100%);
+      /* 帯の下端は、影で落とすのではなく**帯そのものを溶かす**。
+         影で落とすと、升目が切れた線がうっすら残って境目になる */
+      mask-image: linear-gradient(to bottom, #000 70%, rgba(0, 0, 0, 0.6) 88%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 70%, rgba(0, 0, 0, 0.6) 88%, transparent 100%);
     }
 
-  .p-hero__col--third {
-      display: block;
-    }
-
-  /* SPは写真が下へ溶けるので、色も左からではなく下端に寄せる */
-  .p-hero__tiles::after {
-      opacity: 0.5;
-      mask-image: linear-gradient(to bottom, transparent 58%, #000 100%);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 58%, #000 100%);
-    }
-
-  .p-hero::after {
+  /* SPは3列×3段のまま。4列目は出さない */
+  .p-hero__col--fourth {
       display: none;
     }
 
+  /* SPは升目が上段にあるので、幕は下の段（文字組み）だけに張る */
+  .p-hero__drape {
+      inset: calc(var(--header-h) + var(--hero-tiles-h)) 0 0;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+
+  /* SPでもトロフィーは出す。文字組みの下が大きく空くので、右下に小さく立たせる */
+  .p-hero__trophy {
+      width: min(124px, 32vw);
+      margin: auto 0 0 auto;
+    }
+
+  /* **升目に掛けるスモークはSPでは薄くする**。
+     PCの値は縦に長い壁に合わせたもので、横に広く背の低いSPの帯に当てると、
+     右側と下側の企業ロゴが暗くて読めなくなる */
+  .p-hero__tiles::before {
+      background: radial-gradient(
+        farthest-corner at 24% 0%,
+        rgba(14, 25, 50, 0.02) 0%,
+        rgba(14, 25, 50, 0.12) 30%,
+        rgba(14, 25, 50, 0.24) 58%,
+        rgba(14, 25, 50, 0.36) 82%,
+        rgba(14, 25, 50, 0.44) 100%
+      );
+    }
+
+  /* SPは升目が横3列・上段にあるので、右上からの筋は浅い角度で当てる */
+  .p-hero__tiles::after {
+      background: conic-gradient(
+        from 0deg at 100% 0%,
+        transparent 178deg,
+        rgba(255, 252, 247, var(--beam-w)) 208deg,
+        rgba(255, 252, 247, var(--beam-w)) 226deg,
+        transparent 256deg
+      );
+    }
+
+  /* **PCの光の筋はSPでは出さない**。画面が縦長なので、横から差す角度のまま出すと
+     斜めの硬い線が画面を横切り、影が壊れて見える。SPは面の光だけで作る */
+  .p-hero__inner::before,
+    .p-hero__inner::after,
+    .p-hero::after {
+      display: none;
+    }
+
+  /* SPの覆い。囲みの影は弱めて、右上からの柔らかい明かりと、
+     升目の帯から文字組みへのつながりだけを作る */
+  .p-hero::before {
+      /* **囲みの影は浅く**。画面幅が390pxしかないので、PCと同じぼかし幅だと
+         左右の端まで食い込んで、端に置いたロゴが沈む */
+      box-shadow: inset 0 0 70px 6px rgba(0, 0, 0, 0.4);
+      background:
+        /* ロゴと説明文に当てる明かり。**暗い地にロゴを置くので、ここが主役の光**。
+         位置は文字組みの左寄り（ロゴの位置）に合わせる */
+        radial-gradient(
+          86% 26% at 38% calc(var(--hero-tiles-h) + 22%),
+          rgba(255, 246, 224, 0.2) 0%,
+          rgba(255, 246, 224, 0.07) 46%,
+          transparent 76%
+        ),
+        /* トロフィーの側にも弱く1つ */
+        radial-gradient(
+          60% 20% at 80% calc(var(--hero-tiles-h) + 58%),
+          rgba(255, 246, 224, 0.1) 0%,
+          transparent 74%
+        ),
+        radial-gradient(
+          124% 74% at 50% 44%,
+          transparent 64%,
+          rgba(0, 0, 0, 0.12) 88%,
+          rgba(0, 0, 0, 0.22) 100%
+        );
+    }
+
   .p-hero__inner {
+      /* SPは1列なので、PCで入れた「2列目に置く」指定を戻す
+         （戻さないと、ありもしない2列目が作られて升目の帯が潰れる） */
+      grid-column: 1;
       grid-row: 2;
       min-width: 0;
       flex-direction: column;
       align-items: flex-start;
-      /* PCの「コピーを写真側へ寄せる」指定が、縦積みでは上下に離す動きになるため戻す */
-      justify-content: center;
-      gap: clamp(14px, 2.6svh, 24px);
-      padding: clamp(18px, 3svh, 30px) var(--pad-x) clamp(20px, 3.4svh, 34px);
-    }
-
-  .p-hero__copy {
-      order: 1;
-      /* 12文字＋字間0.16em が画面幅に収まる上限。
-         360px でも1行のまま収まるよう 5.4vw／上限22px に抑えている */
-      font-size: min(5.4vw, 22px);
-      writing-mode: horizontal-tb;
-      gap: 6px;
-      /* 長い行がグリッドの列幅を押し広げないように */
-      min-width: 0;
-      line-height: 1.7;
-    }
-
-  /* 横組みなので、コピーは上から覆いを外すのではなく、枠の中を下からせり上げる */
-  .p-hero__line {
-      clip-path: inset(0 -0.2em 100% -0.2em);
-      animation-name: lineRise;
+      /* 文字は上寄せ、トロフィーは下。あいだは余りで空ける */
+      justify-content: flex-start;
+      gap: 0;
+      padding: clamp(22px, 4svh, 40px) var(--pad-x) clamp(18px, 3svh, 30px);
     }
 
   .p-hero__meta {
       order: 2;
       margin-top: 0;
+      /* SPはトロフィーを出さないので、塊を上げる余白は要らない */
+      margin-bottom: 0;
     }
 
   .p-hero__wordmark img {
-      width: min(320px, 66vw);
+      width: min(380px, 80vw);
+    }
+
+  .p-hero__meta {
+      max-width: none;
     }
 
   .p-hero__meta::after {
@@ -1570,7 +2019,7 @@
 
   .p-hero__text {
       margin-top: clamp(12px, 2.2svh, 20px);
-      font-size: 13.5px;
+      font-size: 15px;
       line-height: 2;
     }
 
@@ -1679,9 +2128,9 @@
       gap: 2px;
     }
 
-  /* SPの文字は全体的に一段小さく */
+  /* SPの文字は全体的に一段小さく（FVのリードだけは読ませたいので大きめのまま） */
   .p-hero__text {
-      font-size: 13.5px;
+      font-size: 15px;
     }
 
   .p-concept__title,
@@ -1757,8 +2206,24 @@
       animation: none;
     }
 
-  .p-hero__line,
-    .p-hero__wordmark img,
+  .p-hero__tiles {
+      opacity: 1;
+      animation: none;
+    }
+
+  /* 両翼の光は動かさず、最初から出しておく（opacity で出し入れしているので、
+     animation を切るだけだと 0 のまま消えてしまう） */
+  .p-hero__trophy,
+    .p-hero::after,
+    .p-hero__drape::before,
+    .p-hero__inner::before,
+    .p-hero__inner::after,
+    .p-hero__tiles::after {
+      opacity: 1;
+      animation: none;
+    }
+
+  .p-hero__wordmark img,
     .js .p-grouprow .p-card__visual {
       clip-path: none;
     }

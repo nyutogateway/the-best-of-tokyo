@@ -21,20 +21,24 @@
   top: 12px;
 }
 
+/* 墨地の上に置くので、枠は金、文字は地の色（白）のまま */
 .c-back {
+  position: relative;
   display: inline-block;
-  min-width: 260px;
-  padding: 17px 40px;
-  border: 1px solid var(--c-ink);
+  min-width: 300px;
+  padding: 20px 44px;
+  /* 罫は細く薄い金。**太い枠は安く見える**ので、縁は気配だけにして字間で格を出す */
+  border: 1px solid rgba(201, 164, 90, 0.45);
   font-family: var(--f-gothic);
-  font-size: 12.5px;
-  letter-spacing: 0.16em;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
   transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
 
 .c-back:hover {
-  background: var(--c-ink);
-  border-color: var(--c-ink);
+  background: rgba(201, 164, 90, 0.18);
+  border-color: var(--c-accent);
   color: #fff;
 }
 
@@ -50,7 +54,7 @@
   display: inline-block;
   padding-bottom: 3px;
   border-bottom: 1px solid var(--c-accent);
-  color: var(--c-ink);
+  color: #fff;
   font-family: var(--f-gothic);
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -109,13 +113,7 @@
   content: attr(data-text);
 }
 
-/* 白地の見出し（INDEX / 記事の MORE STORIES）も、墨の面の見出しとまったく同じ淡い金にそろえる
-   （黄みの強い金にすると、そこだけ別の金に見えて統一感が崩れるため）。
-   白地では淡い金が溶けやすいので、縁だけわずかに太らせる（外に見えるのは約1.25px） */
-.p-index__label::before,
-.p-related__en::before {
-  -webkit-text-stroke-width: 2.5px;
-}
+/* 見出しの金は1種類、縁の太さもサイト全体で同じ（地がどこも墨になったため、白地向けの指定は不要） */
 
 
 /* スクロール連動のフェードイン ------------------------------
@@ -206,15 +204,14 @@
 /* ロゴ帯は墨。ABOUT・STORIES の墨の帯のあいだで、そこだけ白いと浮くため。
    ロゴは白地の画像が多いので、1社ずつ白い升目に入れて墨の上に並べる（FV の升目と同じ扱い） */
 .p-logos {
-  background: var(--c-ink);
+  background: var(--grain), var(--c-indigo-deep);
 }
 
-/* FV の写真と帯がぶつかって見えるので、上の帯だけ間を空ける。
-   上の帯は升目の上に墨の余白（--band-gap）を取り、升目の下は ABOUT の上の余白（同じ値）に任せる。
+/* 上の帯は升目の上に墨の余白（--band-gap）を取り、升目の下は ABOUT の上の余白（同じ値）に任せる。
+   FVとの間に別の余白を足すと、切れ目が2回来て区切りが雑に見えるので、余白はこの1つだけにする。
    下の帯（ABOUT と STORIES のあいだ）は自前の余白を持たず、上下とも隣の帯の余白（同じ値）に任せる。
    こうすると、どちらの帯も升目の上下の墨が同じ幅になる */
 .p-hero + .p-logos {
-  margin-top: clamp(56px, 8vh, 120px);
   padding-top: var(--band-gap);
 }
 

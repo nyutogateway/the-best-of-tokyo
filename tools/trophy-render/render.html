@@ -1,0 +1,273 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>trophy render</title>
+<style>html,body{margin:0;background:#222}canvas{display:block}</style>
+<canvas id="cv"></canvas>
+<pre id="out">pending</pre>
+<script id="vs" type="x-shader">#version 300 es
+in vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }
+</script>
+<script id="fs" type="x-shader">#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform vec2 uRes;
+uniform vec4 uView;   // xmin, xmax, ymin, ymax  (orthographic window)
+uniform float uSeed;
+
+// ---- かたち：5稜の星（面取りつき）＋円柱の台 ---------------------------
+// 参考にした実物は、鏡面の星が斜めに立ち、円柱の台に根元が差し込まれている形。
+// 星は板を切り抜いただけだと安っぽいので、中心を厚く・先端を薄くして稜を作る
+float sdStar5(vec2 p, float r, float rf){
+  const vec2 k1 = vec2(0.809016994375, -0.587785252292);
+  const vec2 k2 = vec2(-0.809016994375, -0.587785252292);
+  p.x = abs(p.x);
+  p -= 2.0 * max(dot(k1, p), 0.0) * k1;
+  p -= 2.0 * max(dot(k2, p), 0.0) * k2;
+  p.x = abs(p.x);
+  p.y -= r;
+  vec2 ba = rf * vec2(-k1.y, k1.x) - vec2(0.0, 1.0);
+  float h = clamp(dot(p, ba) / dot(ba, ba), 0.0, r);
+  return length(p - ba * h) * sign(p.y * ba.x - p.x * ba.y);
+}
+
+float sdCyl(vec3 p, float r, float h, float rd){
+  vec2 d = vec2(length(p.xz) - r + rd, abs(p.y) - h + rd);
+  return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rd;
+}
+
+mat3 rotX(float a){ float c = cos(a), s = sin(a); return mat3(1.0, 0.0, 0.0, 0.0, c, -s, 0.0, s, c); }
+mat3 rotY(float a){ float c = cos(a), s = sin(a); return mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c); }
+mat3 rotZ(float a){ float c = cos(a), s = sin(a); return mat3(c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0); }
+
+float smin(float a, float b, float k){
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}
+
+// 戻り値 x = 距離、y = 材質（いまは金のみ 0）
+vec2 map2(vec3 p){
+  // 星。**板を切り抜いた形ではなく、ふくらんだ立体**にするのが要点。
+  // 実物の例は、腕の面がなめらかに張り出していて、鏡面が周りを大きく映す。
+  // 断面をドーム（中心ほど厚く、縁へ向かって円く落ちる）にすると、その見え方になる。
+  // ここの回転は「世界→星の座標」なので、見た目は符号が逆に効く
+  vec3 q = rotZ(0.42) * rotX(-0.20) * rotY(-0.26) * (p - vec3(0.34, 1.72, 0.0));
+  float d2 = sdStar5(q.xy, 0.95, 0.52);
+  float u = clamp(-d2 / 0.42, 0.0, 1.0);            // 0 = 縁、1 = 中心
+  float t = 0.035 + 0.30 * sqrt(u);                 // ドームの厚み（sqrt で縁が丸くなる）
+  float star = max(d2, abs(q.z) - t) - 0.03;
+
+  // 台。金属の円柱と、その下の透明な座（ガラス）
+  float col = sdCyl(p - vec3(0.0, 0.420, 0.0), 0.36, 0.42, 0.03);
+  float glass = sdCyl(p - vec3(0.0, 0.090, 0.0), 0.60, 0.09, 0.02);
+  float metal = smin(star, col, 0.05);
+  return (glass < metal) ? vec2(glass, 1.0) : vec2(metal, 0.0);
+}
+float map(vec3 p){ return map2(p).x; }
+
+vec3 calcNormal(vec3 p){
+  vec2 e = vec2(1.0, -1.0) * 0.0012;
+  return normalize(e.xyy * map(p + e.xyy) + e.yyx * map(p + e.yyx)
+                 + e.yxy * map(p + e.yxy) + e.xxx * map(p + e.xxx));
+}
+
+float trace(vec3 ro, vec3 rd, float tmax){
+  float t = 0.0;
+  for(int i = 0; i < 78; i++){
+    vec3 p = ro + rd * t;
+    float d = map(p);
+    if(d < 0.0006 * (1.0 + t)) return t;
+    t += d * 0.92;
+    if(t > tmax) break;
+  }
+  return -1.0;
+}
+
+// ---- 環境：紺のスタジオ。左上に主光源、右上に補助、後ろに逆光 ----------
+// 光源。acos は高くつくので、角度ではなく cos のしきい値で裾を作る
+vec3 lamp(vec3 d, vec3 L, float c0, float c1, float power, vec3 col){
+  return col * power * smoothstep(c0, c1, dot(d, L));
+}
+vec3 env(vec3 d){
+  float h = d.y;
+  // 上は明るい空、下は暗い床。**この明暗差が金属に見えるかどうかを決める**。
+  // 全体が中間調だと、いくら磨いても真鍮のつや消しに見える
+  vec3 sky    = mix(vec3(0.135, 0.150, 0.180), vec3(0.280, 0.300, 0.345), smoothstep(0.0, 0.8, h));
+  vec3 floorC = mix(vec3(0.034, 0.040, 0.058), vec3(0.070, 0.078, 0.098), smoothstep(-1.0, 0.0, h));
+  vec3 c = mix(floorC, sky, smoothstep(-0.015, 0.015, h));
+  c += vec3(1.15, 1.10, 1.00) * smoothstep(0.045, 0.0, abs(h - 0.02));   // 地平の帯
+  c += lamp(d, vec3(0.5507, 0.7210, 0.4206), 0.91309, 0.98219, 13.00, vec3(1.000, 0.975, 0.930));  // 主光（右上の大きな面光源。トロフィーが画面の右に立つので、光も右から）
+  c += lamp(d, vec3(0.2516, 0.9560, 0.1509), 0.92106, 0.98384, 3.20, vec3(1.000, 0.985, 0.960));  // 上から
+  c += lamp(d, vec3(-0.8096, 0.4250, 0.4048), 0.89605, 0.97865, 2.60, vec3(1.000, 0.950, 0.880));  // 左の補助
+  c += lamp(d, vec3(-0.0953, 0.2860, -0.9535), 0.86782, 0.97275, 1.70, vec3(0.900, 0.940, 1.000));  // 逆光
+  c += lamp(d, vec3(0.2166, -0.9206, 0.3249), 0.76484, 0.95080, 0.60, vec3(1.000, 0.860, 0.660));  // 床の照り返し
+  c += lamp(d, vec3(0.7903, 0.2173, 0.5729), 0.86782, 0.97275, 5.00, vec3(1.000, 0.970, 0.930));  // カメラ後ろの白い面（右）
+  c += lamp(d, vec3(-0.7729, 0.1585, 0.6144), 0.88699, 0.97676, 2.80, vec3(1.000, 0.960, 0.910));  // カメラ後ろの白い面（右）
+  return c;
+}
+
+// ---- GGX ---------------------------------------------------------------
+uint seed;
+float rnd(){
+  seed = seed * 1664525u + 1013904223u;
+  return float(seed >> 8) / 16777216.0;
+}
+vec3 sampleGGX(vec3 n, float a){
+  float u1 = rnd(), u2 = rnd();
+  float phi = 6.2831853 * u1;
+  float ct = sqrt((1.0 - u2) / (1.0 + (a * a - 1.0) * u2));
+  float st = sqrt(max(0.0, 1.0 - ct * ct));
+  vec3 up = abs(n.z) < 0.9 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+  vec3 tx = normalize(cross(up, n)), ty = cross(n, tx);
+  return normalize(tx * (st * cos(phi)) + ty * (st * sin(phi)) + n * ct);
+}
+float smithG(float nv, float nl, float a){
+  float k = a * a * 0.5;
+  return (nv / (nv * (1.0 - k) + k)) * (nl / (nl * (1.0 - k) + k));
+}
+
+const vec3 GOLD = vec3(1.000, 0.762, 0.330);   // 金。実物の例はクロムだが、サイトの金に合わせる
+const vec3 PLATE_ALBEDO = vec3(0.016, 0.026, 0.055);   // ガラスの座（暗い誘電体）
+const vec3 PLATE_F0 = vec3(0.07);
+const float PLATE_ROUGH = 0.03;
+const float ROUGH = 0.036;   // 面の映り込みをはっきりさせる（ぼんやりすると鮮明に見えない）
+
+// GLSL は再帰できないので、1バウンスぶんを展開した版を使う
+vec3 shade1(vec3 p, vec3 n, vec3 v, float mat){
+  vec3 sum = vec3(0.0);
+  vec3 F0 = (mat > 0.5) ? PLATE_F0 : GOLD;
+  float rg = (mat > 0.5) ? PLATE_ROUGH : ROUGH;
+  if(mat > 0.5) sum += PLATE_ALBEDO * (env(n) * 0.55 + vec3(0.05));
+  const int N = 3;
+  float nv = max(dot(n, v), 1e-3);
+  for(int i = 0; i < N; i++){
+    vec3 h = sampleGGX(n, rg);
+    vec3 l = reflect(-v, h);
+    float nl = dot(n, l);
+    if(nl <= 0.0) continue;
+    float vh = max(dot(v, h), 1e-3);
+    vec3 F = F0 + (1.0 - F0) * pow(1.0 - vh, 5.0);
+    float w = smithG(nv, nl, rg) * vh / (nv * max(dot(n, h), 1e-3));
+    sum += env(l) * F * w;
+  }
+  return sum / float(N);
+}
+vec3 shade0(vec3 p, vec3 n, vec3 v, float mat){
+  vec3 sum = vec3(0.0);
+  vec3 F0 = (mat > 0.5) ? PLATE_F0 : GOLD;
+  float rg = (mat > 0.5) ? PLATE_ROUGH : ROUGH;
+  if(mat > 0.5) sum += PLATE_ALBEDO * (env(n) * 0.55 + vec3(0.05));
+  const int N = 9;
+  float nv = max(dot(n, v), 1e-3);
+  for(int i = 0; i < N; i++){
+    vec3 h = sampleGGX(n, rg);
+    vec3 l = reflect(-v, h);
+    float nl = dot(n, l);
+    if(nl <= 0.0) continue;
+    float vh = max(dot(v, h), 1e-3);
+    vec3 F = F0 + (1.0 - F0) * pow(1.0 - vh, 5.0);
+    float w = smithG(nv, nl, rg) * vh / (nv * max(dot(n, h), 1e-3));
+    vec3 inc;
+    float t = trace(p + n * 0.004, l, 4.0);
+    if(t > 0.0){
+      vec3 p2 = p + n * 0.004 + l * t;
+      inc = shade1(p2, calcNormal(p2), -l, map2(p2).y) * 0.92;
+    } else {
+      inc = env(l);
+    }
+    sum += inc * F * w;
+  }
+  return sum / float(N);
+}
+
+void main(){
+  vec2 frag = gl_FragCoord.xy;
+  seed = uint(frag.x) * 1973u + uint(frag.y) * 9277u + uint(uSeed) * 26699u | 1u;
+  vec3 acc = vec3(0.0);
+  float cov = 0.0;
+  const int AA = 2;
+  for(int m = 0; m < AA; m++){
+    for(int n = 0; n < AA; n++){
+      vec2 o = (vec2(float(m), float(n)) + vec2(rnd(), rnd())) / float(AA);
+      vec2 uv = (frag + o) / uRes * 2.0 - 1.0;
+      vec3 rd = normalize(vec3(0.0, -0.085, -1.0));       // わずかに見下ろす正射
+      vec3 rt = vec3(1.0, 0.0, 0.0);
+      vec3 up = normalize(cross(rt, rd));
+      vec3 tgt = vec3(0.22, 1.360, 0.0);                   // 画面の中心に来る点
+      vec3 ro = tgt + rt * (uv.x * uView.y) + up * (uv.y * uView.w) - rd * 6.0;
+      float t = trace(ro, rd, 12.0);
+      if(t > 0.0){
+        vec3 p = ro + rd * t;
+        vec2 m = map2(p);
+        acc += shade0(p, calcNormal(p), -rd, m.y);
+        cov += 1.0;
+      }
+    }
+  }
+  float a = cov / float(AA * AA);
+  vec3 col = (cov > 0.0) ? acc / cov : vec3(0.0);
+  col *= 1.06;
+  col = col / (col + 1.0);                    // トーンマッピング
+  col = pow(max(col, 0.0), vec3(1.0 / 2.2));   // ガンマ
+  fragColor = vec4(col, a);
+}
+</script>
+<script>
+(function () {
+  var W = 1100, H = 1387;
+  var cv = document.getElementById('cv');
+  cv.width = W; cv.height = H;
+  var gl = cv.getContext('webgl2', { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true, antialias: false });
+  var out = document.getElementById('out');
+  if (!gl) { out.textContent = 'NO WEBGL'; return; }
+
+  function sh(type, src) {
+    var s = gl.createShader(type); gl.shaderSource(s, src.trim()); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  var pr = gl.createProgram();
+  try {
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, document.getElementById('vs').textContent));
+    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, document.getElementById('fs').textContent));
+  } catch (e) { out.textContent = 'COMPILE ERROR\n' + e.message; return; }
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { out.textContent = 'LINK ERROR\n' + gl.getProgramInfoLog(pr); return; }
+  gl.useProgram(pr);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(pr, 'a');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  gl.uniform2f(gl.getUniformLocation(pr, 'uRes'), W, H);
+  gl.uniform4f(gl.getUniformLocation(pr, 'uView'), 0.0, 1.15, 0.0, 1.45);  // 半幅・半高
+  var seedLoc = gl.getUniformLocation(pr, 'uSeed');
+
+  gl.viewport(0, 0, W, H);
+  gl.enable(gl.SCISSOR_TEST);
+  gl.clearColor(0, 0, 0, 0);
+  gl.disable(gl.SCISSOR_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.SCISSOR_TEST);
+
+  // 一度に描くとGPUの監視に引っかかるので、帯に分けて描く
+  var STRIPS = 560, i = 0, t0 = performance.now();
+  function step() {
+    var y0 = Math.floor(H * i / STRIPS), y1 = Math.floor(H * (i + 1) / STRIPS);
+    gl.scissor(0, y0, W, y1 - y0);
+    gl.uniform1f(seedLoc, i + 1);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    i++;
+    if (i < STRIPS) { setTimeout(step, 0); }
+    else {
+      gl.finish();
+      var ms = Math.round(performance.now() - t0);
+      var url = cv.toDataURL('image/png');
+      out.textContent = 'OK ' + W + 'x' + H + ' ' + ms + 'ms\n' + url;
+    }
+  }
+  setTimeout(step, 0);
+})();
+</script>

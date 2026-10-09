@@ -5,12 +5,17 @@
    layout.css — ヘッダー / グローバルナビ / フッター
    ========================================================= */
 
+/* ヘッダーは墨地。中の文字・ボタンは白 */
 .l-header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
   height: var(--header-h);
+  color: #fff;
 }
+
+/* ヘッダーは最初から出す（一度「FVの上では出さない」形にしていたが、ご指示で戻した）。
+   FVの上では地を透かし、スクロールすると墨の帯が出る */
 
 /* 紙面色の地は疑似要素に持たせる。
    backdrop-filter を .l-header 自身に掛けると、この要素が
@@ -20,9 +25,12 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 1px 0 var(--c-line-thin);
-  backdrop-filter: blur(6px);
+  background: rgba(14, 25, 50, 0.92);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
+  /* 以前は backdrop-filter: blur(6px) を掛けていたが、**FVの升目がこの下でずっと動くため、
+     帯の下の景色を毎フレームぼかし直すことになり重かった**。地は92%の不透明度があり、
+     ぼかしがなくても見え方はほとんど変わらないのでやめた */
+  /* FVの上では地を透かし、スクロールすると墨の帯が出る（下層・記事は --solid で常に出す） */
   opacity: 0;
   transition: opacity 0.4s ease;
   content: "";
@@ -42,16 +50,10 @@
   padding: 0 var(--pad-x);
 }
 
+/* ロゴも最初から出す（以前はスクロールするまで隠していた） */
 .l-header__logo img {
   width: auto;
   height: clamp(34px, 3vw, 42px);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.l-header--solid .l-header__logo img,
-.l-header.is-scrolled .l-header__logo img {
-  opacity: 1;
 }
 
 /* PCでは英字だけを横並びに。日本語・グループ番号・局ロゴはSPメニュー専用 */
@@ -89,7 +91,7 @@
 }
 
 .l-nav__list a:hover {
-  color: var(--c-ink);
+  color: #fff;
 }
 
 .l-nav__list a:hover::after {
@@ -103,12 +105,11 @@
 
 /* footer ------------------------------------------------- */
 
-/* フッターは白地。直前の BROADCASTER が墨の帯なので、白で締めて墨と白の交互をそろえる。
-   上端の虹色の線はそのまま境目に使う */
+/* フッターは白地。墨の本文のあとを白で締める。上端の虹色の線が境目 */
 .l-footer {
   position: relative;
   padding: clamp(56px, 8vw, 96px) var(--pad-x) 40px;
-  background: var(--c-paper);
+  background: var(--grain), var(--c-paper);
   color: var(--c-ink);
   text-align: center;
 }
@@ -183,22 +184,6 @@
   background: #fff;
 }
 
-/* 墨のフッター（記事ページで使う）。フッターは直前の面と反対の色にする：
-   TOP・下層は墨の面のあとなので白、記事は白い本文と MORE STORIES のあとなので墨 */
-.l-footer--ink {
-  background: var(--c-ink);
-  color: #fff;
-}
-
-.l-footer--ink .l-footer__copy {
-  border-top-color: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.l-footer--ink .l-footer__station img {
-  border-color: transparent;
-}
-
 @media (max-width: 767px) {
   /* SPはFVの写真が画面の上まで来るので、ヘッダーは常に紙面色を敷いて
      ロゴとボタンが写真に埋もれないようにする */
@@ -219,7 +204,7 @@
       padding: 10px 0 10px 10px;
       border: 0;
       background: none;
-      color: var(--c-ink);
+      color: #fff;
       cursor: pointer;
     }
 
@@ -275,7 +260,7 @@
       inset: 0;
       z-index: 1;
       overflow-y: auto;
-      background: var(--c-ink);
+      background: var(--grain), var(--c-indigo-deep);
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.4s ease, visibility 0.4s ease;

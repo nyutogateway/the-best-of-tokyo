@@ -1,0 +1,36 @@
+<!doctype html>
+<meta charset="utf-8"><title>image optimize</title><pre id="out">pending</pre>
+<script>
+// [元ファイル, 出力名, 最大幅]
+var JOBS = [
+  ['logo-white-gold.png', 'logo-white-gold.webp', 760],
+  ['logo-blackgold.png',  'logo-blackgold.webp',  760],
+  ['wordmark-blackgold.png', 'wordmark-blackgold.webp', 780],
+  ['mark.png', 'mark-icon.png', 64]
+];
+for (var i = 1; i <= 23; i++) {
+  var n = ('0' + i).slice(-2);
+  JOBS.push(['logos/logo-' + n + '.png', 'logos/logo-' + n + '.webp', 260]);
+}
+var out = [], done = 0;
+function run(job) {
+  var im = new Image();
+  im.onload = function () {
+    var scale = Math.min(1, job[2] / im.naturalWidth);
+    var W = Math.round(im.naturalWidth * scale), H = Math.round(im.naturalHeight * scale);
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var g = c.getContext('2d');
+    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(im, 0, 0, W, H);
+    var url = job[1].slice(-4) === '.png' ? c.toDataURL('image/png') : c.toDataURL('image/webp', 0.9);
+    out.push(job[1] + '\t' + W + 'x' + H + '\t' + url);
+    if (++done === JOBS.length) document.getElementById('out').textContent = 'OK\n' + out.join('\n');
+  };
+  im.onerror = function () {
+    out.push(job[1] + '\tERROR\t');
+    if (++done === JOBS.length) document.getElementById('out').textContent = 'OK\n' + out.join('\n');
+  };
+  im.src = '../assets/img/' + job[0];
+}
+JOBS.forEach(run);
+</script>

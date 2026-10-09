@@ -12,7 +12,7 @@
   position: relative;
   isolation: isolate;
   padding: calc(var(--header-h) + clamp(40px, 7vw, 90px)) var(--pad-x) clamp(70px, 10vw, 120px);
-  background: var(--c-ink);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
   color-scheme: dark;
 }

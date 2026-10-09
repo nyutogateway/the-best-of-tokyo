@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <!-- 画面全体に薄く掛ける粒子。フィルムの粒のように地のグラデーションへ乗せると、
+       段（バンディング）が消えて面が締まる。
+       白い粒と黒い粒を1枚に重ねてあるのが要点：白は墨・紺の面で効き、黒は白い面で効くので、
+       1つの画像のままサイトのどの面でもざらつきが出る（どちらも相手の面では沈む）。
+       粒は疎らにする：alpha に gamma を掛けて暗い側を落としているので、面が白く（黒く）浮かない。
+       タイル状に繰り返すので stitchTiles を指定している -->
+  <filter id="light" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" seed="7"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0"/>
+    <feComponentTransfer>
+      <feFuncA type="gamma" exponent="3" amplitude="0.26"/>
+    </feComponentTransfer>
+  </filter>
+  <filter id="ink" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" seed="21"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0"/>
+    <feComponentTransfer>
+      <feFuncA type="gamma" exponent="3" amplitude="0.22"/>
+    </feComponentTransfer>
+  </filter>
+  <rect width="240" height="240" filter="url(#light)"/>
+  <rect width="240" height="240" filter="url(#ink)"/>
+</svg>

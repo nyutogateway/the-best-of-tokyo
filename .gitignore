@@ -1,2 +1,5 @@
 .DS_Store
 __tmp*.html
+
+# ご支給いただいた第三者の図（公開リポジトリには入れない）
+assets/img/area-map-mx.jpg
