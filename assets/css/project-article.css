@@ -615,8 +615,10 @@
       grid-template-columns: 1fr;
     }
 
+  /* SPは1列になるので、写真は幅を抑えて**中央に置く**（左に寄せたままだと落ち着かない） */
   .p-article__visual {
       max-width: 280px;
+      margin-inline: auto;
     }
 
   .p-qa__q,

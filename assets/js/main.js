@@ -23,6 +23,43 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  /* FVのロゴに光を入れる。
+     PCはロゴにカーソルを乗せたとき（CSSの :hover）。
+     **SPはカーソルが無いので、少しスクロールした時点で一度だけ点ける**。
+     付けるのはクラスだけで、動かすのは transform と filter。
+     どちらも作り直し（レイアウト）を起こさないので、スクロール中でも重くならない */
+  var heroMeta = document.querySelector('.p-hero__meta');
+  if (heroMeta && window.matchMedia('(max-width: 767px)').matches) {
+    var litOnce = function () {
+      if (window.scrollY > 24) {
+        heroMeta.classList.add('is-lit');
+        window.removeEventListener('scroll', litOnce);
+      }
+    };
+    window.addEventListener('scroll', litOnce, { passive: true });
+  }
+
+  /* カードは最初に企業ロゴを出し、カーソルを乗せると写真に変わる（CSSの :hover）。
+     **SPはカーソルが無いので、画面に入ったカードから順に写真へ切り替える**。
+     付けるのはクラスだけ。切り替わるのは opacity と clip-path なので、
+     カードが何枚あってもスクロールは重くならない */
+  var cards = document.querySelectorAll('.p-card');
+  /* 条件は「カーソルが無い」だけでなく「画面が狭い」も見る。
+     hover の判定だけだと、タッチ対応のノートPCや開発者ツールの表示幅変更で
+     どちらにも当てはまらず、切り替えが起きないことがある */
+  if (cards.length && window.matchMedia('(hover: none), (max-width: 767px)').matches && 'IntersectionObserver' in window) {
+    var cardIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-shown');
+        cardIo.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -18% 0px' });
+    Array.prototype.forEach.call(cards, function (el) {
+      cardIo.observe(el);
+    });
+  }
+
   /* モバイルメニューの開閉 */
   if (toggle && nav) {
     /* ボタンには文字を置いていないので、読み上げ用の名前だけ入れ替える */

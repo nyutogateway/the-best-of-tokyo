@@ -186,8 +186,25 @@
 
 
 /* ロゴは左から右へ、覆いを引くように現れる */
+/* ロゴに光を入れる。PCはカーソルを乗せたとき、SPは少しスクロールしたとき（`is-lit`）。
+   **動かすのは filter と transform だけ**にしてある（幅や位置を動かすと作り直しが起きる） */
+.p-hero__meta:hover .p-hero__wordmark img,
+.p-hero__meta.is-lit .p-hero__wordmark img {
+  filter:
+    drop-shadow(0 0 18px rgba(255, 232, 178, 0.55))
+    drop-shadow(0 0 42px rgba(255, 216, 130, 0.3));
+}
+
+/* 虹の線は、金の光に合わせて横へ伸びる（scale なので作り直しは起きない） */
+.p-hero__meta:hover::after,
+.p-hero__meta.is-lit::after {
+  scale: 4 1;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
+}
+
 .p-hero__wordmark img {
   width: 100%;
+  transition: filter 0.6s ease;
   clip-path: inset(-10% 100% -10% 0);
   animation: wordIn 1.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
@@ -199,9 +216,10 @@
   height: 3px;
   margin-top: clamp(18px, 2.4vw, 28px);
   background: var(--rainbow);
-  scale: 0 1;
+  scale: 1 1;
   transform-origin: left;
-  animation: barIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards;
+  animation: barIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 2.2s backwards;
+  transition: scale 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
   content: "";
 }
 
@@ -613,9 +631,12 @@
   }
 }
 
+/* **始点をキーフレームに、終点は宣言値**にしてある。
+   `forwards` で終点をアニメーション側に持たせると、終わったあとも
+   アニメーションの値が宣言値より強く効き、hover で伸ばせなくなる */
 @keyframes barIn {
-  to {
-    scale: 1 1;
+  from {
+    scale: 0 1;
   }
 }
 
@@ -889,7 +910,7 @@
   transition: clip-path 0s linear 0.6s;
 }
 
-.js .p-grouprow .p-card__visual img {
+.js .p-grouprow .p-card__visual img:not(.p-card__logo) {
   scale: 1.14;
   transition:
     transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -901,7 +922,7 @@
   transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) var(--card-delay, 0s);
 }
 
-.js .p-grouprow.is-revealed > .p-group.is-active .p-card__visual img {
+.js .p-grouprow.is-revealed > .p-group.is-active .p-card__visual img:not(.p-card__logo) {
   scale: 1;
   transition:
     transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -1351,18 +1372,74 @@
   box-shadow:
     inset 0 0 0 1px rgba(201, 164, 90, 0.28),
     0 16px 32px rgba(0, 0, 0, 0.42);
-  transition: box-shadow 0.45s ease;
+  transition: box-shadow 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* カードは**最初に企業ロゴを出し、カーソルを乗せると人物の写真**に変わる。
+   FVの升目（白い枠に企業ロゴ）と同じ見え方にして、FVからの流れをつなげている。
+   SPはカーソルが無いので、画面に入ったところで JS が `is-shown` を付けて切り替える。
+   切り替えるのは opacity だけ（作り直しが起きないので、カードが何枚あっても重くならない） */
+.p-card__logo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 16%;
+  background: #fff;
+  object-fit: contain;
+  /* **溶かすのではなく、斜めに拭って外す**。
+     透明度だけで入れ替えると、どれだけ秒数を伸ばしてもパッと変わって見える。
+     右上の角から斜めの線が左下へ抜けていく形にすると、変化の進み方が目で追える。
+     向きは、入れ替わりで出てくる虹色の拭い（右上から）とそろえてある。
+     4つの点を同じ量だけ平行移動させているので、辺の傾きは変わらない。
+     **移動量は「ちょうど抜けきるぶん」にすること**。余分に動かすと、
+     抜けきったあとも時間が残り、見た目は一瞬で変わったように見える */
+  clip-path: polygon(-170% 0, 100% 0, 170% 100%, -100% 100%);
+  transition: clip-path 1.05s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (hover: hover) {
-  .p-card:hover .p-card__visual {
-      box-shadow:
-        inset 0 0 0 1px rgba(201, 164, 90, 0.6),
-        0 22px 42px rgba(0, 0, 0, 0.5);
+  .p-card:hover .p-card__logo {
+      clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
     }
 }
 
-.p-card__visual img {
+.p-card.is-shown .p-card__logo {
+  clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
+}
+
+/* SPの保険。JSが `is-shown` を付ける前提だが、**行が画面に入ったときに付く
+   `is-revealed`（既存の仕組み）でも同じ切り替えが起きる**ようにしておく。
+   どちらか一方が動かない環境でも、ロゴが残り続けることはない */
+@media (hover: none), (max-width: 767px) {
+  .p-grouprow.is-revealed .p-card__logo {
+      clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
+    }
+}
+
+@media (hover: hover) {
+  /* 写真が出るとき、カードの縁が金に光る */
+  .p-card:hover .p-card__visual {
+      box-shadow:
+        inset 0 0 0 1px rgba(201, 164, 90, 0.75),
+        0 22px 42px rgba(0, 0, 0, 0.5),
+        0 0 34px rgba(255, 226, 160, 0.3);
+    }
+}
+
+.p-card.is-shown .p-card__visual {
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.62),
+    0 20px 38px rgba(0, 0, 0, 0.46),
+    0 0 26px rgba(255, 226, 160, 0.2);
+}
+
+/* **写真だけに効かせる**（`:not(.p-card__logo)` を外さないこと）。
+   ロゴも同じ `.p-card__visual img` に当たるので、外すと
+   ・ロゴのトランジションがここで上書きされ、拭いが一瞬で終わる
+   ・ロゴの色が写真用の調整（彩度を落とす）を受けてしまう */
+.p-card__visual img:not(.p-card__logo) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1370,7 +1447,7 @@
      「寄せ集め」に見える。彩度をわずかに落とし、締まりを少し足して、
      1つの面として読めるところまで寄せる（人物の写真なので、掛けるのはここまで） */
   filter: saturate(0.94) contrast(1.04);
-  transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ホバーで、そのグループの色が左から拭うように出る。
@@ -1401,7 +1478,7 @@
   line-height: 1;
   /* 右上の角から左下へ向かって覆う */
   clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
-  transition: clip-path 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: clip-path 0.95s cubic-bezier(0.33, 0, 0.2, 1) 0.28s;
   content: "READ";
 }
 
@@ -1411,7 +1488,12 @@
     }
 }
 
-.p-card:hover .p-card__visual img {
+/* SPは hover が無いので、画面に入ったときに同じ拭いを走らせる */
+.p-card.is-shown .p-card__visual::after {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.p-card:hover .p-card__visual img:not(.p-card__logo) {
   transform: scale(1.05);
 }
 
@@ -1764,8 +1846,7 @@
 
 /* 図は紺地に溶けるベクターなので、白い面には載せない */
 .p-station__area img {
-  width: min(680px, 100%);
-  margin-inline: auto;
+  width: 100%;
 }
 
 
@@ -2229,7 +2310,7 @@
     }
 
   .p-hero__meta::after,
-    .js .p-grouprow .p-card__visual img {
+    .js .p-grouprow .p-card__visual img:not(.p-card__logo) {
       scale: none;
     }
 }
