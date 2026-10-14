@@ -186,10 +186,7 @@
 
 
 /* ロゴは左から右へ、覆いを引くように現れる */
-/* ロゴに光を入れる。PCはカーソルを乗せたとき、SPは少しスクロールしたとき（`is-lit`）。
-   **動かすのは filter と transform だけ**にしてある（幅や位置を動かすと作り直しが起きる） */
-.p-hero__meta:hover .p-hero__wordmark img,
-.p-hero__meta.is-lit .p-hero__wordmark img {
+.p-hero__wordmark img {
   filter:
     drop-shadow(0 0 18px rgba(255, 232, 178, 0.55))
     drop-shadow(0 0 42px rgba(255, 216, 130, 0.3));
@@ -204,7 +201,6 @@
 
 .p-hero__wordmark img {
   width: 100%;
-  transition: filter 0.6s ease;
   clip-path: inset(-10% 100% -10% 0);
   animation: wordIn 1.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }

@@ -23,22 +23,6 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* FVのロゴに光を入れる。
-     PCはロゴにカーソルを乗せたとき（CSSの :hover）。
-     **SPはカーソルが無いので、少しスクロールした時点で一度だけ点ける**。
-     付けるのはクラスだけで、動かすのは transform と filter。
-     どちらも作り直し（レイアウト）を起こさないので、スクロール中でも重くならない */
-  var heroMeta = document.querySelector('.p-hero__meta');
-  if (heroMeta && window.matchMedia('(max-width: 767px)').matches) {
-    var litOnce = function () {
-      if (window.scrollY > 24) {
-        heroMeta.classList.add('is-lit');
-        window.removeEventListener('scroll', litOnce);
-      }
-    };
-    window.addEventListener('scroll', litOnce, { passive: true });
-  }
-
   /* カードは最初に企業ロゴを出し、カーソルを乗せると写真に変わる（CSSの :hover）。
      **SPはカーソルが無いので、画面に入ったカードから順に写真へ切り替える**。
      付けるのはクラスだけ。切り替わるのは opacity と clip-path なので、
