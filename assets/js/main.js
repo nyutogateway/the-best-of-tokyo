@@ -43,7 +43,7 @@
      **SPはカーソルが無いので、画面に入ったカードから順に写真へ切り替える**。
      付けるのはクラスだけ。切り替わるのは opacity と clip-path なので、
      カードが何枚あってもスクロールは重くならない */
-  var cards = document.querySelectorAll('.p-card');
+  var cards = document.querySelectorAll('.p-card, .p-related__card');
   /* 条件は「カーソルが無い」だけでなく「画面が狭い」も見る。
      hover の判定だけだと、タッチ対応のノートPCや開発者ツールの表示幅変更で
      どちらにも当てはまらず、切り替えが起きないことがある */
