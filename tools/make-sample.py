@@ -220,8 +220,11 @@ def convert_story(html, no):
     html = re.sub(
         r'(<p class="p-article__profile">).*?(</p>)', rf"\1{PROFILE}\2", html, flags=re.S
     )
+    # サンプルでは外部に出さず、その記事ページ自身へ飛ばす（example.com は行き止まりなので）
     html = re.sub(
-        r'(<a class="c-textLink" href=")[^"]*(")', r"\1https://example.com/\2", html
+        r'<a class="c-textLink" href="[^"]*"[^>]*>',
+        f'<a class="c-textLink" href="{no:02d}.html">',
+        html,
     )
 
     # 章の見出し・本文
