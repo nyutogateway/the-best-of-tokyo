@@ -177,7 +177,8 @@ $rows   = array_chunk( $groups, 2 );
         <?php
         /* 放送エリア図はベクター（SVG）なので、どの大きさでも粗が出ません。
            県境は国土数値情報（国土交通省）の行政区域データから起こしたものです。
-           出典の表記（フッター）は消さないでください。 */
+           フッターに出していた出典表記は、ご指示により外しています（同データの利用約款は
+           出典の明示を求めています。表に出したくない場合は図の差し替えが確実です）。 */
         ?>
         <figure class="p-station__area">
           <img src="<?php echo esc_url( tbt_area_map() ); ?>" alt="<?php echo esc_attr( $station_name . ' の放送エリア図' ); ?>" width="680" height="490" loading="lazy" decoding="async">

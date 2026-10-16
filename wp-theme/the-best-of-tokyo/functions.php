@@ -238,7 +238,7 @@ add_action( 'customize_register', function ( $wp_customize ) {
 		),
 		'tbt_footer_copy' => array(
 			'label' => 'フッターの表記',
-			'desc'  => '改行できます。地図の出典表記はここに入っています（消さないでください）。',
+			'desc'  => '改行できます。',
 			'type'  => 'textarea',
 			'def'   => tbt_default( 'footer_copy' ),
 		),
@@ -282,7 +282,7 @@ function tbt_default( $key ) {
 		'station_text'    => '1995年11月1日に開局した、東京都を放送対象地域とする独立放送局です。首都圏の暮らしに根ざした情報番組から、スポーツ、アニメ、東京都議会中継まで、この都市そのものを映す編成を続けています。「THE BEST OF TOKYO 後世に残す言葉」は、同局の公式サイトと連動して展開するインタビューメディアです。',
 		'station_area'    => '東京都（地上デジタル9ch）',
 		'station_url'     => 'https://s.mxtv.jp/',
-		'footer_copy'     => "放送エリア図の地図データは、国土数値情報（国土交通省）を加工して作成しています。\n©THE BEST OF TOKYO All Rights Reserved.",
+		'footer_copy'     => '©THE BEST OF TOKYO All Rights Reserved.',
 	);
 	return isset( $d[ $key ] ) ? $d[ $key ] : '';
 }
