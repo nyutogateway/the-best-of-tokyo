@@ -214,7 +214,7 @@ HTMLへの直書き（style属性・style要素・インラインscript）は全
 |---|---|
 | 人物写真 | AI生成の画像（`assets/img/sample/face-01〜13.jpg`）。実在の人物ではありません |
 | 記事中の写真・流し写真 | AI生成の画像（`assets/img/sample/scene-01〜04.jpg`）。顔が写り込まないものを選んでいます |
-| 企業ロゴ | 「ロゴが入ります」のプレースホルダ（`assets/img/sample/logo-01〜12.svg`） |
+| 企業ロゴ | 「ロゴが入ります」のプレースホルダ（`assets/img/sample/logo-01〜50.svg`）。**掲載者1人につき1種類**で、形・組み方・書体・色・縦横比を変えてあります |
 | 氏名・会社名・役職・本文 | 「氏名が入ります」「会社名が入ります」などの差し込み見本 |
 
 - **検索エンジンには登録されません**。`robots.txt` が全ページ `Disallow`、各ページに `<meta name="robots" content="noindex,nofollow">` が入っています。本番公開のときに両方を外してください

@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 N_FACE = 13   # assets/img/sample/face-01..13.jpg
 N_SCENE = 4   # assets/img/sample/scene-01..04.jpg
-N_LOGO = 12   # assets/img/sample/logo-01..12.svg
+N_LOGO = 50   # assets/img/sample/logo-01..50.svg（50人ぶん＝1人1種類）
 
 FACE_W = FACE_H = 640
 SCENE_W, SCENE_H = 750, 494
