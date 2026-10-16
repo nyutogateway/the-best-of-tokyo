@@ -1,0 +1,762 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   project-article.css — 記事ページ（記事FV / 章 / Q&A / 写真帯 / 締めの言葉）
+   ========================================================= */
+
+/* 記事は「白（頭）→ 墨（本文・MESSAGE）→ 白（MORE STORIES〜一覧へ戻る）→ 墨（フッター）」。
+   記事全体の地を墨にし、頭と締めだけを画面幅いっぱいの白い面にしている。
+   上の余白は白い頭（.p-article__head）の中で取る。
+   isolation で重なりの基準をここに作り、日輪マーク（z-index: -1）が墨の地の上・白い面の下に来るようにする */
+.p-article {
+  position: relative;
+  isolation: isolate;
+  padding: 0 var(--pad-x);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
+  color: #fff;
+}
+
+/* 日輪マークを薄く敷く。position: fixed なので、読み進めても画面に留まる。墨地なので白で */
+.p-article::before {
+  position: fixed;
+  top: 50%;
+  left: 13%;
+  z-index: -1;
+  width: min(64vh, 44vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("../img/mark.svg") no-repeat center / contain;
+  filter: brightness(0) invert(1);
+  /* 本文の後ろに透けるので、気配が残る程度まで薄く */
+  opacity: 0.04;
+  /* 画面に留まったまま、ゆっくり回り続ける */
+  animation: markSpin 120s linear infinite;
+  pointer-events: none;
+  content: "";
+}
+
+@keyframes markSpin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.p-article__inner {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+/* 記事の頭（写真・タイトル・名前）。サイト全体が墨地なので、面は敷かずそのまま置く */
+.p-article__head {
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(320px, 34%, 400px) 1fr;
+  gap: clamp(28px, 4.5vw, 56px);
+  align-items: start;
+  padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
+  padding-bottom: clamp(40px, 6vw, 66px);
+}
+
+.p-article__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.p-article__visual {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #1b2436;
+}
+
+.p-article__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 写真は、その塊が出るときに幕が上がるように下から現れ、少し寄った状態からゆっくり引く
+   （TOPのカードと同じ動き）。寄りは scale で持たせ、ホバーの transform とぶつからないようにしている。
+   本文の写真（.p-figure）は枠の外へはみ出せないので、幕だけにしている */
+.js [data-reveal] :is(.p-article__visual, .p-related__visual),
+.js [data-reveal] .p-figure img {
+  clip-path: inset(100% 0 0 0);
+}
+
+.js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
+  scale: 1.14;
+}
+
+.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual),
+.js [data-reveal].is-revealed .p-figure img {
+  clip-path: inset(0);
+  transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.1s);
+}
+
+.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual) img {
+  scale: 1;
+  transition:
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    scale 1.9s cubic-bezier(0.16, 0.8, 0.24, 1) calc(var(--reveal-delay, 0s) + 0.1s);
+}
+
+.p-article__title {
+  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.8;
+  letter-spacing: 0.1em;
+}
+
+.p-article__name {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--c-line-thin);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.p-article__romaji {
+  display: block;
+  margin-top: 6px;
+  color: var(--c-mute);
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.28em;
+}
+
+.p-article__company {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--f-gothic);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.p-article__profile {
+  margin-top: 22px;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+  line-height: 2.15;
+}
+
+.p-article__intro .c-textLink {
+  margin-top: 20px;
+}
+
+/* 頭に金を効かせる：タイトルと名前の間の金の罫・名前（淡い金）・ローマ字（金） */
+.p-article__head .p-article__name {
+  border-top-color: rgba(201, 164, 90, 0.55);
+  color: #efd99a;
+}
+
+.p-article__head .p-article__romaji {
+  color: var(--c-accent);
+}
+
+/* 白い面（頭・一覧へ戻る）は、出る演出で面ごと透けると墨から白へ明滅するので、
+   面は最初から出しておき、中身だけをいつもの動きで出す（写真は幕の動きがあるので対象外） */
+.js :is(.p-article__head, .p-article__foot)[data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+.js :is(.p-article__head, .p-article__foot)[data-reveal] > :not(.p-article__visual) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.js :is(.p-article__head, .p-article__foot)[data-reveal].is-revealed > :not(.p-article__visual) {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1.05s cubic-bezier(0.16, 0.8, 0.24, 1) var(--reveal-delay, 0s),
+    transform 1.15s cubic-bezier(0.16, 0.8, 0.24, 1) var(--reveal-delay, 0s);
+}
+
+.p-chapter {
+  padding: clamp(50px, 7vw, 84px) 0 0;
+  display: flow-root;
+}
+
+.p-chapter__label {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--c-accent);
+  font-family: var(--f-display);
+  font-size: clamp(16px, 1.4vw, 19px);
+  letter-spacing: 0.22em;
+}
+
+.p-chapter__label::before,
+.p-chapter__label::after {
+  flex: 1;
+  height: 2px;
+  background: var(--gold-grad);
+  content: "";
+}
+
+.p-chapter__title {
+  margin-top: clamp(30px, 4.6vw, 52px);
+  font-size: clamp(1.2rem, 2.3vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.95;
+  letter-spacing: 0.13em;
+  text-align: center;
+}
+
+.p-qa {
+  margin-top: 34px;
+}
+
+.p-qa__item + .p-qa__item {
+  margin-top: 30px;
+}
+
+/* grid のままだと float を避けて箱ごと横にずれるだけで、
+   画像の下に文章が回り込まない。通常のブロック＋記号は絶対配置にしている */
+.p-qa__q,
+.p-qa__a {
+  position: relative;
+  display: block;
+  padding-left: 46px;
+  margin-top: 16px;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  line-height: 2.35;
+}
+
+.p-qa__q {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.95;
+}
+
+.p-qa__mark {
+  position: absolute;
+  top: 0.28em;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-family: var(--f-gothic);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 本文は墨地。Q は金のベタに墨の文字、A は金の輪に白の文字 */
+.p-qa__q .p-qa__mark {
+  background: var(--c-accent);
+  color: var(--c-ink);
+}
+
+.p-qa__a .p-qa__mark {
+  border: 1px solid var(--c-accent);
+  color: #fff;
+}
+
+/* 章の写真は本文に回り込ませる。
+   Q/A の丸バッジは段落ボックスの左端に絶対配置しているので、
+   段落自体はブロックのままでよく、行だけが写真を避けて流れる */
+.p-figure {
+  float: right;
+  width: 50%;
+  /* 本文（.p-qa）の書き出しと写真の天を合わせる */
+  margin: 34px 0 22px clamp(24px, 3.4vw, 44px);
+}
+
+.p-figure img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+
+.p-figure figcaption {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  line-height: 1.8;
+}
+
+/* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文）で、本文と同じ墨地に置く。
+   下の余白で、白の MORE STORIES との間を取る */
+.p-chapter--message {
+  margin-top: clamp(56px, 8vw, 96px);
+  padding-bottom: clamp(64px, 9vw, 110px);
+}
+
+/* 締めの言葉。本文より一段大きく組む */
+.p-chapter__text {
+  margin-top: clamp(26px, 4vw, 44px);
+  font-size: clamp(17px, 1.4vw, 19px);
+  letter-spacing: 0.06em;
+  line-height: 2.3;
+}
+
+/* 同じグループの他の掲載者（記事末尾の導線） --------------- */
+
+/* MORE STORIES から一覧へ戻るまでが記事の締め。サイト全体が墨地なので、面は敷かない */
+.p-related {
+  --g: var(--c-red);
+  --g-ink: var(--c-red-deep);
+  padding-top: clamp(56px, 8vw, 96px);
+}
+
+/* 墨地に合わせたカードの文字色（白地向けの指定を上書き） */
+.p-related .p-related__romaji {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.p-related .p-related__card:hover .p-related__name {
+  color: #efd99a;
+}
+
+.p-related .p-related__company {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* 業種ごとの色は TOP と同じく金と墨に揃えている（クラス名は業種の番号のまま残す） */
+.p-related--g1,
+.p-related--g2,
+.p-related--g3,
+.p-related--g4,
+.p-related--g5,
+.p-related--g6,
+.p-related--g7,
+.p-related--g8,
+.p-related--g9,
+.p-related--g10 {
+  --g: var(--c-accent);
+  --g-ink: var(--c-ink);
+}
+
+.p-related__head {
+  position: relative;
+  margin-bottom: clamp(24px, 3.4vw, 38px);
+  padding-bottom: 14px;
+}
+
+.p-related__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--g);
+  content: "";
+}
+
+.p-related__en {
+  font-weight: 400;
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 3.2vw, 2.3rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.p-related__list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.8vw, 24px);
+}
+
+.p-related__card {
+  display: block;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .p-related__card:hover {
+      transform: translateY(-6px);
+    }
+}
+
+.p-related__visual {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: #1b2436;
+  /* 写真を地にじかに置くと、切り抜きを並べたように見える。
+     細い金の罫で縁取り、影で少し持ち上げて「掛けた額」にする */
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.3),
+    0 16px 34px rgba(0, 0, 0, 0.42);
+  transition: box-shadow 0.45s ease;
+}
+
+@media (hover: hover) {
+  .p-related__card:hover .p-related__visual {
+      box-shadow:
+        inset 0 0 0 1px rgba(201, 164, 90, 0.75),
+        0 22px 44px rgba(0, 0, 0, 0.5),
+        0 0 34px rgba(255, 226, 160, 0.3);
+    }
+}
+
+/* カードの作りは TOP と同じ：**最初に企業ロゴ、カーソルを乗せると
+   右上から斜めに拭って人物写真**。SPは画面に入ったときに同じ切り替えが走る。
+   写真用の指定は `:not(.p-related__logo)` に限定すること。
+   外すとロゴにも当たり、拭いのトランジションが上書きされて一瞬で切り替わる */
+.p-related__logo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 16%;
+  background: #fff;
+  object-fit: contain;
+  clip-path: polygon(-170% 0, 100% 0, 170% 100%, -100% 100%);
+  transition: clip-path 1.05s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .p-related__card:hover .p-related__logo {
+      clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
+    }
+}
+
+.p-related__card.is-shown .p-related__logo {
+  clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
+}
+
+/* SPは虹色の拭いを止めずに通り過ぎさせる（出しっぱなしにすると写真が沈む） */
+@media (hover: none), (max-width: 767px) {
+  .p-related__card.is-shown .p-related__visual::after {
+      animation: cardSweep 1.9s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+    }
+}
+
+.p-related__card.is-shown .p-related__visual {
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.45),
+    0 16px 34px rgba(0, 0, 0, 0.42);
+}
+
+.p-related__visual img:not(.p-related__logo) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* TOPのカードと同じ調子に寄せる（寄せ集めに見せない） */
+  filter: saturate(0.94) contrast(1.04);
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* TOPのカードと同じ、虹色の拭い（右上から左下へ） */
+.p-related__visual::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  /* 虹色は TOKYO MX の配色のうち、黒文字が乗る明るい側だけ */
+  background: linear-gradient(
+    45deg,
+    var(--mx-green) 0%,
+    var(--mx-yellow) 30%,
+    var(--mx-orange) 55%,
+    var(--mx-pink) 80%,
+    var(--mx-blue) 100%
+  );
+  opacity: 0.8;
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(15px, 1.7vw, 24px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+  /* 右上の角から左下へ向かって覆う */
+  clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
+  transition: clip-path 0.95s cubic-bezier(0.33, 0, 0.2, 1) 0.28s;
+  content: "READ";
+}
+
+@media (hover: hover) {
+  .p-related__card:hover .p-related__visual::after {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+
+.p-related__card:hover .p-related__visual img:not(.p-related__logo) {
+  transform: scale(1.05);
+}
+
+.p-related__body {
+  display: block;
+  padding: 18px 2px 0;
+}
+
+/* 静かに置く。写真には重ねず、字間を広げた小さなラベルとして */
+.p-related__romaji {
+  display: block;
+  color: var(--g-ink, var(--c-red-deep));
+  font-family: var(--f-display);
+  font-size: 11.5px;
+  letter-spacing: 0.26em;
+  line-height: 1.75;
+  text-transform: uppercase;
+}
+
+.p-related__name {
+  display: block;
+  margin-top: 10px;
+  font-size: clamp(18px, 1.5vw, 22px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.p-related__card:hover .p-related__name {
+  color: var(--g-ink);
+}
+
+/* 社名2行＋役職1行ぶんの高さを塊全体で確保して、4枚の高さを揃える
+   （社名の側で2行ぶん取ると、1行の社名と役職の間が空いて間延びする） */
+/* 社名2行＋役職1行ぶんの高さを塊全体で確保して、4枚の高さを揃える。
+   **ここを大きく取りすぎると、短い社名のカードの下に大きな空きができて間延びする** */
+.p-related__company {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  min-height: calc(3.4em + 9px);
+  margin-top: 10px;
+  padding-top: 12px;
+  color: var(--c-ink-soft);
+  font-family: var(--f-gothic);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+/* 罫は全幅の灰ではなく、**短い金の罫**。区切りではなく飾りとして置く */
+.p-related__company::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 1px;
+  background: rgba(201, 164, 90, 0.75);
+  content: "";
+}
+
+.p-related__corp,
+.p-related__role {
+  display: block;
+}
+
+/* 一覧へ戻る。記事の締め */
+.p-article__foot {
+  padding: clamp(34px, 4.6vw, 56px) 0 clamp(70px, 10vw, 120px);
+  text-align: center;
+}
+
+.p-marquee {
+  width: 100vw;
+  margin: clamp(50px, 7vw, 84px) 0 0 calc(50% - 50vw);
+  overflow: hidden;
+}
+
+/* 写真の帯も、ほかの写真と同じく幕が上がるように下から現れる。
+   幕（clip-path）は帯そのもの（出る合図を受ける塊）ではなく中の列にかける。
+   塊そのものを切り取ると見える面積が0になり、画面に入ったことが検知されず出てこないため */
+.js .p-marquee[data-reveal] .p-marquee__track {
+  clip-path: inset(100% 0 0 0);
+}
+
+.js .p-marquee[data-reveal].is-revealed .p-marquee__track {
+  clip-path: inset(0);
+  transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.1s);
+}
+
+.p-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 56s linear infinite;
+}
+
+/* カーソルを乗せただけでは止めない。キーボード操作中だけ止める */
+.p-marquee:focus-within .p-marquee__track {
+  animation-play-state: paused;
+}
+
+.p-marquee__set {
+  display: flex;
+}
+
+/* 1画面に5枚。幅を 20vw に固定して枚数をそろえる（写真の縦横比に左右されない） */
+/* 高さを決めて、幅は 4:3 から出す */
+.p-marquee__set img {
+  width: auto;
+  height: clamp(170px, 16vw, 300px);
+  max-width: none;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* タブレット（1023px以下） */
+@media (max-width: 1023px) {
+  /* 回り込みに必要な幅がないので、写真は本文の上に全幅で置く */
+  .p-figure {
+      float: none;
+      width: min(100%, 620px);
+      /* 見出しにくっつかないよう、上にも余白を取る */
+      margin: clamp(24px, 3.4vw, 36px) auto clamp(26px, 3.4vw, 36px);
+    }
+
+  .p-article__head {
+      grid-template-columns: clamp(240px, 38%, 320px) 1fr;
+      gap: clamp(22px, 3.4vw, 40px);
+    }
+
+  .p-related__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  .p-marquee__set img {
+      height: clamp(150px, 20vw, 210px);
+    }
+}
+
+@media (max-width: 767px) {
+  .p-article::before {
+      left: 50%;
+      width: 92vw;
+      opacity: 0.04;
+    }
+  .p-marquee__set img {
+      height: clamp(130px, 30vw, 190px);
+    }
+
+  .p-article__head {
+      grid-template-columns: 1fr;
+    }
+
+  /* SPは1列になるので、写真は幅を抑えて**中央に置く**（左に寄せたままだと落ち着かない） */
+  .p-article__visual {
+      max-width: 280px;
+      margin-inline: auto;
+    }
+
+  .p-qa__q,
+    .p-qa__a {
+      padding-left: 38px;
+    }
+
+  .p-related__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  .p-figure {
+      float: none;
+      width: 100%;
+      margin: 24px 0 26px;
+    }
+
+  .p-qa__mark {
+      width: 26px;
+      height: 26px;
+      font-size: 11px;
+    }
+
+  /* SPの文字は全体的に一段小さく */
+  .p-article__name {
+      font-size: 20px;
+    }
+
+  .p-article__romaji {
+      font-size: 12px;
+    }
+
+  .p-article__company {
+      font-size: 13px;
+    }
+
+  .p-article__profile {
+      font-size: 13px;
+    }
+
+  .p-chapter__label {
+      font-size: 14px;
+    }
+
+  .p-qa__q {
+      font-size: 15.5px;
+    }
+
+  .p-qa__a {
+      font-size: 15px;
+    }
+
+  .p-chapter__text {
+      font-size: 15.5px;
+    }
+
+  .p-related__name {
+      font-size: 15px;
+    }
+
+  .p-related__romaji {
+      font-size: 11.5px;
+    }
+
+  .p-related__company {
+      font-size: 11px;
+    }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .p-marquee {
+      overflow-x: auto;
+    }
+
+  .p-marquee__track {
+      animation: none;
+    }
+
+  .p-marquee__set:last-child {
+      display: none;
+    }
+
+  .js [data-reveal] :is(.p-article__visual, .p-related__visual),
+    .js [data-reveal] .p-figure img,
+    .js .p-marquee[data-reveal] .p-marquee__track {
+      clip-path: none;
+    }
+
+  .js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
+      scale: none;
+    }
+
+  .js :is(.p-article__head, .p-article__foot)[data-reveal] > :not(.p-article__visual) {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+}

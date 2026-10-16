@@ -1,0 +1,377 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   project-page.css — 下層ページ（プライバシーポリシー / お問い合わせフォーム）
+   ========================================================= */
+
+/* 下層ページ（お問い合わせ・プライバシーポリシー）は墨の面。TOP の墨の帯と同じ白抜き・金。
+   isolation で重なりの基準をこの面に作り、日輪マーク（z-index: -1）が墨の地の上・文字の下に来るようにする。
+   color-scheme: dark で、セレクトの選択肢などブラウザ標準の部品も暗い表示にそろえる */
+.p-page {
+  position: relative;
+  isolation: isolate;
+  padding: calc(var(--header-h) + clamp(40px, 7vw, 90px)) var(--pad-x) clamp(70px, 10vw, 120px);
+  background: var(--grain), var(--fold), var(--c-indigo-deep);
+  color: #fff;
+  color-scheme: dark;
+}
+
+/* 日輪マークを薄く敷く。position: fixed なので、スクロールしても画面に留まる。墨地なので白で */
+.p-page::before {
+  position: fixed;
+  top: 50%;
+  left: 8%;
+  z-index: -1;
+  width: min(60vh, 42vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("../img/mark.svg") no-repeat center / contain;
+  filter: brightness(0) invert(1);
+  /* フォームや本文の後ろに透けるので、気配が残る程度まで薄く */
+  opacity: 0.05;
+  /* 画面に留まったまま、ゆっくり回り続ける */
+  animation: markSpin 120s linear infinite;
+  pointer-events: none;
+  content: "";
+}
+
+@keyframes markSpin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.p-page__inner {
+  max-width: 920px;
+  margin-inline: auto;
+}
+
+/* 見出しは TOP と同じ「大型欧文＋小さな日本語＋虹色の罫」 */
+.p-page__head {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.p-page__head::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  content: "";
+}
+
+.p-page__en {
+  color: var(--c-ink);
+  font-family: var(--f-display);
+  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.p-page__title {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+/* 「お送りくださ／い。」のように語の途中で割れないよう、
+   このページの本文は通常の禁則に戻す（サイト全体は anywhere） */
+.p-page__lead,
+.p-page__block p,
+.p-page__list li,
+.p-form__hint,
+.p-form__checkLabel {
+  overflow-wrap: normal;
+}
+
+.p-form__checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.p-page__lead {
+  margin-top: 34px;
+  font-size: 15.5px;
+  line-height: 2.3;
+}
+
+.p-page__block {
+  margin-top: clamp(38px, 5vw, 54px);
+}
+
+.p-page__heading {
+  margin-bottom: 14px;
+  padding-left: 14px;
+  border-left: 2px solid var(--c-accent);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.p-page__block p,
+.p-page__block li {
+  font-size: 15px;
+  line-height: 2.25;
+}
+
+.p-page__block p + p {
+  margin-top: 1.2em;
+}
+
+.p-page__list {
+  margin-top: 8px;
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+
+.p-page__list li::marker {
+  color: var(--c-accent);
+  font-size: 13px;
+}
+
+/* 本文中のリンク。部品の既定は墨の文字なので、墨地のこのページでは白にする（下線の金はそのまま） */
+.p-page .c-textLink {
+  color: #fff;
+}
+
+/* form ---------------------------------------------------- */
+
+.p-form {
+  margin-top: clamp(34px, 5vw, 56px);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+/* 項目名を左、入力欄を右に置く2欄組み（SPでは上下に積む） */
+.p-form__row {
+  display: grid;
+  grid-template-columns: clamp(200px, 25%, 270px) 1fr;
+  gap: clamp(14px, 2.4vw, 34px);
+  align-items: start;
+  padding: clamp(20px, 2.6vw, 30px) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.p-form__label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 15px;
+  font-family: var(--f-gothic);
+  font-size: 13.5px;
+  letter-spacing: 0.1em;
+  line-height: 1.7;
+}
+
+.p-form__required,
+.p-form__optional {
+  flex: none;
+  margin-top: 2px;
+  padding: 3px 8px 4px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.p-form__optional {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 墨地なので、必須は金のベタに墨の文字 */
+.p-form__required {
+  background: var(--c-accent);
+  color: var(--c-ink);
+}
+
+.p-form__hint {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--f-gothic);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.p-form__input,
+.p-form__select,
+.p-form__textarea {
+  width: 100%;
+  padding: 14px 16px;
+  /* 墨地の入力欄。地をわずかに持ち上げ、縁は白の半透明 */
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-family: var(--f-gothic);
+  font-size: 15px;
+  line-height: 1.8;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.p-form__textarea {
+  min-height: 220px;
+  resize: vertical;
+}
+
+.p-form__input:focus,
+.p-form__select:focus,
+.p-form__textarea:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px rgba(201, 164, 90, 0.18);
+  outline: none;
+}
+
+/* 未入力のまま送信しようとした欄は縁を朱に */
+.p-form__input:user-invalid,
+.p-form__select:user-invalid,
+.p-form__textarea:user-invalid {
+  border-color: var(--c-accent);
+}
+
+/* 同意のチェック */
+.p-form__consent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: clamp(26px, 3.4vw, 40px);
+}
+
+.p-form__check {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--c-accent);
+}
+
+/* 送信ボタン。墨地なので金の細い枠で輪郭を出し、ホバーで薄い金がゆっくり左から差し込み、
+   下端の局の配色が全幅まで伸びる（色で塗り替えず、締まる方向へ動かす） */
+.p-form__submit {
+  position: relative;
+  display: block;
+  min-width: 300px;
+  margin: clamp(28px, 3.4vw, 40px) auto 0;
+  padding: 20px 44px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 164, 90, 0.75);
+  background: transparent;
+  color: #fff;
+  font-family: var(--f-gothic);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.p-form__submit::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(201, 164, 90, 0.2);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  content: "";
+}
+
+.p-form__submit::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--rainbow);
+  transform: scaleX(0.24);
+  transform-origin: 0 50%;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  content: "";
+}
+
+@media (hover: hover) {
+  .p-form__submit:hover::before,
+    .p-form__submit:hover::after {
+      transform: scaleX(1);
+    }
+}
+
+.p-form__submit:focus-visible::before,
+.p-form__submit:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* WordPress版で使う 2つの部品（静的サイトでは出番がありません）
+   ・.p-form__trap … 迷惑送信よけ。人には見えない位置に置くだけの入力欄
+   ・.p-form__note … 送信の結果（成功・失敗）のお知らせ */
+.p-form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.p-form__note {
+  margin-top: clamp(20px, 2.4vw, 28px);
+  padding: 16px 20px;
+  border-left: 3px solid var(--c-accent);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.86);
+  font-family: var(--f-gothic);
+  font-size: 13.5px;
+  line-height: 1.9;
+}
+
+/* SP（767px以下） ------------------------------------- */
+
+@media (max-width: 767px) {
+  .p-form__row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+  .p-form__label {
+      padding-top: 0;
+    }
+
+  .p-page::before {
+      left: 50%;
+      width: 92vw;
+      opacity: 0.05;
+    }
+
+  /* SPの文字は全体的に一段小さく */
+  .p-page__title {
+      font-size: 14px;
+    }
+
+  .p-page__lead {
+      font-size: 14px;
+    }
+
+  .p-page__heading {
+      font-size: 15px;
+    }
+
+  .p-page__block p,
+    .p-page__block li {
+      font-size: 14px;
+    }
+
+  .p-form__label,
+    .p-form__checkLabel {
+      font-size: 12.5px;
+    }
+
+  .p-form__input,
+    .p-form__select,
+    .p-form__textarea {
+      font-size: 14px;
+    }
+
+}

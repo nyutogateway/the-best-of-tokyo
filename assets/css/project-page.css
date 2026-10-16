@@ -305,6 +305,28 @@
   transform: scaleX(1);
 }
 
+/* WordPress版で使う 2つの部品（静的サイトでは出番がありません）
+   ・.p-form__trap … 迷惑送信よけ。人には見えない位置に置くだけの入力欄
+   ・.p-form__note … 送信の結果（成功・失敗）のお知らせ */
+.p-form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.p-form__note {
+  margin-top: clamp(20px, 2.4vw, 28px);
+  padding: 16px 20px;
+  border-left: 3px solid var(--c-accent);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.86);
+  font-family: var(--f-gothic);
+  font-size: 13.5px;
+  line-height: 1.9;
+}
+
 /* SP（767px以下） ------------------------------------- */
 
 @media (max-width: 767px) {

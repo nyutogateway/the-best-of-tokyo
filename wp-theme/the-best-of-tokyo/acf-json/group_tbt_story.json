@@ -1,0 +1,199 @@
+{
+  "key": "group_tbt_story",
+  "title": "掲載者情報",
+  "fields": [
+    {
+      "key": "field_tbt_headline",
+      "label": "キャッチコピー",
+      "name": "headline",
+      "type": "textarea",
+      "instructions": "記事ページ上部の大見出し。ページのタイトルタグにも使われます。例: 最期まで自分らしく 地域密着の介護事業。未入力なら氏名を表示します。Enterで改行するとそのまま改行されます。",
+      "rows": 2,
+      "new_lines": "",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_en_name",
+      "label": "英字名（ローマ字）",
+      "name": "en_name",
+      "type": "text",
+      "instructions": "例: hiroki hara（名 → 姓の順）。トップのカードでは最後の語で自動的に2行に折り返し、CSSで大文字にして表示します。",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_company",
+      "label": "会社名・団体名",
+      "name": "company",
+      "type": "text",
+      "instructions": "例: 株式会社コステム",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_company_en",
+      "label": "会社名（英字）",
+      "name": "company_en",
+      "type": "text",
+      "instructions": "英字表記が必要なとき用の予備欄。例: COSTEM Inc.",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_role",
+      "label": "役職",
+      "name": "role",
+      "type": "text",
+      "instructions": "例: 代表取締役",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_lead",
+      "label": "プロフィール",
+      "name": "lead",
+      "type": "textarea",
+      "instructions": "記事ページ上部、氏名の下に出る紹介文。改行はそのまま反映されます。",
+      "rows": 6,
+      "new_lines": "",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_url",
+      "label": "企業サイトURL",
+      "name": "url",
+      "type": "url",
+      "instructions": "入力すると「企業サイトを見る」リンクが出ます。空欄なら出ません。",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_logo",
+      "label": "企業ロゴ",
+      "name": "logo",
+      "type": "image",
+      "instructions": "トップのカードは、はじめにこのロゴを出し、マウスを乗せる（スマホはスクロール）と写真に変わります。ファーストビュー背面のロゴの壁と、流れるロゴの帯にも使われます。背景が白のロゴ画像を入れてください。",
+      "return_format": "url",
+      "preview_size": "medium",
+      "library": "all",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_portrait",
+      "label": "記事ページの人物写真（縦長）",
+      "name": "portrait",
+      "type": "image",
+      "instructions": "記事ページ上部に出る人物写真。縦長（3:4）推奨。空欄ならアイキャッチ画像を使います。",
+      "return_format": "url",
+      "preview_size": "medium",
+      "library": "all",
+      "required": 0
+    },
+    {
+      "key": "field_tbt_band_tab",
+      "label": "流し写真（記事の途中を横に流れる帯）",
+      "name": "",
+      "type": "tab",
+      "instructions": "2章目の下に、入れた写真が横に流れる帯が出ます。1枚も入れなければ帯は出ません。",
+      "placement": "top",
+      "endpoint": 0
+    },
+    {
+      "key": "field_tbt_band_1",
+      "label": "流し写真 1",
+      "name": "band_1",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_2",
+      "label": "流し写真 2",
+      "name": "band_2",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_3",
+      "label": "流し写真 3",
+      "name": "band_3",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_4",
+      "label": "流し写真 4",
+      "name": "band_4",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_5",
+      "label": "流し写真 5",
+      "name": "band_5",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_6",
+      "label": "流し写真 6",
+      "name": "band_6",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_7",
+      "label": "流し写真 7",
+      "name": "band_7",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    },
+    {
+      "key": "field_tbt_band_8",
+      "label": "流し写真 8",
+      "name": "band_8",
+      "type": "image",
+      "return_format": "url",
+      "preview_size": "thumbnail",
+      "library": "all",
+      "required": 0,
+      "wrapper": { "width": "25" }
+    }
+  ],
+  "location": [
+    [
+      { "param": "post_type", "operator": "==", "value": "story" }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "acf_after_title",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "show_in_rest": 1,
+  "description": "記事の中身（章・Q&A）は下の本文エディタで作成します。見出し(H2)が章の区切り、「Q：」「A：」で始まる段落が質問と回答になります。トップのカード写真は右側の「アイキャッチ画像」、グループ分けは「業種」です。",
+  "modified": 1792108800
+}

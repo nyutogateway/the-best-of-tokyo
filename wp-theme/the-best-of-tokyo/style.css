@@ -1,0 +1,14 @@
+/*
+Theme Name: THE BEST OF TOKYO 後世に残す言葉
+Theme URI: https://github.com/nyutogateway/the-best-of-tokyo
+Description: THE BEST OF TOKYO 後世に残す言葉 公式テーマ。掲載者（インタビュー）はカスタム投稿タイプ「掲載者」＋ACF、グループ分けはタクソノミー「業種」で管理します。Word 原稿（.docx）の取り込み機能つき。実CSSは assets/css/ の6ファイルを functions.php から読み込みます。
+Author: N-BRIDGE
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+Text Domain: tbt
+*/
+
+/* 実際のスタイルは assets/css/foundation.css ほか5ファイルを functions.php で読み込みます。
+   このファイルはテーマ識別用で、ここに書いたスタイルは読み込まれません。 */

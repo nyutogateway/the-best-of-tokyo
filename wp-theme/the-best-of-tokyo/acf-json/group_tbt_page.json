@@ -1,0 +1,27 @@
+{
+  "key": "group_tbt_page",
+  "title": "ページ見出し",
+  "fields": [
+    {
+      "key": "field_tbt_page_en",
+      "label": "英字見出し",
+      "name": "page_en",
+      "type": "text",
+      "instructions": "ページ上部に大きく出る英字。例: PRIVACY POLICY / CONTACT。未入力ならスラッグを大文字にして表示します。",
+      "required": 0
+    }
+  ],
+  "location": [
+    [
+      { "param": "post_type", "operator": "==", "value": "page" }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "side",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "description": "",
+  "modified": 1756684800
+}

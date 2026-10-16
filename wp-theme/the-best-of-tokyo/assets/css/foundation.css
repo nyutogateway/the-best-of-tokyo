@@ -1,0 +1,179 @@
+@charset "UTF-8";
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   foundation.css — 変数・リセット・基本タイポグラフィ
+   ========================================================= */
+
+/* =========================================================
+   THE BEST OF TOKYO / 後世に残す言葉
+   1. Foundation
+   2. Layout   (header / footer / nav)
+   3. Project  (hero / concept / stories / onair)
+   4. Component
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Foundation
+   --------------------------------------------------------- */
+
+:root {
+  --c-red: #a2302c;
+  --c-red-deep: #6e1c19;
+  --c-ink: #211c1b;
+  --c-ink-soft: #4a423f;
+  --c-mute: #857a75;
+  --c-paper: #ffffff;
+  --c-paper-2: #f2eee9;
+  --c-line: #d8cec6;
+  --c-line-thin: #e8e2db;
+
+  --f-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --f-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* 欧文の見出し専用。極太コンデンス（Forbes の大見出しに寄せる） */
+  --f-display: "Anton", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+
+  --w-max: 1180px;
+  /* 墨の帯どうしの間（ロゴ帯の上下・ABOUT の上下・STORIES の上）で使う余白。
+     どこも同じ値にして、帯の上下の余白感をそろえる */
+  --band-gap: clamp(56px, 8vw, 110px);
+  --pad-x: 6vw;
+  --header-h: 96px;
+
+  /* TOKYO MX ロゴ（tokyo-mx.svg）から抜き出した実配色 */
+  --mx-purple: #49418d;
+  --mx-blue: #1ea2d9;
+  --mx-cyan: #2a91c6;
+  --mx-green: #a2c554;
+  --mx-yellow: #f3d046;
+  --mx-orange: #e58b3b;
+  --mx-vermilion: #db5434;
+  --mx-pink: #d64f8d;
+
+  /* TOKYO MX のロゴ配色。見出しの罫・フッター・ボタンなどで使う（虹色は残す） */
+  --rainbow: linear-gradient(
+    90deg,
+    var(--mx-purple) 0%,
+    var(--mx-blue) 18%,
+    var(--mx-green) 36%,
+    var(--mx-yellow) 52%,
+    var(--mx-orange) 68%,
+    var(--mx-vermilion) 84%,
+    var(--mx-pink) 100%
+  );
+
+  /* 線・下線・フォーカスなどに使う金（白地でも見える明るさ） */
+  --c-accent: #c9a45a;
+
+  /* 藍。墨（--c-ink）が茶寄りの黒なのに対して、こちらは青寄りの暗い地。
+     FV など「奥行きを出したい面」に使う */
+  --c-indigo: #1b2e55;
+  --c-indigo-deep: #0e1932;
+
+  /* 斜めの陰り。平らな墨の地に奥行きを出すための飾り。
+     以前は細い稜線（光の線）も重ねていたが、線が「棒」に見えるのでやめ、
+     広い影だけをゆるやかに落としている。角度はサイト全体で共通 */
+  --fold: linear-gradient(104deg, rgba(0, 0, 0, 0.3) 0 30%, transparent 78%);
+
+  /* フィルムの粒。地のグラデーションに出る段（バンディング）を消し、平らな面を締める。
+     **地の一部として、いちばん奥に敷く**こと（背景の重ねの先頭に置く）。
+     画面全体に1枚かぶせる形も試したが、写真・企業ロゴ・文字の上にも粒が乗って
+     汚れに見えたためやめた。面を塗っている要素それぞれの background に足していく */
+  --grain: url("../img/grain.svg") 0 0 / 240px 240px repeat;
+
+  /* 金の線・金の文字に使うグラデーション。明るい金だけで組み、暗い黄土色は使わない */
+  --gold-grad: linear-gradient(
+    90deg,
+    #d4b060 0%,
+    #efd99a 30%,
+    #fbf0cf 50%,
+    #efd99a 70%,
+    #d4b060 100%
+  );
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* サイト全体の地は深い紺。白地の面はほとんど作らず、白は企業ロゴの升目・写真・フッターだけ。
+   墨（--c-ink）は文字やバッジの色として残し、地には使わない（FVの紺と境目が出るため） */
+body {
+  margin: 0;
+  /* 粒は地の一部。写真・ロゴ・文字はこの上に乗るので、粒は掛からない */
+  background: var(--grain), var(--c-indigo-deep);
+  color: #fff;
+  font-family: var(--f-mincho);
+  font-size: 16px;
+  line-height: 2;
+  letter-spacing: 0.06em;
+  font-feature-settings: "palt";
+  overflow-wrap: anywhere;
+}
+
+h1, h2, h3, p, dl, dd, figure {
+  margin: 0;
+}
+
+/* 見出しは文節で折り返す（「地域密/着」のような切れ方を防ぐ）。未対応ブラウザは通常の折り返し */
+h1, h2, h3 {
+  word-break: auto-phrase;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  :root {
+      --pad-x: 22px;
+      --header-h: 68px;
+    }
+
+  /* 画面が狭いぶん、本文の基準を1段下げる */
+  body {
+      font-size: 15px;
+      line-height: 1.95;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+      scroll-behavior: auto;
+    }
+
+  *,
+    *::before,
+    *::after {
+      animation-duration: 0.001s !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.001s !important;
+    }
+}
