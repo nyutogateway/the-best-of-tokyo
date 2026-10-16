@@ -316,10 +316,8 @@
   animation: tilesShow 0.01s linear 2.8s forwards;
   margin-top: var(--header-h);
   display: grid;
-  /* 2列。1列目は上へ、2列目は下へ往復する。
-     列を増やすほど1枚が小さくなり、企業ロゴが読めなくなるので2列に留めている
-     （markup は4列ぶんあり、3・4列目はSPでだけ使う） */
-  grid-template-columns: repeat(2, 1fr);
+  /* 4列。列ごとに上下へ交互に流す（1・3列目は上、2・4列目は下） */
+  grid-template-columns: repeat(4, 1fr);
   /* 升目のあいだに地の墨を見せ、1枚ずつ独立した白い升目に見せる */
   gap: 6px;
   overflow: hidden;
@@ -566,15 +564,13 @@
   animation-direction: alternate-reverse, normal;
 }
 
-/* 3列目。入場は2列目の0.1秒あと。PC・タブレットは2列なので出さない（SPで3列にするとき使う） */
+/* 3列目。入場は2列目の0.1秒あと */
 .p-hero__col--third {
-  display: none;
   animation-delay: 2.8s, 3.1s;
 }
 
-/* 4列目も2列目と同じく逆向き。入場はいちばん最後。こちらはどの幅でも出さない（予備） */
+/* 4列目も2列目と同じく逆向き。入場はいちばん最後 */
 .p-hero__col--fourth {
-  display: none;
   animation-delay: 2.8s, 3.25s;
   animation-direction: alternate-reverse, normal;
 }
@@ -1975,9 +1971,9 @@
       -webkit-mask-image: linear-gradient(to bottom, #000 70%, rgba(0, 0, 0, 0.6) 88%, transparent 100%);
     }
 
-  /* SPは画面の幅いっぱいなので3列。3列目だけ出し直す（4列目は使わない） */
-  .p-hero__col--third {
-      display: block;
+  /* SPは3列×3段のまま。4列目は出さない */
+  .p-hero__col--fourth {
+      display: none;
     }
 
   /* SPは升目が上段にあるので、幕は下の段（文字組み）だけに張る */
