@@ -121,6 +121,7 @@ function tbt_docx_screen_upload() {
 			<tr><th>見出しの決まり</th><td>中見出し・メッセージ見出しは<strong>短い1行で、「。」で終えない</strong>（これで見出しと判定します）</td></tr>
 			<tr><th>読まないもの</th><td><code>※</code> で始まる段落（制作メモ）、画像、表、テキストボックス</td></tr>
 			<tr><th>Google ドキュメント</th><td>「ファイル → ダウンロード → Microsoft Word（.docx）」で保存してから選んでください</td></tr>
+			<tr><th>重複の確認</th><td>同じ中身の原稿は登録できません。<strong>会社名・氏名が既存の掲載者と同じ</strong>ときは確認画面で知らせ、チェックを外した状態にします（別人・別法人なら、チェックを入れれば登録できます）</td></tr>
 		</tbody>
 	</table>
 	<?php
@@ -157,14 +158,15 @@ function tbt_docx_screen_preview( $items, $token ) {
 }
 
 function tbt_docx_preview_card( $i, $it ) {
-	$m   = $it['data'];
-	$dup = $it['dup'];
+	$m     = $it['data'];
+	$dup   = $it['dup'];
+	$clash = isset( $it['clash'] ) ? $it['clash'] : array();
 	?>
 	<div class="tbt-docx__card">
 		<h2 class="tbt-docx__file">
 			<?php if ( $m && ! ( $dup && 'same' === $dup['type'] ) ) : ?>
 				<label>
-					<input type="checkbox" name="items[]" value="<?php echo (int) $i; ?>" <?php checked( ! $dup ); ?>>
+					<input type="checkbox" name="items[]" value="<?php echo (int) $i; ?>" <?php checked( ! $dup && ! $clash ); ?>>
 					<?php echo esc_html( $it['name'] ); ?>
 				</label>
 			<?php else : ?>
@@ -185,6 +187,25 @@ function tbt_docx_preview_card( $i, $it ) {
 				同じファイル名の原稿を取り込み済みで、<strong>内容が変わっています</strong>（<?php tbt_docx_post_link( $dup['post_id'] ); ?>）。<br>
 				既存の記事は上書きしません。差分は編集画面で直してください。別の下書きとして登録したいときだけチェックを入れてください。
 			</p></div>
+		<?php endif; ?>
+
+		<?php if ( $clash ) : ?>
+			<div class="notice notice-warning inline">
+				<p><strong>すでに同じ名前のものがあります。</strong>チェックを外してあります。別人・別法人であることを確かめたうえで登録してください。</p>
+				<ul>
+					<?php foreach ( $clash as $c ) : ?>
+						<li>
+							<?php echo 'company' === $c['type'] ? '会社名・団体名' : '氏名'; ?>
+							「<strong><?php echo esc_html( $c['value'] ); ?></strong>」が
+							<?php if ( $c['post_id'] ) : ?>
+								登録済みの掲載者と同じです → <?php tbt_docx_post_link( $c['post_id'] ); ?>
+							<?php else : ?>
+								この回の別の原稿「<?php echo esc_html( $c['file'] ); ?>」と同じです
+							<?php endif; ?>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
 		<?php endif; ?>
 
 		<?php if ( $m['warnings'] ) : ?>
@@ -323,7 +344,7 @@ add_action( 'admin_post_tbt_docx_parse', function () {
 	$items = array();
 	foreach ( $files as $f ) {
 		$name = tbt_docx_norm_name( sanitize_text_field( wp_unslash( $f['name'] ) ) );
-		$item = array( 'name' => $name, 'hash' => '', 'data' => null, 'error' => '', 'dup' => null );
+		$item = array( 'name' => $name, 'hash' => '', 'data' => null, 'error' => '', 'dup' => null, 'clash' => array() );
 
 		if ( UPLOAD_ERR_OK !== $f['error'] ) {
 			$item['error'] = in_array( $f['error'], array( UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE ), true )
@@ -348,6 +369,9 @@ add_action( 'admin_post_tbt_docx_parse', function () {
 		// アップロードされたファイル自体は PHP がリクエスト終了時に消す（サーバーには残さない）
 		$items[] = $item;
 	}
+
+	// 会社名・氏名の重複を調べる（登録済みの掲載者と、この回に選んだ原稿どうしの両方）
+	tbt_docx_mark_clashes( $items );
 
 	$token = strtolower( wp_generate_password( 16, false ) );
 	set_transient( tbt_docx_key( 'p', $token ), $items, HOUR_IN_SECONDS );
@@ -400,6 +424,116 @@ function tbt_docx_find_dup( $name, $hash ) {
 		return array( 'type' => 'changed', 'post_id' => (int) $named[0] );
 	}
 	return null;
+}
+
+/* ------------------------------------------------------------------
+ * 会社名・氏名の重複
+ *   ファイル名やファイルの中身が違っても、同じ会社・同じ人の原稿なら気づけるようにする。
+ *   同じ会社から2人目を載せることは実際にあるため、登録そのものは止めず、
+ *   確認画面で知らせてチェックを外しておく（そのままボタンを押せば登録されない）。
+ * ---------------------------------------------------------------- */
+
+/**
+ * 比べるための形にそろえる
+ *   全角・半角、大文字・小文字、空白をならし、会社名は「株式会社」などの法人格を外す。
+ */
+function tbt_docx_norm_key( $text, $is_company = false ) {
+	$text = (string) $text;
+	if ( class_exists( 'Normalizer' ) ) {
+		$text = Normalizer::normalize( $text, Normalizer::FORM_KC );
+	}
+	$text = preg_replace( '/[\s\x{3000}\x{00a0}]+/u', '', $text );
+	if ( $is_company ) {
+		$text = str_replace(
+			array( '株式会社', '有限会社', '合同会社', '合資会社', '合名会社', '一般社団法人', '一般財団法人',
+				'公益社団法人', '公益財団法人', '社会福祉法人', '医療法人社団', '医療法人', '学校法人',
+				'宗教法人', 'NPO法人', '特定非営利活動法人', '(株)', '(有)' ),
+			'',
+			$text
+		);
+	}
+	return mb_strtolower( $text, 'UTF-8' );
+}
+
+/** 登録済みの掲載者（氏名・会社名）の一覧。array( post_id => array( 'name' => …, 'company' => … ) ) */
+function tbt_docx_existing_people() {
+	static $people = null;
+	if ( null !== $people ) {
+		return $people;
+	}
+	$people = array();
+	$ids    = get_posts( array(
+		'post_type'      => 'story',
+		'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+	) );
+	foreach ( $ids as $id ) {
+		$people[ (int) $id ] = array(
+			'name'    => get_the_title( $id ),
+			'company' => (string) tbt_field( 'company', $id ),
+		);
+	}
+	return $people;
+}
+
+/**
+ * 読み込んだ原稿に、会社名・氏名の重複の印をつける
+ *   $items[n]['clash'] に array( 'type' => 'person'|'company', 'post_id' => int|null,
+ *   'file' => string|null, 'value' => string ) が入る（post_id は登録済み、file は同じ回の別の原稿）
+ */
+function tbt_docx_mark_clashes( array &$items ) {
+	$existing = tbt_docx_existing_people();
+
+	foreach ( $items as $i => $item ) {
+		if ( ! $item['data'] ) {
+			continue;
+		}
+		// 取り込み済みの原稿（中身が同じ）は、別途その旨を出すのでここでは見ない
+		if ( $item['dup'] && 'same' === $item['dup']['type'] ) {
+			continue;
+		}
+
+		$m     = $item['data'];
+		$clash = array();
+
+		$keys = array(
+			'person'  => array( tbt_docx_norm_key( $m['name'] ), $m['name'] ),
+			'company' => array( tbt_docx_norm_key( $m['company'], true ), $m['company'] ),
+		);
+
+		foreach ( $keys as $type => $pair ) {
+			list( $key, $label ) = $pair;
+			if ( '' === $key ) {
+				continue;
+			}
+
+			// 登録済みの掲載者と
+			foreach ( $existing as $post_id => $p ) {
+				$other = 'person' === $type ? tbt_docx_norm_key( $p['name'] ) : tbt_docx_norm_key( $p['company'], true );
+				if ( '' !== $other && $other === $key ) {
+					$clash[] = array( 'type' => $type, 'post_id' => $post_id, 'file' => null, 'value' => $label );
+					break;
+				}
+			}
+
+			// 同じ回に選んだ、ひとつ前までの原稿と
+			foreach ( $items as $j => $other_item ) {
+				if ( $j >= $i || ! $other_item['data'] ) {
+					continue;
+				}
+				$o = $other_item['data'];
+				$other = 'person' === $type ? tbt_docx_norm_key( $o['name'] ) : tbt_docx_norm_key( $o['company'], true );
+				if ( '' !== $other && $other === $key ) {
+					$clash[] = array( 'type' => $type, 'post_id' => null, 'file' => $other_item['name'], 'value' => $label );
+					break;
+				}
+			}
+		}
+
+		$items[ $i ]['clash'] = $clash;
+	}
 }
 
 /* ------------------------------------------------------------------
