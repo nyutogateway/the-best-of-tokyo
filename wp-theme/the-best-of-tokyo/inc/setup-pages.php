@@ -18,8 +18,31 @@ function tbt_provision() {
 	tbt_provision_industries();
 	tbt_ensure_page( 'contact', 'お問い合わせ', tbt_default_contact_content(), 'CONTACT' );
 	tbt_ensure_page( 'privacy', 'プライバシーポリシー', tbt_default_privacy_content(), 'PRIVACY POLICY' );
+
+	// 制作中は検索エンジンに拾わせない（公開の準備ができたら管理画面で外す）
+	update_option( 'blog_public', 0 );
+
 	flush_rewrite_rules();   // 掲載者の /stories/… を有効にする
 }
+
+/* ------------------------------------------------------------------
+ * 検索よけが効いているあいだ、管理画面に出し続ける注意書き
+ *   （外し忘れ／外しすぎの両方を防ぐため、状態をはっきり出す）
+ * ---------------------------------------------------------------- */
+add_action( 'admin_notices', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	if ( get_option( 'blog_public' ) ) {
+		return;
+	}
+	printf(
+		'<div class="notice notice-info"><p><strong>いまは検索エンジンに登録されない設定です。</strong>'
+		. '制作中・サンプル公開のあいだはこのままにしてください。本番公開のときは'
+		. '<a href="%s">設定 → 表示設定</a>の「検索エンジンがサイトをインデックスしないようにする」のチェックを外します。</p></div>',
+		esc_url( admin_url( 'options-reading.php' ) )
+	);
+} );
 
 /** スラッグのページが無ければ作成する */
 function tbt_ensure_page( $slug, $title, $content, $page_en = '' ) {

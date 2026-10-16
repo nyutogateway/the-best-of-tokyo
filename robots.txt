@@ -1,4 +1,9 @@
+# 公開前のサンプル状態です。検索エンジンには拾わせません。
+# 本番公開のときは、この2行を
+#   User-agent: *
+#   Allow: /
+# に戻し、各ページの <meta name="robots" content="noindex,nofollow"> も外してください。
 User-agent: *
-Allow: /
+Disallow: /
 
 Sitemap: https://the-best-of-tokyo.com/sitemap.xml
