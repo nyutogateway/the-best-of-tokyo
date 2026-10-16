@@ -88,8 +88,13 @@
   clip-path: inset(100% 0 0 0);
 }
 
-.js [data-reveal] :is(.p-article__visual, .p-related__visual) img {
+/* **寄りは写真だけに掛ける**。`:not(.p-related__logo)` を外すと企業ロゴまで14%拡大され、
+   枠からはみ出して切れる（TOPのカードはロゴを除外しているので、揃えていないと見え方が変わる） */
+.js [data-reveal] :is(.p-article__visual, .p-related__visual) img:not(.p-related__logo) {
   scale: 1.14;
+  transition:
+    transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1),
+    scale 0s linear 0.6s;
 }
 
 .js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual),
@@ -98,10 +103,12 @@
   transition: clip-path 1.25s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.1s);
 }
 
-.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual) img {
+.js [data-reveal].is-revealed :is(.p-article__visual, .p-related__visual) img:not(.p-related__logo) {
   scale: 1;
+  /* ここは下の `.p-related__visual img` より強いので、**ホバーの寄りの秒数もここで決まる**。
+     TOPのカード（1.1s）と同じ値にしておくこと */
   transition:
-    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1),
     scale 1.9s cubic-bezier(0.16, 0.8, 0.24, 1) calc(var(--reveal-delay, 0s) + 0.1s);
 }
 
@@ -434,6 +441,15 @@
   clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
 }
 
+/* SPの保険。JSが `is-shown` を付ける前提だが、**カードが画面に入ったときに付く
+   `is-revealed`（既存の仕組み）でも同じ切り替えが起きる**ようにしておく。
+   TOPのカードにも同じ保険が入っている。どちらか一方が動かない環境でも、ロゴが残り続けない */
+@media (hover: none), (max-width: 767px) {
+  .js [data-reveal].is-revealed .p-related__logo {
+      clip-path: polygon(-340% 0, -70% 0, 0 100%, -270% 100%);
+    }
+}
+
 /* SPは虹色の拭いを止めずに通り過ぎさせる（出しっぱなしにすると写真が沈む） */
 @media (hover: none), (max-width: 767px) {
   .p-related__card.is-shown .p-related__visual::after {
@@ -444,7 +460,7 @@
 .p-related__card.is-shown .p-related__visual {
   box-shadow:
     inset 0 0 0 1px rgba(201, 164, 90, 0.45),
-    0 16px 34px rgba(0, 0, 0, 0.42);
+    0 16px 32px rgba(0, 0, 0, 0.42);
 }
 
 .p-related__visual img:not(.p-related__logo) {
