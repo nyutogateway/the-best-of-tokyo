@@ -1477,19 +1477,7 @@
     }
 }
 
-@keyframes cardSweep {
-  0% {
-    clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
-  }
-
-  46% {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  }
-
-  100% {
-    clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
-  }
-}
+/* @keyframes cardSweep は TOP と記事ページの両方で使うので component.css に置いている */
 
 .p-card:hover .p-card__visual img:not(.p-card__logo) {
   transform: scale(1.05);

@@ -42,6 +42,23 @@
   color: #fff;
 }
 
+/* カードの虹色の拭い。TOP（.p-card）と記事ページの MORE STORIES（.p-related__card）の
+   両方から使うので、ページ固有のCSSではなくここに置く。
+   **片方のファイルにだけ置くと、記事ページでSPの拭いが動かない** */
+@keyframes cardSweep {
+  0% {
+    clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
+  }
+
+  46% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  100% {
+    clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+  }
+}
+
 @media (max-width: 767px) {
   .c-back,
     .p-form__submit {
