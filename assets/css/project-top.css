@@ -546,13 +546,14 @@
        （0.1秒ずらすと 1752px ÷ 30秒 × 0.1秒 ≒ 6px、ちょうど升目の隙間ぶんの段差になる）。
      入場の遅らせ（列ごとに0.1秒ずつ）はそのままで構わない。入場は translate で、
      終われば 0 に戻るため、ずれが残らないため */
-  /* 一方向に流し続けず、上へ1セットぶん進んだら同じ速さで戻る往復にする（alternate）。
-     速さは一定（linear）。端では向きが切り替わる。
+  /* 往復させず一方向に流し続ける。1・3列目は上へ、2・4列目は下へ（reverse）。2セットぶんの高さがあるので、50%進むと元の見た目に戻り、繋ぎ目なく回る。
+     （以前は alternate で往復させていたが、端で向きが切り替わるのが不自然だったのでやめた）
+     速さは一定（linear）。
 
      4列とも同じ向きに往復させる。向きを互い違いにすると、上へ行く列と下へ行く列の
      位置の差が時間とともに変わり続け、升目の横の行が永久に揃わない（段差に見える） */
   animation:
-    heroFlowUp 20s linear 2.8s infinite alternate both,
+    heroFlowUp 20s linear 2.8s infinite both,
     colInUp 2.2s cubic-bezier(0.16, 1, 0.3, 1) 2.8s both;
 }
 
@@ -561,7 +562,7 @@
    （入場をゆっくりにしたぶん、その時間が長く目につくようになった） */
 .p-hero__col--down {
   animation-delay: 2.8s, 2.95s;
-  animation-direction: alternate-reverse, normal;
+  animation-direction: reverse, normal;
 }
 
 /* 3列目。入場は2列目の0.1秒あと */
@@ -572,7 +573,7 @@
 /* 4列目も2列目と同じく逆向き。入場はいちばん最後 */
 .p-hero__col--fourth {
   animation-delay: 2.8s, 3.25s;
-  animation-direction: alternate-reverse, normal;
+  animation-direction: reverse, normal;
 }
 
 /* 升目は正方形固定（列の幅＝1辺）。画面の縦幅で形が変わらないようにしている */
