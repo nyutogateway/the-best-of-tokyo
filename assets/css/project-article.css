@@ -119,6 +119,12 @@
   content: "THE BEST OF";
 }
 
+/* 右の文字（タイトル・会社名など）は、はみ出してくる金の輪より前に出す（輪に被られて読めなくならないように） */
+.p-article__intro {
+  position: relative;
+  z-index: 3;
+}
+
 /* 左上の日輪マークは置かない。ジャケットの周りを回る大きな日輪（.p-article__ring）がその代わり */
 
 .p-article__visual img {
