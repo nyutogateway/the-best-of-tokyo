@@ -13,6 +13,8 @@
   position: relative;
   isolation: isolate;
   padding: 0 var(--pad-x);
+  /* 記事の頭の金の輪は左右に大きく張り出すので、画面の端で切る（横スクロールを出さない） */
+  overflow-x: clip;
   background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
 }
@@ -53,8 +55,8 @@
 .p-article__head {
   position: relative;
   display: grid;
-  /* 左の列＝ジャケット＋後ろから出る金のレコードのはみ出し（ジャケットの3割）。ジャケットの幅は clamp のまま */
-  grid-template-columns: calc(clamp(320px, 34%, 400px) * 1.3) 1fr;
+  /* 左の列＝ジャケットの1.5倍（周りを回る金の輪のぶん）。ジャケットの幅は clamp のまま */
+  grid-template-columns: calc(clamp(320px, 34%, 400px) * 1.5) 1fr;
   gap: clamp(28px, 4.5vw, 56px);
   align-items: start;
   padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
@@ -146,7 +148,7 @@
    半分に切る clip-path は傾ける前の盤面の座標で効くので、上半分＝奥、下半分＝手前になる。
    盤そのものは回さず、溝の上の斜めの光（conic-gradient の角度 --spin）を回して「回っている」ように見せる
    （盤ごと回すと、切った半分も一緒に回ってしまう）。
-   .p-article__jacket の幅＝ジャケット（76.92%）の1.3倍＝輪の直径。ジャケットは真ん中に置く。
+   .p-article__jacket の幅＝ジャケットの1.5倍。輪の直径はジャケットの1.75倍で、列から少し左右にはみ出す。ジャケットは真ん中に置く。
    輪の真ん中はくり抜いて、溝の部分だけを残す */
 @property --spin {
   syntax: "<angle>";
@@ -160,7 +162,7 @@
 
 .p-article__jacket .p-article__visual {
   z-index: 1;
-  width: 76.92%;
+  width: 66.67%;
   margin-inline: auto;
 }
 
@@ -169,16 +171,16 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  animation: ringSpin 14s linear infinite;
+  animation: ringSpin 6s linear infinite;
 }
 
 .p-article__record::before,
 .p-article__record::after {
   position: absolute;
-  top: 58%;
-  left: 0;
+  top: 47%;
+  left: -8.33%;
   z-index: 0;
-  width: 100%;
+  width: 116.67%;
   aspect-ratio: 1 / 1;
   /* 縦の真ん中を top の位置に合わせる（margin の % は幅基準＝直径基準） */
   margin-top: -50%;
@@ -186,19 +188,23 @@
   background:
     conic-gradient(
       from calc(30deg + var(--spin)),
-      rgba(255, 248, 225, 0) 0deg,
-      rgba(255, 248, 225, 0.6) 22deg,
-      rgba(255, 248, 225, 0) 55deg,
-      rgba(255, 248, 225, 0) 180deg,
-      rgba(255, 248, 225, 0.5) 202deg,
-      rgba(255, 248, 225, 0) 235deg
+      rgba(255, 250, 230, 0) 0deg,
+      rgba(255, 250, 230, 0.95) 10deg,
+      rgba(255, 250, 230, 0) 26deg,
+      rgba(60, 40, 10, 0.35) 70deg,
+      rgba(60, 40, 10, 0) 110deg,
+      rgba(255, 250, 230, 0) 180deg,
+      rgba(255, 250, 230, 0.85) 190deg,
+      rgba(255, 250, 230, 0) 206deg,
+      rgba(60, 40, 10, 0.35) 250deg,
+      rgba(60, 40, 10, 0) 290deg
     ),
     repeating-radial-gradient(circle closest-side, #a8823a 0 0.7%, #d9bc72 0.7% 1.5%),
     #c9a45a;
-  -webkit-mask: radial-gradient(circle closest-side, transparent 66%, #000 66.6% 99%, transparent 100%);
-  mask: radial-gradient(circle closest-side, transparent 66%, #000 66.6% 99%, transparent 100%);
-  clip-path: inset(0 0 50% 0);
-  transform: perspective(1600px) rotate(-12deg) rotateX(72deg);
+  -webkit-mask: radial-gradient(circle closest-side, transparent 71%, #000 71.6% 99%, transparent 100%);
+  mask: radial-gradient(circle closest-side, transparent 71%, #000 71.6% 99%, transparent 100%);
+  clip-path: inset(0 0 49.4% 0); /* 手前の半分と少し重ねて、切れ目の細い線を出さない */
+  transform: perspective(1600px) rotate(-8deg) rotateX(73deg);
   animation: ringIn 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
   content: "";
 }
@@ -998,7 +1004,7 @@
     }
 
   .p-article__head {
-      grid-template-columns: calc(clamp(240px, 38%, 320px) * 1.3) 1fr;
+      grid-template-columns: calc(clamp(240px, 38%, 320px) * 1.5) 1fr;
       gap: clamp(22px, 3.4vw, 40px);
     }
 
@@ -1027,7 +1033,7 @@
 
   /* SPは1列になるので、写真は幅を抑えて**中央に置く**（左に寄せたままだと落ち着かない） */
   .p-article__jacket {
-      width: min(100%, calc(280px * 1.3));
+      width: min(100%, calc(280px * 1.5));
       margin-inline: auto;
     }
 
