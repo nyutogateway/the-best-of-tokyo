@@ -142,20 +142,8 @@
     0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* ベスト盤の世界観：金のレコード（ゴールドディスク＝栄誉）を土星の輪のように寝かせて、ジャケットの周りで回す。
-   輪は奥の半分（::before）と手前の半分（::after）に分けて描き、奥はジャケットの後ろ、手前はジャケットの前に置く
-   （3D の面の交差に任せるとブラウザによって前後が崩れるので、重なり順は z-index で決めている）。
-   半分に切る clip-path は傾ける前の盤面の座標で効くので、上半分＝奥、下半分＝手前になる。
-   盤そのものは回さず、溝の上の斜めの光（conic-gradient の角度 --spin）を回して「回っている」ように見せる
-   （盤ごと回すと、切った半分も一緒に回ってしまう）。
-   .p-article__jacket の幅＝ジャケットの1.5倍。輪の直径はジャケットの1.75倍で、列から少し左右にはみ出す。ジャケットは真ん中に置く。
-   輪の真ん中はくり抜いて、溝の部分だけを残す */
-@property --spin {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-
+/* ベスト盤の世界観：左上と同じ金の日輪マークが2つ、土星の衛星のようにジャケットの周りを回る。
+   .p-article__jacket の幅＝ジャケットの1.5倍（マークの通り道のぶん）。ジャケットは真ん中に置く */
 .p-article__jacket {
   position: relative;
 }
@@ -166,19 +154,16 @@
   margin-inline: auto;
 }
 
-/* 左上と同じ日輪マーク（紺）が2つ、輪の溝の上をジャケットの周りに回る（土星の衛星のように）。
-   通り道は輪の溝の真ん中あたりに合わせた楕円（offset-path）。輪を傾けると通り道とずれるので、輪は水平のまま。
-   奥を通る間はジャケットの後ろ（z-index 0）、手前を通る間は前（z-index 2）に切り替える */
+/* 通り道は水平の楕円（offset-path）。奥を通る間はジャケットの後ろ（z-index 0）、手前を通る間は前（z-index 2）に切り替える */
 .p-article__jacket::before,
 .p-article__jacket::after {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 0;
-  width: 11%;
+  width: 9%;
   aspect-ratio: 1 / 1;
-  /* 金の輪の上を通るので、マークは紺（金の上で金だと見えない） */
-  background: var(--c-indigo-deep);
+  background: var(--gold-grad);
   -webkit-mask: var(--mark-mask) center / contain no-repeat;
   mask: var(--mark-mask) center / contain no-repeat;
   offset-path: ellipse(49.6% 16.3% at 50% 56%);
@@ -217,72 +202,6 @@
   100% {
     z-index: 0;
     offset-distance: 100%;
-  }
-}
-
-/* 器だけ。z-index も transform も付けない（付けると重なりの箱ができ、半分ずつ前後に置けなくなる） */
-.p-article__record {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  animation: ringSpin 6s linear infinite;
-}
-
-.p-article__record::before,
-.p-article__record::after {
-  position: absolute;
-  top: 56%;
-  left: -8.33%;
-  z-index: 0;
-  width: 116.67%;
-  aspect-ratio: 1 / 1;
-  /* 縦の真ん中を top の位置に合わせる。下の日輪マークの通り道（ellipse の at 50% 56%）と揃えること */
-  translate: 0 -50%;
-  border-radius: 50%;
-  background:
-    conic-gradient(
-      from calc(30deg + var(--spin)),
-      rgba(255, 250, 230, 0) 0deg,
-      rgba(255, 250, 230, 0.95) 10deg,
-      rgba(255, 250, 230, 0) 26deg,
-      rgba(60, 40, 10, 0.35) 70deg,
-      rgba(60, 40, 10, 0) 110deg,
-      rgba(255, 250, 230, 0) 180deg,
-      rgba(255, 250, 230, 0.85) 190deg,
-      rgba(255, 250, 230, 0) 206deg,
-      rgba(60, 40, 10, 0.35) 250deg,
-      rgba(60, 40, 10, 0) 290deg
-    ),
-    repeating-radial-gradient(circle closest-side, #a8823a 0 0.7%, #d9bc72 0.7% 1.5%),
-    #c9a45a;
-  -webkit-mask: radial-gradient(circle closest-side, transparent 71%, #000 71.6% 99%, transparent 100%);
-  mask: radial-gradient(circle closest-side, transparent 71%, #000 71.6% 99%, transparent 100%);
-  clip-path: inset(0 0 49.4% 0); /* 手前の半分と少し重ねて、切れ目の細い線を出さない */
-  transform: perspective(1600px) rotateX(73deg);
-  animation: ringIn 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
-  content: "";
-}
-
-.p-article__record::after {
-  z-index: 2;
-  clip-path: inset(50% 0 0 0);
-}
-
-@keyframes ringIn {
-  from {
-    opacity: 0;
-    scale: 0.55;
-  }
-
-  to {
-    opacity: 1;
-    scale: 1;
-  }
-}
-
-@keyframes ringSpin {
-  to {
-    --spin: 360deg;
   }
 }
 
@@ -1161,10 +1080,7 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .p-article__record,
-    .p-article__record::before,
-    .p-article__record::after,
-    .p-article__jacket::before,
+  .p-article__jacket::before,
     .p-article__jacket::after {
       animation: none;
     }
