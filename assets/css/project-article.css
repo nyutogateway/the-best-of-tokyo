@@ -158,7 +158,7 @@
   aspect-ratio: 1 / 1;
   translate: 0 -50%;
   clip-path: inset(0 0 49.4% 0); /* 手前の半分と少し重ねて、切れ目の細い線を出さない */
-  transform: perspective(1600px) rotateX(72deg);
+  transform: perspective(1600px) rotate(-9deg) rotateX(72deg);
   pointer-events: none;
   animation: ringIn 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
 }
