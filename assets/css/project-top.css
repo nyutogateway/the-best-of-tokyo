@@ -1981,6 +1981,14 @@
   color: rgba(255, 255, 255, 0.86);
   font-size: 15px;
   line-height: 2.1;
+  /* 文節で折り返し、最後の行に1〜2文字だけ残らないようにする */
+  word-break: auto-phrase;
+  text-wrap: pretty;
+}
+
+/* 媒体名は途中で切らない */
+.p-station__media {
+  white-space: nowrap;
 }
 
 /* 放送エリアの模式図。**地図そのものではなく「見立て」**として置く
