@@ -27,13 +27,12 @@ PX_LON, PX_LAT = 357.3, 440.0
 
 GOLD = "#c9a45a"
 GOLD_LIGHT = "#e3c98c"
-CREAM = "#fff6dc"
-# 海はサイトの背景（foundation.css の --c-indigo-deep）、陸はそれより一段明るい紺。カードの地も同じ紺
-SEA = "#0e1932"
-LAND = "#17264a"
-REACH = "#2a3a62"  # 受信エリアの陸（さらに一段明るい紺）
-FONT = "'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
-NUM = "'Helvetica Neue',Arial,sans-serif"
+CREAM = "#f3ead2"
+# 陸はサイトの地と同じ紺（図が地に溶けるように）、海はそれより一段暗い紺
+LAND = "#0e1932"
+SEA = "#0a1226"
+FONT = "'Shippori Mincho B1','Hiragino Mincho ProN','Yu Mincho',serif"
+NUM = FONT
 
 src = SVG.read_text(encoding="utf-8")
 
@@ -64,9 +63,20 @@ IN_TOKYO = {"立川市", "八王子市", "青梅市"}
 cities = [(x, y, name) for x, y, name in shapes["cities"] if name not in IN_TOKYO]
 assert land and cities, "元の図から形を拾えなかった"
 
-halo = f'paint-order="stroke" stroke="{SEA}" stroke-width="3" stroke-linejoin="round"'
+halo = f'paint-order="stroke" stroke="{LAND}" stroke-width="3.2" stroke-linejoin="round"'
 out = []
 w = out.append
+
+# 日輪マーク（assets/img/mark.svg）の線を、送信所の印として小さく描く
+MARK = (ROOT / "assets/img/mark.svg").read_text(encoding="utf-8")
+mark_lines = re.findall(r"<line[^>]+/>", MARK)
+pts = [tuple(map(float, m)) for m in re.findall(r'x1="([\d.]+)" y1="([\d.]+)"', MARK)]
+mcx = sum(p[0] for p in pts) / len(pts)
+mcy = sum(p[1] for p in pts) / len(pts)
+
+# 載せる市は主なものだけ（多いと賑やかになり安っぽく見える）
+KEEP = ["さいたま市", "川越市", "所沢市", "千葉市", "横浜市", "横須賀市", "木更津市", "つくば市", "成田市"]
+cities = [c for c in cities if c[2] in KEEP]
 
 w(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" '
   'aria-label="TOKYO MX の放送エリア図。放送対象地域の東京都と、東京スカイツリーから約50kmの受信エリアの目安">')
@@ -83,66 +93,70 @@ w(f"""  <defs>
 
 w('  <g clip-path="url(#frame)">')
 w(f'    <rect width="{W}" height="{H}" fill="{SEA}"/>')
-
-# 陸（平らに塗る）
 d_land = " ".join(land)
-w(f'    <path d="{d_land}" fill="{LAND}" stroke="rgba(255,255,255,.28)" stroke-width=".7" stroke-linejoin="round"/>')
-# 受信エリアの目安：円の中の陸を一段明るい焦げ茶で平らに塗る（斜線は作り物っぽく見えるので使わない）
-w(f'    <path d="{d_land}" fill="{REACH}" stroke="rgba(255,255,255,.28)" stroke-width=".7" stroke-linejoin="round" clip-path="url(#reachClip)"/>')
-# 放送対象地域：東京都（金の単色）
-w(f'    <path d="{tokyo}" fill="{GOLD}" stroke="{GOLD_LIGHT}" stroke-width=".8" stroke-linejoin="round"/>')
-# 50kmの円（細い実線1本）
-w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{GOLD_LIGHT}" stroke-width="1"/>')
-# 円の上に「約50km」（右上、線を抜いて置く）
-ang = math.radians(-38)
-lx, ly = CX + R50 * math.cos(ang), CY + R50 * math.sin(ang)
-w(f'    <text x="{lx:.1f}" y="{ly + 4:.1f}" text-anchor="middle" font-family="{FONT}" font-size="11" fill="{GOLD_LIGHT}" '
-  f'paint-order="stroke" stroke="{SEA}" stroke-width="6" stroke-linejoin="round">約50km</text>')
+# 陸：地と同じ紺。県境と海岸は金の髪の毛ほどの線
+w(f'    <path d="{d_land}" fill="{LAND}"/>')
+# 受信エリアの目安：円の中の陸だけ、金をごくうすく
+w(f'    <path d="{d_land}" fill="{GOLD}" fill-opacity=".05" clip-path="url(#reachClip)"/>')
+w(f'    <path d="{d_land}" fill="none" stroke="{GOLD}" stroke-opacity=".32" stroke-width=".6" stroke-linejoin="round"/>')
+# 放送対象地域：東京都（金をうすく敷き、縁だけ金の実線）
+w(f'    <path d="{tokyo}" fill="{GOLD}" fill-opacity=".24" stroke="{GOLD_LIGHT}" stroke-width=".9" stroke-linejoin="round"/>')
+# 50kmの円＝レコードのいちばん外側のトラック（記事の「TRACK 01…」と同じ見立て）。
+# 縁は金の細い実線、その内側に細い溝の同心円を幅およそ6kmぶん刻む（内側ほどうすく）
+GROOVES = 14
+w(f'    <g fill="none" stroke="{GOLD_LIGHT}" stroke-width=".45">')
+for n in range(1, GROOVES + 1):
+    r = R50 - n * 1.7
+    w(f'      <circle cx="{CX}" cy="{CY}" r="{r:.1f}" stroke-opacity="{0.42 * (1 - n / (GROOVES + 2)):.2f}"/>')
+w("    </g>")
+w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{GOLD_LIGHT}" stroke-width=".9"/>')
+# 円の真上に「半径 約50km」
+w(f'    <text x="{CX}" y="{CY - R50 - 7:.1f}" text-anchor="middle" font-family="{FONT}" font-size="9.5" letter-spacing="2" fill="{GOLD_LIGHT}">半径 約50km</text>')
 
-# 県名（日本語だけ。控えめに）
-prefs = [(173, 134, "埼玉県"), (468, 368, "千葉県"), (215, 402, "神奈川県"), (560, 70, "茨城県")]
-w(f'    <g font-family="{FONT}" font-size="11.5" letter-spacing="2" fill="rgba(255,255,255,.42)" text-anchor="middle" {halo}>')
+# 県名（明朝、字間を広く、うすく）
+prefs = [(173, 134, "埼玉県"), (488, 380, "千葉県"), (215, 412, "神奈川県"), (575, 70, "茨城県")]
+w(f'    <g font-family="{FONT}" font-size="12" letter-spacing="7" fill="#fff" fill-opacity=".34" text-anchor="middle">')
 for x, y, ja in prefs:
     w(f'      <text x="{x}" y="{y}">{ja}</text>')
 w("    </g>")
 
 # 東京都の名前
-w(f'    <text x="104" y="207" text-anchor="middle" font-family="{FONT}" font-size="14" font-weight="700" letter-spacing="3" fill="{SEA}">東京都</text>')
+w(f'    <text x="112" y="210" text-anchor="middle" font-family="{FONT}" font-size="15" font-weight="600" letter-spacing="9" fill="{GOLD_LIGHT}">東京都</text>')
 
-# 市の点
-w(f'    <g font-family="{FONT}" font-size="10" letter-spacing=".5">')
+# 市（小さな金の点と、小さな明朝）
+w(f'    <g font-family="{FONT}" font-size="9.5" letter-spacing="1" fill="#fff" fill-opacity=".72">')
 for x, y, name in cities:
-    w(f'      <circle cx="{x}" cy="{y}" r="1.9" fill="#fff"/>')
-    w(f'      <text x="{x + 5:.1f}" y="{y + 3.5:.1f}" fill="rgba(255,255,255,.78)" {halo}>{name}</text>')
+    w(f'      <circle cx="{x}" cy="{y}" r="1.5" fill="{GOLD_LIGHT}" fill-opacity="1"/>')
+    w(f'      <text x="{x + 5:.1f}" y="{y + 3.3:.1f}" {halo}>{name}</text>')
 w("    </g>")
 
-# 送信所（東京スカイツリー）
-w(f'    <path d="{tower}" fill="#fff"/>')
+# 送信所（東京スカイツリー）：日輪マーク
+sc = 0.06
+w(f'    <g transform="translate({CX - mcx * sc:.2f} {CY - mcy * sc:.2f}) scale({sc})" fill="none" stroke="{GOLD_LIGHT}" stroke-width="16" stroke-linecap="round">')
+for ln in mark_lines:
+    w("      " + ln)
+w("    </g>")
+w(f'    <circle cx="{CX}" cy="{CY}" r="1.8" fill="{CREAM}"/>')
 w(f'    <g font-family="{FONT}" {halo}>')
-w(f'      <text x="354" y="210" font-size="11.5" font-weight="700" letter-spacing="1" fill="#fff">東京スカイツリー</text>')
-w(f'      <text x="354" y="224" font-size="9.5" letter-spacing="1" fill="rgba(255,255,255,.7)">送信所（地上デジタル 9ch）</text>')
+w(f'      <text x="{CX + 22}" y="{CY - 6}" font-size="12" font-weight="600" letter-spacing="2" fill="{CREAM}">東京スカイツリー</text>')
+w(f'      <text x="{CX + 22}" y="{CY + 8}" font-size="8.5" letter-spacing="2" fill="{GOLD_LIGHT}">送信所・地上デジタル 9ch</text>')
 w("    </g>")
 
-# 凡例（左下）
-lx0, ly0 = 18, 410
-w(f'    <rect x="{lx0}" y="{ly0}" width="210" height="62" fill="{SEA}" fill-opacity=".86" stroke="rgba(255,255,255,.18)" stroke-width=".8"/>')
-w(f'    <rect x="{lx0 + 12}" y="{ly0 + 13}" width="16" height="11" fill="{REACH}" stroke="rgba(255,255,255,.3)" stroke-width=".6"/>')
-w(f'    <rect x="{lx0 + 12}" y="{ly0 + 37}" width="16" height="11" fill="{GOLD}" stroke="{GOLD_LIGHT}" stroke-width=".6"/>')
-w(f'    <g font-family="{FONT}" font-size="10" fill="rgba(255,255,255,.85)" letter-spacing=".5">')
-w(f'      <text x="{lx0 + 36}" y="{ly0 + 22}">受信エリアの目安（送信所から約50km）</text>')
-w(f'      <text x="{lx0 + 36}" y="{ly0 + 46}">放送対象地域（東京都）</text>')
+# 凡例（左下。箱は付けない）
+lx0, ly0 = 22, 444
+w(f'    <g font-family="{FONT}" font-size="9" letter-spacing="1.5" fill="#fff" fill-opacity=".72">')
+w(f'      <rect x="{lx0}" y="{ly0}" width="14" height="8" fill="{GOLD}" fill-opacity=".24" stroke="{GOLD_LIGHT}" stroke-width=".7"/>')
+w(f'      <text x="{lx0 + 22}" y="{ly0 + 7.5}">放送対象地域（東京都）</text>')
+w(f'      <path d="M{lx0} {ly0 + 23} h14 M{lx0} {ly0 + 25.5} h14 M{lx0} {ly0 + 28} h14" stroke="{GOLD_LIGHT}" stroke-width=".6"/>')
+w(f'      <text x="{lx0 + 22}" y="{ly0 + 26.5}">受信エリアの目安（送信所から約50km）</text>')
 w("    </g>")
 
 # 縮尺（右下）
-sx, sy = W - 24 - 20 * KM, H - 22
-w(f'    <path d="M{sx:.1f} {sy - 4} V{sy} H{sx + 20 * KM:.1f} V{sy - 4} M{sx + 10 * KM:.1f} {sy} V{sy - 3}" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1"/>')
-w(f'    <g font-family="{NUM}" font-size="8.5" fill="rgba(255,255,255,.7)" text-anchor="middle">')
-for km in (0, 10, 20):
-    w(f'      <text x="{sx + km * KM:.1f}" y="{sy - 8}">{"20km" if km == 20 else km}</text>')
-w("    </g>")
+sx, sy = W - 26 - 20 * KM, H - 24
+w(f'    <path d="M{sx:.1f} {sy - 3} V{sy} H{sx + 20 * KM:.1f} V{sy - 3}" fill="none" stroke="{GOLD_LIGHT}" stroke-opacity=".7" stroke-width=".7"/>')
+w(f'    <text x="{sx + 10 * KM:.1f}" y="{sy - 7}" text-anchor="middle" font-family="{FONT}" font-size="8.5" letter-spacing="1" fill="{GOLD_LIGHT}" fill-opacity=".8">20km</text>')
 
 w("  </g>")
-w(f'  <rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" fill="none" stroke="rgba(255,255,255,.18)"/>')
 w("</svg>")
 
 SVG.write_text("\n".join(out) + "\n", encoding="utf-8")
