@@ -357,6 +357,49 @@
   content: "";
 }
 
+/* 章が画面に入ったら、金の線が「TRACK 03」から左右へ伸び、文字は字間を詰めながら浮かぶ。
+   出す合図は既存の .p-chapter[data-reveal].is-revealed（main.js） */
+.js .p-chapter[data-reveal] .p-chapter__label {
+  color: transparent;
+  letter-spacing: 0.6em;
+}
+
+.js .p-chapter[data-reveal] .p-chapter__label::before,
+.js .p-chapter[data-reveal] .p-chapter__label::after {
+  transform: scaleX(0);
+  transform-origin: right center;
+}
+
+.js .p-chapter[data-reveal] .p-chapter__label::after {
+  transform-origin: left center;
+}
+
+.js .p-chapter[data-reveal].is-revealed .p-chapter__label {
+  color: var(--c-accent);
+  letter-spacing: 0.22em;
+  transition:
+    color 1s ease calc(var(--reveal-delay, 0s) + 0.15s),
+    letter-spacing 1.4s cubic-bezier(0.16, 0.8, 0.24, 1) calc(var(--reveal-delay, 0s) + 0.15s);
+}
+
+.js .p-chapter[data-reveal].is-revealed .p-chapter__label::before,
+.js .p-chapter[data-reveal].is-revealed .p-chapter__label::after {
+  transform: none;
+  transition: transform 1.6s cubic-bezier(0.65, 0, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.35s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .p-chapter[data-reveal] .p-chapter__label {
+    color: var(--c-accent);
+    letter-spacing: 0.22em;
+  }
+
+  .js .p-chapter[data-reveal] .p-chapter__label::before,
+  .js .p-chapter[data-reveal] .p-chapter__label::after {
+    transform: none;
+  }
+}
+
 .p-chapter__title {
   margin-top: clamp(30px, 4.6vw, 52px);
   font-size: clamp(1.2rem, 2.3vw, 1.6rem);
