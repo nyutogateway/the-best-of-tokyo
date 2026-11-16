@@ -38,7 +38,16 @@ python3 restyle.py          # 見た目（海と陸の塗り分け・電波の�
   文字の位置は見て調整してください
 - 正式なエリア図を使うなら、TOKYO MX の図を許諾を得て差し替えるのが確実です
 
-## 夜景の衛星写真版（いま使っている図）
+## 点描版（いま使っている図）
+
+`dotmap.py` が、陸を細かい点で描き、東京都の点だけを金にした図を `assets/img/area-map.svg` に書き出します。
+枠も地も付けず（背景は透明）、端はぼかしてサイトの紺に溶かしています。
+
+```sh
+python3 dotmap.py
+```
+
+## 夜景の衛星写真版（前の案）
 
 `nightmap.py` が、NASA の夜間光画像（Black Marble。`blackmarble.jpg`）を金に染めて敷き、
 東京都の縁・50kmの円・県境・地名を重ねて `assets/img/area-map.svg` を書き出します（写真は SVG の中に埋め込み）。
@@ -48,4 +57,4 @@ python3 restyle.py          # 見た目（海と陸の塗り分け・電波の�
 python3 nightmap.py
 ```
 
-`restyle.py` を流すと、写真なしの線画の図で上書きされるので注意。
+`restyle.py` / `nightmap.py` / `dotmap.py` はどれも同じ area-map.svg を上書きするので、使う案のものだけを流すこと。
