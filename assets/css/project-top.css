@@ -842,13 +842,14 @@
   transform: none;
 }
 
-/* 切り替わったとき、カードが左から順にパラパラと出る */
+/* 切り替わったとき、カードが左から順に、奥から起き上がるように大きく出る（派手め） */
 .p-grouprow > .p-group .p-cards > li {
   opacity: 0;
-  transform: translateY(16px);
+  transform: perspective(1000px) translateY(90px) rotateX(-38deg) scale(0.9);
+  transform-origin: 50% 100%;
   transition:
-    opacity 0.5s ease,
-    transform 0.6s cubic-bezier(0.16, 0.8, 0.24, 1);
+    opacity 0.7s ease,
+    transform 1.2s cubic-bezier(0.16, 0.8, 0.24, 1);
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li {
@@ -857,28 +858,28 @@
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li:nth-child(1) {
-  --card-delay: 0.08s;
-  transition-delay: 0.08s;
+  --card-delay: 0.13s;
+  transition-delay: 0.13s;
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li:nth-child(2) {
-  --card-delay: 0.16s;
-  transition-delay: 0.16s;
+  --card-delay: 0.26s;
+  transition-delay: 0.26s;
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li:nth-child(3) {
-  --card-delay: 0.24s;
-  transition-delay: 0.24s;
+  --card-delay: 0.39s;
+  transition-delay: 0.39s;
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li:nth-child(4) {
-  --card-delay: 0.32s;
-  transition-delay: 0.32s;
+  --card-delay: 0.52s;
+  transition-delay: 0.52s;
 }
 
 .p-grouprow > .p-group.is-active .p-cards > li:nth-child(5) {
-  --card-delay: 0.4s;
-  transition-delay: 0.4s;
+  --card-delay: 0.65s;
+  transition-delay: 0.65s;
 }
 
 /* 写真は幕が上がるように下から現れ、少し寄った状態からゆっくり引く。
@@ -989,6 +990,13 @@
 }
 
 /* 動きを止める設定のときは、重ねずに縦に並べてすべて見せる */
+@media (prefers-reduced-motion: reduce) {
+  .p-grouprow > .p-group .p-cards > li {
+      transform: none;
+      transition: opacity 0.3s ease;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .p-grouprow {
       row-gap: clamp(46px, 6vw, 88px);

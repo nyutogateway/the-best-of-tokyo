@@ -313,6 +313,7 @@
 .js :is(.p-article__head, .p-article__foot)[data-reveal] {
   opacity: 1;
   transform: none;
+  filter: none;
 }
 
 .js :is(.p-article__head, .p-article__foot)[data-reveal] > :not(.p-article__visual) {

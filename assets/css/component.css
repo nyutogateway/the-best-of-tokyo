@@ -137,49 +137,53 @@
    JSが動いたときだけ .js が付くので、JS無効でも中身は消えない。
    対象の指定は main.js 側。 */
 
+/* 大きく下から、ぼけた状態で少し縮んで現れ、ピントが合いながら所定の位置に収まる（派手め） */
 .js [data-reveal] {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(64px) scale(0.96);
+  filter: blur(10px);
 }
 
-/* ゆっくり立ち上げて、最後に静かに止める。跳ねは入れない */
+/* 最後は静かに止める。跳ねは入れない */
 .js [data-reveal].is-revealed {
   opacity: 1;
   transform: none;
+  filter: none;
   transition:
-    opacity 1.05s cubic-bezier(0.16, 0.8, 0.24, 1),
-    transform 1.15s cubic-bezier(0.16, 0.8, 0.24, 1);
+    opacity 1.3s cubic-bezier(0.16, 0.8, 0.24, 1),
+    transform 1.6s cubic-bezier(0.16, 0.8, 0.24, 1),
+    filter 1.2s cubic-bezier(0.16, 0.8, 0.24, 1);
   transition-delay: var(--reveal-delay, 0s);
 }
 
 /* 同じ親の中の並び順ぶんだけ遅らせる（main.js が data-reveal に番号を入れる）。
    遅れは変数で持たせ、中の見出しや写真の動きも同じ遅れに揃える */
 .js [data-reveal="1"] {
-  --reveal-delay: 0.09s;
+  --reveal-delay: 0.14s;
 }
 
 .js [data-reveal="2"] {
-  --reveal-delay: 0.18s;
+  --reveal-delay: 0.28s;
 }
 
 .js [data-reveal="3"] {
-  --reveal-delay: 0.27s;
+  --reveal-delay: 0.42s;
 }
 
 .js [data-reveal="4"] {
-  --reveal-delay: 0.36s;
+  --reveal-delay: 0.56s;
 }
 
 .js [data-reveal="5"] {
-  --reveal-delay: 0.45s;
+  --reveal-delay: 0.70s;
 }
 
 .js [data-reveal="6"] {
-  --reveal-delay: 0.54s;
+  --reveal-delay: 0.84s;
 }
 
 .js [data-reveal="7"] {
-  --reveal-delay: 0.63s;
+  --reveal-delay: 0.98s;
 }
 
 /* 大見出しの英字は、切り抜いた枠の中を下からせり上がる。
@@ -204,6 +208,7 @@
     .js [data-reveal].is-revealed {
       opacity: 1;
       transform: none;
+      filter: none;
       transition: none;
     }
 
