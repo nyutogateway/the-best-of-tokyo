@@ -119,17 +119,7 @@
   content: "THE BEST OF";
 }
 
-.p-article__visual::after {
-  position: absolute;
-  top: 4.8cqw;
-  left: 4.6cqw;
-  width: 7cqw;
-  height: 7cqw;
-  background: var(--gold-grad);
-  -webkit-mask: var(--mark-mask) center / contain no-repeat;
-  mask: var(--mark-mask) center / contain no-repeat;
-  content: "";
-}
+/* 左上の日輪マークは置かない。マークはジャケットの周りを回る1つ（.p-article__jacket::before）が代わり */
 
 .p-article__visual img {
   position: absolute;
@@ -142,7 +132,7 @@
     0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* ベスト盤の世界観：左上と同じ金の日輪マークが2つ、土星の衛星のようにジャケットの周りを回る。
+/* ベスト盤の世界観：金の日輪マークが1つ、土星の衛星のようにジャケットの周りを回る（ジャケット左上のマークの代わり）。
    .p-article__jacket の幅＝ジャケットの1.5倍（マークの通り道のぶん）。ジャケットは真ん中に置く */
 .p-article__jacket {
   position: relative;
@@ -155,13 +145,12 @@
 }
 
 /* 通り道は水平の楕円（offset-path）。奥を通る間はジャケットの後ろ（z-index 0）、手前を通る間は前（z-index 2）に切り替える */
-.p-article__jacket::before,
-.p-article__jacket::after {
+.p-article__jacket::before {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 0;
-  width: 9%;
+  width: 10%;
   aspect-ratio: 1 / 1;
   background: var(--gold-grad);
   -webkit-mask: var(--mark-mask) center / contain no-repeat;
@@ -173,10 +162,6 @@
     markIn 1.2s ease 2s both,
     markOrbit 9s linear infinite;
   content: "";
-}
-
-.p-article__jacket::after {
-  animation-delay: 2s, -4.5s;
 }
 
 @keyframes markIn {
@@ -1080,13 +1065,8 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .p-article__jacket::before,
-    .p-article__jacket::after {
+  .p-article__jacket::before {
       animation: none;
-    }
-
-  .p-article__jacket::after {
-      offset-distance: 50%;
     }
 
   .p-marquee {
