@@ -37,3 +37,15 @@ python3 restyle.py          # 見た目（海と陸の塗り分け・電波の�
 - 枠の範囲（`HALF_W_KM` / `HALF_H_KM`）を変えると縮尺も変わります。円の半径はkmから計算しているので自動で追従しますが、
   文字の位置は見て調整してください
 - 正式なエリア図を使うなら、TOKYO MX の図を許諾を得て差し替えるのが確実です
+
+## 夜景の衛星写真版（いま使っている図）
+
+`nightmap.py` が、NASA の夜間光画像（Black Marble。`blackmarble.jpg`）を金に染めて敷き、
+東京都の縁・50kmの円・県境・地名を重ねて `assets/img/area-map.svg` を書き出します（写真は SVG の中に埋め込み）。
+画像の取り直し方は `nightmap.py` の先頭に書いてあります。県境などの形は `shapes.json` から取ります。
+
+```sh
+python3 nightmap.py
+```
+
+`restyle.py` を流すと、写真なしの線画の図で上書きされるので注意。
