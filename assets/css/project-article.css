@@ -21,7 +21,9 @@
 .p-article::before {
   position: fixed;
   top: 50%;
-  left: 13%;
+  /* 右寄りに置く。記事の頭の左の列（ジャケットと、後ろから出て回る金のレコード）に重ねると、
+     丸くて回るものが同じ場所に2つ並んでうるさいので */
+  left: 87%;
   z-index: -1;
   width: min(64vh, 44vw);
   aspect-ratio: 1;
@@ -51,7 +53,8 @@
 .p-article__head {
   position: relative;
   display: grid;
-  grid-template-columns: clamp(320px, 34%, 400px) 1fr;
+  /* 左の列＝ジャケット＋後ろから出る金のレコードのはみ出し（ジャケットの3割）。ジャケットの幅は clamp のまま */
+  grid-template-columns: calc(clamp(320px, 34%, 400px) * 1.3) 1fr;
   gap: clamp(28px, 4.5vw, 56px);
   align-items: start;
   padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
@@ -78,6 +81,151 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* 人物写真もカードと同じジャケット型（黒と金の2色）。枠の大きさ（3:4）は変えず、中だけ組み替える。
+   上は黒の細い横縞に金の「THE BEST OF」と日輪マーク、写真は金の縁の額に収め、
+   下の金の帯に会社名（figcaption）。大きさは枠の幅に比例（cqw）。
+   TOPの .p-cards--cover・MORE STORIES の .p-related__list--cover と見た目をそろえている */
+.p-article__visual {
+  position: relative;
+  container-type: inline-size;
+  border-radius: 3px;
+  background:
+    var(--gold-grad) bottom / 100% 42% no-repeat,
+    repeating-linear-gradient(to bottom, #15120f 0 2px, #1f1a15 2px 3px);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.6),
+    0 16px 32px rgba(0, 0, 0, 0.42);
+}
+
+.p-article__visual::before {
+  position: absolute;
+  top: 5.6cqw;
+  right: 0;
+  left: 0;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--f-mincho);
+  font-size: 7.4cqw;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-align: center;
+  content: "THE BEST OF";
+}
+
+.p-article__visual::after {
+  position: absolute;
+  top: 4.8cqw;
+  left: 4.6cqw;
+  width: 7cqw;
+  height: 7cqw;
+  background: var(--gold-grad);
+  -webkit-mask: var(--mark-mask) center / contain no-repeat;
+  mask: var(--mark-mask) center / contain no-repeat;
+  content: "";
+}
+
+.p-article__visual img {
+  position: absolute;
+  top: 18cqw;
+  left: 12%;
+  width: 76%;
+  height: 90cqw;
+  box-shadow:
+    0 0 0 1px rgba(201, 164, 90, 0.8),
+    0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* ベスト盤の世界観：ジャケットの後ろから金のレコード（ゴールドディスク＝栄誉）が出て、ゆっくり回る。
+   .p-article__jacket の幅＝ジャケット（76.92%）＋はみ出し。レコードの直径はジャケットの幅の0.9倍。
+   最初はジャケットの真後ろに隠れていて、開いて少ししてから右へすべり出る（JSに頼らずCSSのアニメーションだけ）。
+   回っているのが分かるように、溝の上に斜めの光（conic-gradient）を乗せている */
+.p-article__jacket {
+  position: relative;
+}
+
+.p-article__jacket .p-article__visual {
+  z-index: 1;
+  width: 76.92%;
+}
+
+.p-article__record {
+  position: absolute;
+  top: 50%;
+  left: 3.85%;
+  z-index: 0;
+  width: 69.23%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, #15120f 0 34%, #d4b060 34% 35.5%, transparent 35.5%),
+    conic-gradient(
+      from 30deg,
+      rgba(255, 248, 225, 0) 0deg,
+      rgba(255, 248, 225, 0.5) 22deg,
+      rgba(255, 248, 225, 0) 55deg,
+      rgba(255, 248, 225, 0) 180deg,
+      rgba(255, 248, 225, 0.4) 202deg,
+      rgba(255, 248, 225, 0) 235deg
+    ),
+    repeating-radial-gradient(circle closest-side, #a8823a 0 0.7%, #d9bc72 0.7% 1.5%),
+    #c9a45a;
+  box-shadow:
+    inset 0 0 0 2px rgba(90, 64, 20, 0.6),
+    0 18px 36px rgba(0, 0, 0, 0.5);
+  translate: 0 -50%;
+  animation:
+    recordOut 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both,
+    recordSpin 14s linear 3s infinite;
+}
+
+/* 黒いレーベルの真ん中に金の日輪マーク */
+.p-article__record::after {
+  position: absolute;
+  inset: 40%;
+  background: var(--gold-grad);
+  -webkit-mask: var(--mark-mask) center / contain no-repeat;
+  mask: var(--mark-mask) center / contain no-repeat;
+  content: "";
+}
+
+@keyframes recordOut {
+  from {
+    translate: 0 -50%;
+  }
+
+  to {
+    translate: 39% -50%;
+  }
+}
+
+@keyframes recordSpin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+.p-article__visualCorp {
+  position: absolute;
+  top: 108cqw;
+  right: 6cqw;
+  bottom: 0;
+  left: 6cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #15120f;
+  font-family: var(--f-mincho);
+  font-size: 5.6cqw;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-align: center;
 }
 
 /* 写真は、その塊が出るときに幕が上がるように下から現れ、少し寄った状態からゆっくり引く
@@ -279,6 +427,13 @@
   width: 50%;
   /* 本文（.p-qa）の書き出しと写真の天を合わせる */
   margin: 34px 0 22px clamp(24px, 3.4vw, 44px);
+}
+
+/* 写真は出てくる順に右・左・右…と交互に置く（偶数番目に .p-figure--left）。
+   タブレット・SPは回り込みをやめるので、下の @media で左右とも float: none に戻る */
+.p-figure--left {
+  float: left;
+  margin: 34px clamp(24px, 3.4vw, 44px) 22px 0;
 }
 
 .p-figure img {
@@ -576,6 +731,144 @@
   display: block;
 }
 
+/* MORE STORIES もTOPと同じジャケット型（.p-related__list--cover） ----------
+   TOPの .p-cards--cover（project-top.css）と同じ組み方を、こちらの部品名で書いている。
+   **直すときは両方そろえること**。
+   上半分は黒の細い横縞に金の「THE BEST OF」と日輪マーク、真ん中の額は企業ロゴ→ホバーで写真、
+   下半分の金の帯に会社名。氏名・役職は出さない。大きさはカードの幅に比例（cqw） */
+.p-related__list--cover .p-related__card {
+  position: relative;
+  container-type: inline-size;
+}
+
+.p-related__list--cover .p-related__card .p-related__visual {
+  border-radius: 3px;
+  background:
+    var(--gold-grad) bottom / 100% 50% no-repeat,
+    repeating-linear-gradient(to bottom, #15120f 0 2px, #1f1a15 2px 3px);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.6),
+    0 16px 32px rgba(0, 0, 0, 0.42);
+}
+
+.p-related__list--cover .p-related__card .p-related__visual::before {
+  position: absolute;
+  top: 5.4cqw;
+  right: 0;
+  left: 0;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--f-mincho);
+  font-size: 7.4cqw;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-align: center;
+  content: "THE BEST OF";
+}
+
+.p-related__list--cover .p-related__card .p-related__visual img:not(.p-related__logo) {
+  position: absolute;
+  top: 17%;
+  left: 19%;
+  z-index: 1;
+  width: 62%;
+  height: 62%;
+}
+
+.p-related__list--cover .p-related__card .p-related__logo {
+  top: 17%;
+  left: 19%;
+  width: 62%;
+  height: 62%;
+  padding: 0;   /* 額いっぱいにロゴを出す（余白を取らない） */
+  opacity: 1;
+  clip-path: none;
+  transition: opacity 0.6s ease;
+}
+
+@media (hover: hover) {
+  .p-related__list--cover .p-related__card:hover .p-related__logo {
+      opacity: 0;
+    }
+}
+
+.p-related__list--cover .p-related__card.is-shown .p-related__logo {
+  opacity: 0;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .js [data-reveal].is-revealed .p-related__list--cover .p-related__card .p-related__logo {
+      opacity: 0;
+    }
+}
+
+/* 虹色の拭い（READ）の代わりに、左上へ小さく金の日輪マーク */
+.p-related__list--cover .p-related__card .p-related__visual::after {
+  top: 4.6cqw;
+  left: 4.6cqw;
+  width: 7cqw;
+  height: 7cqw;
+  background: var(--gold-grad);
+  opacity: 1;
+  -webkit-mask: var(--mark-mask) center / contain no-repeat;
+  mask: var(--mark-mask) center / contain no-repeat;
+  clip-path: none;
+  animation: none;
+  transition: none;
+  content: "";
+}
+
+.p-related__list--cover .p-related__card .p-related__visual img:not(.p-related__logo),
+.p-related__list--cover .p-related__card .p-related__logo {
+  box-shadow:
+    0 0 0 1px rgba(201, 164, 90, 0.8),
+    0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.p-related__list--cover .p-related__card .p-related__corp {
+  position: absolute;
+  top: 79cqw;
+  right: 5cqw;
+  left: 5cqw;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 21cqw;
+  color: #15120f;
+  font-family: var(--f-mincho);
+  font-size: 5.6cqw;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.p-related__list--cover .p-related__romaji,
+.p-related__list--cover .p-related__name,
+.p-related__list--cover .p-related__role,
+.p-related__list--cover .p-related__company::before {
+  display: none;
+}
+
+.p-related__list--cover .p-related__body {
+  padding: 0;
+}
+
+/* 会社名をカードの帯の位置に出すため、包みの relative / overflow を外す
+   （残すと会社名がこの小さな箱を基準に置かれ、切れて見えなくなる） */
+.p-related__list--cover .p-related__company {
+  position: static;
+  overflow: visible;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
 /* 一覧へ戻る。記事の締め */
 .p-article__foot {
   padding: clamp(34px, 4.6vw, 56px) 0 clamp(70px, 10vw, 120px);
@@ -645,7 +938,7 @@
     }
 
   .p-article__head {
-      grid-template-columns: clamp(240px, 38%, 320px) 1fr;
+      grid-template-columns: calc(clamp(240px, 38%, 320px) * 1.3) 1fr;
       gap: clamp(22px, 3.4vw, 40px);
     }
 
@@ -673,8 +966,8 @@
     }
 
   /* SPは1列になるので、写真は幅を抑えて**中央に置く**（左に寄せたままだと落ち着かない） */
-  .p-article__visual {
-      max-width: 280px;
+  .p-article__jacket {
+      width: min(100%, calc(280px * 1.3));
       margin-inline: auto;
     }
 
@@ -748,6 +1041,11 @@
 
 
 @media (prefers-reduced-motion: reduce) {
+  .p-article__record {
+      translate: 39% -50%;
+      animation: none;
+    }
+
   .p-marquee {
       overflow-x: auto;
     }

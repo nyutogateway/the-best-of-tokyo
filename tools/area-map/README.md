@@ -15,7 +15,10 @@
 curl -sS -o japan.geojson https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson
 python3 makemap.py          # → area-map.svg
 cp area-map.svg ../../assets/img/area-map.svg
+python3 restyle.py          # 見た目（海と陸の塗り分け・電波の輪・目盛り・縮尺・方位・文字）を組み直す
 ```
+
+見た目だけを直すときは `restyle.py` だけを直して流せばよい（県境の形は今の area-map.svg から引き継ぐ）。
 
 ## 中身
 

@@ -5,3 +5,6 @@ __tmp*.html
 assets/img/area-map-mx.jpg
 wp-theme/*.zip
 dist/
+
+# 見比べ用に別案件（closeup-chiba-50）から借りた画像。リポジトリには入れない
+assets/img/trial/

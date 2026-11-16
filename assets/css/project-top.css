@@ -1535,6 +1535,165 @@
   display: block;
 }
 
+/* カード：ジャケット型（.p-cards--cover） -----------------------------
+   サイト全体のカードはこの形（TOPのグループ01〜10すべてに付けている）。
+   記事ページの MORE STORIES も同じ形（project-article.css の .p-related__list--cover）。
+   **直すときは両方そろえること**。
+   音楽アプリの特集ジャケットのように、上に「THE BEST OF」、真ん中に額、下の帯に氏名を置く。
+   **色は黒と金の2色だけ**で組む（上半分は黒の細い横縞、下の帯は金。文字は黒地に金、金地に黒）。
+   額には最初に企業ロゴを出し、カーソルを乗せると写真に変わる（ほかのカードと同じ順番）。
+   カードの下には社名・役職を説明文として添える。
+   マークアップは他のカードと同じで、CSS だけで組み替えている（WPテーマに移すときも同じ部品で済む）。
+   カードの中の大きさは、カードの幅に比例させる（cqw。カードの幅＝正方形の1辺）。
+   カードの大きさ・並び（真ん中の1枚が大きい）は変えない。
+   ほかのカードの指定（中央の1枚の文字の大きさ、SPの切り替えなど）に負けないよう、
+   セレクタは .p-cards.p-cards--cover から書いている */
+.p-cards.p-cards--cover .p-card {
+  position: relative;
+  container-type: inline-size;
+}
+
+.p-cards.p-cards--cover .p-card .p-card__visual {
+  border-radius: 3px;
+  /* 下半分の帯は金のグラデーション（金の線・金の文字と同じもの） */
+  background:
+    var(--gold-grad) bottom / 100% 50% no-repeat,
+    repeating-linear-gradient(to bottom, #15120f 0 2px, #1f1a15 2px 3px);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 164, 90, 0.6),
+    0 16px 32px rgba(0, 0, 0, 0.42);
+}
+
+/* 見出しは明朝で、字間を広げて金で置く */
+.p-cards.p-cards--cover .p-card .p-card__visual::before {
+  position: absolute;
+  top: 5.4cqw;
+  right: 0;
+  left: 0;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--f-mincho);
+  font-size: 7.4cqw;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-align: center;
+  content: "THE BEST OF";
+}
+
+/* 写真は黒の帯から金の帯へまたがる額に収める */
+.p-cards.p-cards--cover .p-card .p-card__visual img:not(.p-card__logo) {
+  position: absolute;
+  top: 17%;
+  left: 19%;
+  z-index: 1;
+  width: 62%;
+  height: 62%;
+}
+
+/* 最初は企業ロゴを額の中に出し、カーソルを乗せると写真に変わる（斜めの拭いは使わない）。
+   ロゴは白地のものが多いので、地は白のまま */
+.p-cards.p-cards--cover .p-card .p-card__logo {
+  top: 17%;
+  left: 19%;
+  width: 62%;
+  height: 62%;
+  padding: 0;   /* 額いっぱいにロゴを出す（余白を取らない） */
+  opacity: 1;
+  clip-path: none;
+  transition: opacity 0.6s ease;
+}
+
+@media (hover: hover) {
+  .p-cards.p-cards--cover .p-card:hover .p-card__logo {
+      opacity: 0;
+    }
+}
+
+/* SPはカーソルが無いので、画面に入ったところで写真に変える（JSの is-shown。保険で is-revealed も見る） */
+.p-cards.p-cards--cover .p-card.is-shown .p-card__logo {
+  opacity: 0;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .p-grouprow.is-revealed .p-cards.p-cards--cover .p-card .p-card__logo {
+      opacity: 0;
+    }
+}
+
+/* 虹色の拭い（READ）の代わりに、左上へ小さく金の日輪マークを置く
+   （マークの形で金のグラデーションを切り抜いている） */
+.p-cards.p-cards--cover .p-card .p-card__visual::after {
+  top: 4.6cqw;
+  left: 4.6cqw;
+  width: 7cqw;
+  height: 7cqw;
+  background: var(--gold-grad);
+  opacity: 1;
+  -webkit-mask: var(--mark-mask) center / contain no-repeat;
+  mask: var(--mark-mask) center / contain no-repeat;
+  clip-path: none;
+  animation: none;
+  transition: none;
+  content: "";
+}
+
+/* 額にも細い金の縁 */
+.p-cards.p-cards--cover .p-card .p-card__visual img:not(.p-card__logo),
+.p-cards.p-cards--cover .p-card .p-card__logo {
+  box-shadow:
+    0 0 0 1px rgba(201, 164, 90, 0.8),
+    0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* 金の帯の中、額の下には会社名を黒で置く。長い社名もあるので2行まで折り返す */
+.p-cards.p-cards--cover .p-card .p-card__corp {
+  position: absolute;
+  top: 79cqw;
+  right: 5cqw;
+  left: 5cqw;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 21cqw;
+  color: #15120f;
+  font-family: var(--f-mincho);
+  font-size: 5.6cqw;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* 氏名・役職は出さない（カードは会社名とロゴ・写真だけで見せる）。
+   会社名（.p-card__corp）は .p-card__company の中にあるので、塊ごとは消さない */
+.p-cards.p-cards--cover > li .p-card__name,
+.p-cards.p-cards--cover .p-card__role {
+  display: none;
+}
+
+/* カードの下は、氏名と役職を添える（英字名は出さない。会社名は帯の中） */
+.p-cards.p-cards--cover .p-card__body {
+  padding: 0;
+}
+
+.p-cards.p-cards--cover .p-card__romaji {
+  display: none;
+}
+
+.p-cards.p-cards--cover .p-card__company {
+  min-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* 4. INDEX（掲載者・企業一覧） ------------------------- */
 
 /* STORIES（墨の面）のあと。上の余白は INDEX 側で取り、下は袋文字の帯（.p-ticker）の余白に任せる
