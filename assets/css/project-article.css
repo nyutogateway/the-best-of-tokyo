@@ -93,7 +93,7 @@
   border-radius: 3px;
   background:
     var(--gold-grad) bottom / 100% 42% no-repeat,
-    var(--c-indigo-deep);
+    var(--grain), var(--c-indigo-deep);
   box-shadow:
     inset 0 0 0 1px rgba(201, 164, 90, 0.6),
     0 16px 32px rgba(0, 0, 0, 0.42);
@@ -745,7 +745,7 @@
   border-radius: 3px;
   background:
     var(--gold-grad) bottom / 100% 50% no-repeat,
-    var(--c-indigo-deep);
+    var(--grain), var(--c-indigo-deep);
   box-shadow:
     inset 0 0 0 1px rgba(201, 164, 90, 0.6),
     0 16px 32px rgba(0, 0, 0, 0.42);
