@@ -140,10 +140,20 @@
     0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* ベスト盤の世界観：ジャケットの後ろから金のレコード（ゴールドディスク＝栄誉）が出て、ゆっくり回る。
-   .p-article__jacket の幅＝ジャケット（76.92%）＋はみ出し。レコードの直径はジャケットの幅の0.9倍。
-   最初はジャケットの真後ろに隠れていて、開いて少ししてから右へすべり出る（JSに頼らずCSSのアニメーションだけ）。
-   回っているのが分かるように、溝の上に斜めの光（conic-gradient）を乗せている */
+/* ベスト盤の世界観：金のレコード（ゴールドディスク＝栄誉）を土星の輪のように寝かせて、ジャケットの周りで回す。
+   輪は奥の半分（::before）と手前の半分（::after）に分けて描き、奥はジャケットの後ろ、手前はジャケットの前に置く
+   （3D の面の交差に任せるとブラウザによって前後が崩れるので、重なり順は z-index で決めている）。
+   半分に切る clip-path は傾ける前の盤面の座標で効くので、上半分＝奥、下半分＝手前になる。
+   盤そのものは回さず、溝の上の斜めの光（conic-gradient の角度 --spin）を回して「回っている」ように見せる
+   （盤ごと回すと、切った半分も一緒に回ってしまう）。
+   .p-article__jacket の幅＝ジャケット（76.92%）の1.3倍＝輪の直径。ジャケットは真ん中に置く。
+   輪の真ん中はくり抜いて、溝の部分だけを残す */
+@property --spin {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
 .p-article__jacket {
   position: relative;
 }
@@ -151,61 +161,68 @@
 .p-article__jacket .p-article__visual {
   z-index: 1;
   width: 76.92%;
+  margin-inline: auto;
 }
 
+/* 器だけ。z-index も transform も付けない（付けると重なりの箱ができ、半分ずつ前後に置けなくなる） */
 .p-article__record {
   position: absolute;
-  top: 50%;
-  left: 3.85%;
+  inset: 0;
+  pointer-events: none;
+  animation: ringSpin 14s linear infinite;
+}
+
+.p-article__record::before,
+.p-article__record::after {
+  position: absolute;
+  top: 58%;
+  left: 0;
   z-index: 0;
-  width: 69.23%;
+  width: 100%;
   aspect-ratio: 1 / 1;
+  /* 縦の真ん中を top の位置に合わせる（margin の % は幅基準＝直径基準） */
+  margin-top: -50%;
   border-radius: 50%;
   background:
-    radial-gradient(circle closest-side, #15120f 0 34%, #d4b060 34% 35.5%, transparent 35.5%),
     conic-gradient(
-      from 30deg,
+      from calc(30deg + var(--spin)),
       rgba(255, 248, 225, 0) 0deg,
-      rgba(255, 248, 225, 0.5) 22deg,
+      rgba(255, 248, 225, 0.6) 22deg,
       rgba(255, 248, 225, 0) 55deg,
       rgba(255, 248, 225, 0) 180deg,
-      rgba(255, 248, 225, 0.4) 202deg,
+      rgba(255, 248, 225, 0.5) 202deg,
       rgba(255, 248, 225, 0) 235deg
     ),
     repeating-radial-gradient(circle closest-side, #a8823a 0 0.7%, #d9bc72 0.7% 1.5%),
     #c9a45a;
-  box-shadow:
-    inset 0 0 0 2px rgba(90, 64, 20, 0.6),
-    0 18px 36px rgba(0, 0, 0, 0.5);
-  translate: 0 -50%;
-  animation:
-    recordOut 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both,
-    recordSpin 14s linear 3s infinite;
-}
-
-/* 黒いレーベルの真ん中に金の日輪マーク */
-.p-article__record::after {
-  position: absolute;
-  inset: 40%;
-  background: var(--gold-grad);
-  -webkit-mask: var(--mark-mask) center / contain no-repeat;
-  mask: var(--mark-mask) center / contain no-repeat;
+  -webkit-mask: radial-gradient(circle closest-side, transparent 66%, #000 66.6% 99%, transparent 100%);
+  mask: radial-gradient(circle closest-side, transparent 66%, #000 66.6% 99%, transparent 100%);
+  clip-path: inset(0 0 50% 0);
+  transform: perspective(1600px) rotate(-12deg) rotateX(72deg);
+  animation: ringIn 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
   content: "";
 }
 
-@keyframes recordOut {
+.p-article__record::after {
+  z-index: 2;
+  clip-path: inset(50% 0 0 0);
+}
+
+@keyframes ringIn {
   from {
-    translate: 0 -50%;
+    opacity: 0;
+    scale: 0.55;
   }
 
   to {
-    translate: 39% -50%;
+    opacity: 1;
+    scale: 1;
   }
 }
 
-@keyframes recordSpin {
+@keyframes ringSpin {
   to {
-    rotate: 1turn;
+    --spin: 360deg;
   }
 }
 
@@ -1084,8 +1101,9 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .p-article__record {
-      translate: 39% -50%;
+  .p-article__record,
+    .p-article__record::before,
+    .p-article__record::after {
       animation: none;
     }
 
