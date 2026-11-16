@@ -105,12 +105,12 @@
 
 /* footer ------------------------------------------------- */
 
-/* フッターは白地。墨の本文のあとを白で締める。上端の虹色の線が境目 */
+/* フッターはサイトの背景と同じ紺。上端の虹色の線が境目。ロゴは白金（logo-white-gold） */
 .l-footer {
   position: relative;
   padding: clamp(56px, 8vw, 96px) var(--pad-x) 40px;
-  background: var(--grain), var(--c-paper);
-  color: var(--c-ink);
+  background: var(--grain), var(--c-indigo-deep);
+  color: #fff;
   text-align: center;
 }
 
@@ -164,8 +164,8 @@
 .l-footer__copy {
   margin-top: 44px;
   padding-top: 22px;
-  border-top: 1px solid var(--c-line-thin);
-  color: var(--c-mute);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.55);
   font-family: var(--f-gothic);
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -175,12 +175,11 @@
   margin-bottom: 40px;
 }
 
-/* 局のロゴは白地の画像なので、白いフッターでは細い罫で囲んで輪郭を出す */
+/* 局のロゴは白地の画像なので、白い札にして紺の上に置く */
 .l-footer__station img {
   width: 232px;
   margin-inline: auto;
   padding: 14px 18px;
-  border: 1px solid var(--c-line-thin);
   background: #fff;
 }
 
