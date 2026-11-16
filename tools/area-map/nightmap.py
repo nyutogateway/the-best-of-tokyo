@@ -60,38 +60,49 @@ w("""  <!-- 放送エリア図（夜景の衛星写真）。作り方は tools/a
        県境：国土数値情報（国土交通省）の行政区域データを加工 -->""")
 w(f"""  <defs>
     <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
-    <!-- 写真の明るさだけを取り出し、金（{GOLD_LIGHT}）で染める。明るすぎる都心は少し抑える -->
-    <filter id="gold" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation=".7"/>
-      <feColorMatrix type="matrix" values="0 0 0 0 .89  0 0 0 0 .79  0 0 0 0 .55  .3 .59 .11 0 0"/>
-      <feComponentTransfer><feFuncA type="gamma" amplitude=".8" exponent="2.4" offset="0"/></feComponentTransfer>
+    <!-- 写真の明るさだけを取り出して色を付ける。
+         東京都の外：青白くうすく（地の質感にとどめる）。東京都の中：金で光らせる（放送対象地域がひと目で分かるように） -->
+    <filter id="dim" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation=".8"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .72  0 0 0 0 .78  0 0 0 0 .92  .3 .59 .11 0 0"/>
+      <feComponentTransfer><feFuncA type="gamma" amplitude=".3" exponent="1.6" offset="0"/></feComponentTransfer>
     </filter>
+    <filter id="gold" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation=".6"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .89  0 0 0 0 .76  0 0 0 0 .45  .3 .59 .11 0 0"/>
+      <feComponentTransfer><feFuncA type="gamma" amplitude=".95" exponent="1.4" offset="0"/></feComponentTransfer>
+    </filter>
+    <clipPath id="tokyoClip"><path d="{tokyo}"/></clipPath>
   </defs>""")
 w('  <g clip-path="url(#frame)">')
 w(f'    <rect width="{W}" height="{H}" fill="{NAVY}"/>')
-w(f'    <image width="{W}" height="{H}" preserveAspectRatio="none" filter="url(#gold)" '
-  f'href="data:image/jpeg;base64,{photo}" xlink:href="data:image/jpeg;base64,{photo}"/>')
+# 写真は1回だけ埋め込み、<use> で2回使う（ファイルを軽くするため）
+w(f'    <defs><image id="night" width="{W}" height="{H}" preserveAspectRatio="none" '
+  f'href="data:image/jpeg;base64,{photo}"/></defs>')
+w(f'    <g filter="url(#dim)"><use href="#night"/></g>')
+w(f'    <g clip-path="url(#tokyoClip)"><path d="{tokyo}" fill="{GOLD}" fill-opacity=".3"/>'
+  f'<g filter="url(#gold)"><use href="#night"/></g></g>')
 # 県境と海岸：ごくうすい線（場所の手がかりだけ）
-w(f'    <path d="{" ".join(land)}" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width=".6" stroke-linejoin="round"/>')
+w(f'    <path d="{" ".join(land)}" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".6" stroke-linejoin="round"/>')
 # 放送対象地域：東京都の縁を金の実線で
 # 明かりの上でも読めるよう、下に紺の縁取りを敷く
 w(f'    <path d="{tokyo}" fill="none" stroke="{NAVY}" stroke-opacity=".75" stroke-width="3.6" stroke-linejoin="round"/>')
 w(f'    <path d="{tokyo}" fill="none" stroke="{GOLD_LIGHT}" stroke-width="1.3" stroke-linejoin="round"/>')
 # 50kmの円
 w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{NAVY}" stroke-opacity=".7" stroke-width="3"/>')
-w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{CREAM}" stroke-width="1" stroke-dasharray="3 3"/>')
-w(f'    <text x="{CX}" y="{CY - R50 - 7:.1f}" text-anchor="middle" font-family="{FONT}" font-size="9.5" letter-spacing="2" fill="{CREAM}" {halo}>半径 約50km</text>')
+w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{CREAM}" stroke-width="1.1" stroke-dasharray="4 3"/>')
+w(f'    <text x="{CX}" y="{CY - R50 - 7:.1f}" text-anchor="middle" font-family="{FONT}" font-size="11" letter-spacing="2" fill="{CREAM}" {halo}>半径 約50km</text>')
 
 # 県名
 prefs = [(173, 134, "埼玉県"), (500, 392, "千葉県"), (200, 420, "神奈川県"), (575, 70, "茨城県")]
-w(f'    <g font-family="{FONT}" font-size="12" letter-spacing="7" fill="#fff" fill-opacity=".55" text-anchor="middle" {halo}>')
+w(f'    <g font-family="{FONT}" font-size="13" letter-spacing="7" fill="#fff" fill-opacity=".7" text-anchor="middle" {halo}>')
 for x, y, ja in prefs:
     w(f'      <text x="{x}" y="{y}">{ja}</text>')
 w("    </g>")
-w(f'    <text x="112" y="210" text-anchor="middle" font-family="{FONT}" font-size="15" font-weight="600" letter-spacing="9" fill="{GOLD_LIGHT}" {halo}>東京都</text>')
+w(f'    <text x="112" y="210" text-anchor="middle" font-family="{FONT}" font-size="17" font-weight="700" letter-spacing="9" fill="{GOLD_LIGHT}" {halo}>東京都</text>')
 
 # 市
-w(f'    <g font-family="{FONT}" font-size="9.5" letter-spacing="1" fill="#fff" fill-opacity=".85">')
+w(f'    <g font-family="{FONT}" font-size="11" letter-spacing="1" fill="#fff">')
 for x, y, name in cities:
     w(f'      <circle cx="{x}" cy="{y}" r="1.4" fill="{CREAM}"/>')
     w(f'      <text x="{x + 5:.1f}" y="{y + 3.3:.1f}" {halo}>{name}</text>')
@@ -104,13 +115,13 @@ for ln in mark_lines:
     w("      " + ln)
 w("    </g>")
 w(f'    <g font-family="{FONT}" {halo}>')
-w(f'      <text x="{CX + 22}" y="{CY - 6}" font-size="12" font-weight="600" letter-spacing="2" fill="{CREAM}">東京スカイツリー</text>')
-w(f'      <text x="{CX + 22}" y="{CY + 8}" font-size="8.5" letter-spacing="2" fill="{GOLD_LIGHT}">送信所・地上デジタル 9ch</text>')
+w(f'      <text x="{CX + 22}" y="{CY - 6}" font-size="13.5" font-weight="700" letter-spacing="2" fill="{CREAM}">東京スカイツリー</text>')
+w(f'      <text x="{CX + 22}" y="{CY + 10}" font-size="10" letter-spacing="2" fill="{GOLD_LIGHT}">送信所・地上デジタル 9ch</text>')
 w("    </g>")
 
 # 凡例（左下）
-lx0, ly0 = 22, 440
-w(f'    <g font-family="{FONT}" font-size="9" letter-spacing="1.5" fill="#fff" fill-opacity=".85" {halo}>')
+lx0, ly0 = 22, 436
+w(f'    <g font-family="{FONT}" font-size="10.5" letter-spacing="1.5" fill="#fff" {halo}>')
 w(f'      <line x1="{lx0}" y1="{ly0 + 4}" x2="{lx0 + 16}" y2="{ly0 + 4}" stroke="{GOLD_LIGHT}" stroke-width="1.3"/>')
 w(f'      <text x="{lx0 + 24}" y="{ly0 + 7.5}">放送対象地域（東京都）</text>')
 w(f'      <line x1="{lx0}" y1="{ly0 + 23}" x2="{lx0 + 16}" y2="{ly0 + 23}" stroke="{CREAM}" stroke-width=".8" stroke-dasharray="2 3"/>')
