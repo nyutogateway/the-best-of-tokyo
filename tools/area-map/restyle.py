@@ -2,7 +2,8 @@
 """放送エリア図（assets/img/area-map.svg）の見た目を組み直す
 
 県境の形は makemap.py で起こした今の area-map.svg からそのまま引き継ぎ、
-見た目（海と陸の塗り分け、受信エリアの光、電波の輪、目盛り・経緯線・縮尺・方位、文字）だけを作り直す。
+見た目（海と陸の塗り分け、受信エリアの塗り、50kmの円、文字、凡例、縮尺）だけを作り直す。
+新聞やテレビ局の実際のエリア図に寄せ、光・グラデーション・動き・英字の飾りは使わない（使うと作り物っぽく見える）。
 makemap.py で県境を作り直したときは、そのあとにこれを流すこと。
 
     python3 tools/area-map/restyle.py
@@ -27,9 +28,10 @@ PX_LON, PX_LAT = 357.3, 440.0
 GOLD = "#c9a45a"
 GOLD_LIGHT = "#e3c98c"
 CREAM = "#fff6dc"
-SEA = "#0a1226"
-LAND = "#16223c"
-LAND_IN = "#24375f"
+# 海はサイトの背景（foundation.css の --c-indigo-deep）、陸はそれより一段明るい紺。カードの地も同じ紺
+SEA = "#0e1932"
+LAND = "#17264a"
+REACH = "#2a3a62"  # 受信エリアの陸（さらに一段明るい紺）
 FONT = "'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif"
 NUM = "'Helvetica Neue',Arial,sans-serif"
 
@@ -67,145 +69,80 @@ out = []
 w = out.append
 
 w(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" '
-  'aria-label="TOKYO MX の放送エリア図。東京都と、東京スカイツリーから半径50kmの範囲">')
+  'aria-label="TOKYO MX の放送エリア図。放送対象地域の東京都と、東京スカイツリーから約50kmの受信エリアの目安">')
 w("""  <!-- 放送エリア図。**県境は実データから起こしている**
        （国土数値情報（国土交通省）の行政区域データ。dataofjapan/land 経由で取得し、
        Ramer–Douglas–Peucker で 0.7px まで間引いた）。
        県境の形は tools/area-map/makemap.py、見た目は tools/area-map/restyle.py で作っている。
        投影は正距円筒。経度に cos(35.71度) を掛けてあるので「円＝送信所から等距離」として扱える。
        中心は東京スカイツリー（北緯35.7101/東経139.8107）、縮尺は 1km = 3.953px -->""")
-w(f"""  <style>
-    .wave {{ transform-box: view-box; transform-origin: {CX}px {CY}px; animation: wave 5.4s cubic-bezier(.2,.6,.3,1) infinite; opacity: 0; }}
-    .wave--2 {{ animation-delay: 1.8s; }}
-    .wave--3 {{ animation-delay: 3.6s; }}
-    @keyframes wave {{
-      0% {{ transform: scale(.03); opacity: .75; }}
-      100% {{ transform: scale(1); opacity: 0; }}
-    }}
-    @media (prefers-reduced-motion: reduce) {{ .wave {{ animation: none; }} }}
-  </style>""")
 w(f"""  <defs>
-    <clipPath id="frame"><rect x="0" y="0" width="{W}" height="{H}" rx="6"/></clipPath>
+    <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
     <clipPath id="reachClip"><circle cx="{CX}" cy="{CY}" r="{R50:.1f}"/></clipPath>
-    <radialGradient id="seaGlow" cx="{CX / W:.4f}" cy="{CY / H:.4f}" r="{R50 * 1.25 / W:.4f}" gradientUnits="objectBoundingBox">
-      <stop offset="0" stop-color="#1b2a4a"/>
-      <stop offset="1" stop-color="{SEA}"/>
-    </radialGradient>
-    <linearGradient id="tokyoFill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f3e2b0"/>
-      <stop offset=".55" stop-color="#d4b060"/>
-      <stop offset="1" stop-color="#b48a3c"/>
-    </linearGradient>
   </defs>""")
 
 w('  <g clip-path="url(#frame)">')
-# 海
 w(f'    <rect width="{W}" height="{H}" fill="{SEA}"/>')
-w(f'    <rect width="{W}" height="{H}" fill="url(#seaGlow)"/>')
 
-# 経緯線（0.25度ごと）
-w('    <g stroke="rgba(227,201,140,.07)" stroke-width="1">')
-lon = 139.0
-while lon <= 140.76:
-    x = CX + (lon - LON0) * PX_LON
-    if 0 < x < W:
-        w(f'      <line x1="{x:.1f}" y1="0" x2="{x:.1f}" y2="{H}"/>')
-    lon += 0.25
-lat = 35.0
-while lat <= 36.3:
-    y = CY - (lat - LAT0) * PX_LAT
-    if 0 < y < H:
-        w(f'      <line x1="0" y1="{y:.1f}" x2="{W}" y2="{y:.1f}"/>')
-    lat += 0.25
-w("    </g>")
-
-# 陸
+# 陸（平らに塗る）
 d_land = " ".join(land)
-w(f'    <path d="{d_land}" fill="{LAND}" stroke="rgba(255,255,255,.2)" stroke-width=".8" stroke-linejoin="round"/>')
-# 受信エリアの中の陸だけを一段明るい紺にして浮かせる
-# （金を薄く重ねると紺と混ざって濁った茶色になるので、金は東京都と輪だけに使う）
-w(f'    <g clip-path="url(#reachClip)">')
-w(f'      <path d="{d_land}" fill="{LAND_IN}" stroke="rgba(227,201,140,.4)" stroke-width=".8" stroke-linejoin="round"/>')
+w(f'    <path d="{d_land}" fill="{LAND}" stroke="rgba(255,255,255,.28)" stroke-width=".7" stroke-linejoin="round"/>')
+# 受信エリアの目安：円の中の陸を一段明るい焦げ茶で平らに塗る（斜線は作り物っぽく見えるので使わない）
+w(f'    <path d="{d_land}" fill="{REACH}" stroke="rgba(255,255,255,.28)" stroke-width=".7" stroke-linejoin="round" clip-path="url(#reachClip)"/>')
+# 放送対象地域：東京都（金の単色）
+w(f'    <path d="{tokyo}" fill="{GOLD}" stroke="{GOLD_LIGHT}" stroke-width=".8" stroke-linejoin="round"/>')
+# 50kmの円（細い実線1本）
+w(f'    <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{GOLD_LIGHT}" stroke-width="1"/>')
+# 円の上に「約50km」（右上、線を抜いて置く）
+ang = math.radians(-38)
+lx, ly = CX + R50 * math.cos(ang), CY + R50 * math.sin(ang)
+w(f'    <text x="{lx:.1f}" y="{ly + 4:.1f}" text-anchor="middle" font-family="{FONT}" font-size="11" fill="{GOLD_LIGHT}" '
+  f'paint-order="stroke" stroke="{SEA}" stroke-width="6" stroke-linejoin="round">約50km</text>')
+
+# 県名（日本語だけ。控えめに）
+prefs = [(173, 134, "埼玉県"), (468, 368, "千葉県"), (215, 402, "神奈川県"), (560, 70, "茨城県")]
+w(f'    <g font-family="{FONT}" font-size="11.5" letter-spacing="2" fill="rgba(255,255,255,.42)" text-anchor="middle" {halo}>')
+for x, y, ja in prefs:
+    w(f'      <text x="{x}" y="{y}">{ja}</text>')
 w("    </g>")
 
-# 東京都（放送対象地域）
-w(f'    <path d="{tokyo}" fill="url(#tokyoFill)" stroke="{CREAM}" stroke-opacity=".7" stroke-width="1" stroke-linejoin="round"/>')
-
-# 距離の輪（10〜40kmは細く、50kmは金の破線）
-w(f'    <g fill="none" stroke="{GOLD}">')
-for km in (10, 20, 30, 40):
-    w(f'      <circle cx="{CX}" cy="{CY}" r="{km * KM:.1f}" stroke-opacity=".22" stroke-width=".8"/>')
-w(f'      <circle cx="{CX}" cy="{CY}" r="{R50:.1f}" stroke-width="1.6" stroke-dasharray="8 6"/>')
-w("    </g>")
-
-# 電波の輪（スカイツリーから広がる）
-for k in (1, 2, 3):
-    w(f'    <circle class="wave wave--{k}" cx="{CX}" cy="{CY}" r="{R50:.1f}" fill="none" stroke="{GOLD_LIGHT}" stroke-width="1.4"/>')
-
-# 距離の目盛り（真下の東京湾の上に置く）
-w(f'    <g font-family="{NUM}" font-size="9.5" fill="{GOLD_LIGHT}" letter-spacing=".5" {halo}>')
-for km in (10, 20, 30, 40):
-    w(f'      <text x="{CX + 14:.1f}" y="{CY + km * KM - 3:.1f}" opacity=".75">{km}</text>')
-w(f'      <text x="{CX + 14:.1f}" y="{CY + R50 - 3:.1f}" font-weight="700">50km</text>')
-w("    </g>")
-
-# 県名
-prefs = [(173, 134, "埼玉", "SAITAMA"), (460, 362, "千葉", "CHIBA"), (215, 402, "神奈川", "KANAGAWA"), (560, 70, "茨城", "IBARAKI")]
-w(f'    <g text-anchor="middle" {halo}>')
-for x, y, ja, en in prefs:
-    w(f'      <text x="{x}" y="{y}" font-family="{FONT}" font-size="12" letter-spacing="3" fill="rgba(227,201,140,.7)">{ja}</text>')
-    w(f'      <text x="{x}" y="{y + 13}" font-family="{NUM}" font-size="7.5" letter-spacing="2.5" fill="rgba(227,201,140,.5)">{en}</text>')
-w("    </g>")
-
-# 東京都の名前（西側の空いたところへ）
-w(f'    <text x="104" y="203" text-anchor="middle" font-family="{FONT}" font-size="16" font-weight="700" letter-spacing="4" fill="#1a1408">東京都</text>')
-w(f'    <text x="104" y="217" text-anchor="middle" font-family="{NUM}" font-size="8" letter-spacing="3" fill="rgba(26,20,8,.7)">TOKYO</text>')
+# 東京都の名前
+w(f'    <text x="104" y="207" text-anchor="middle" font-family="{FONT}" font-size="14" font-weight="700" letter-spacing="3" fill="{SEA}">東京都</text>')
 
 # 市の点
-w(f'    <g font-family="{FONT}" font-size="10.5" letter-spacing=".8">')
+w(f'    <g font-family="{FONT}" font-size="10" letter-spacing=".5">')
 for x, y, name in cities:
-    w(f'      <circle cx="{x}" cy="{y}" r="2.2" fill="{CREAM}"/>')
-    w(f'      <text x="{x + 5.5:.1f}" y="{y + 3.6:.1f}" fill="rgba(255,255,255,.82)" {halo}>{name}</text>')
+    w(f'      <circle cx="{x}" cy="{y}" r="1.9" fill="#fff"/>')
+    w(f'      <text x="{x + 5:.1f}" y="{y + 3.5:.1f}" fill="rgba(255,255,255,.78)" {halo}>{name}</text>')
 w("    </g>")
 
-# スカイツリー（送信所）
-w(f'    <circle cx="{CX}" cy="{CY}" r="16" fill="{GOLD_LIGHT}" opacity=".18"/>')
-w(f'    <circle cx="{CX}" cy="{CY}" r="10" fill="none" stroke="{CREAM}" stroke-width="1.2" opacity=".75"/>')
-w(f'    <path d="{tower}" fill="{CREAM}"/>')
+# 送信所（東京スカイツリー）
+w(f'    <path d="{tower}" fill="#fff"/>')
 w(f'    <g font-family="{FONT}" {halo}>')
-w(f'      <text x="356" y="207" font-size="12.5" font-weight="700" letter-spacing="1.5" fill="#fff">東京スカイツリー</text>')
-w(f'      <text x="356" y="222" font-size="10.5" letter-spacing="1.5" fill="{GOLD_LIGHT}">送信所・地上デジタル 9ch</text>')
+w(f'      <text x="354" y="210" font-size="11.5" font-weight="700" letter-spacing="1" fill="#fff">東京スカイツリー</text>')
+w(f'      <text x="354" y="224" font-size="9.5" letter-spacing="1" fill="rgba(255,255,255,.7)">送信所（地上デジタル 9ch）</text>')
 w("    </g>")
 
 # 凡例（左下）
-w(f'    <g {halo}>')
-w(f'      <line x1="22" y1="404" x2="22" y2="468" stroke="{GOLD}" stroke-width="1.5"/>')
-w(f'      <text x="32" y="414" font-family="{NUM}" font-size="9" letter-spacing="3" fill="{GOLD_LIGHT}">BROADCAST AREA</text>')
-w(f'      <text x="32" y="432" font-family="{FONT}" font-size="11" letter-spacing="1.5" fill="rgba(255,255,255,.85)">東京スカイツリーから半径</text>')
-w(f'      <text x="31" y="466" font-family="{NUM}" font-size="34" font-weight="700" letter-spacing="1" fill="#fff">50<tspan font-size="16" dx="3" fill="{GOLD_LIGHT}">km</tspan></text>')
+lx0, ly0 = 18, 410
+w(f'    <rect x="{lx0}" y="{ly0}" width="210" height="62" fill="{SEA}" fill-opacity=".86" stroke="rgba(255,255,255,.18)" stroke-width=".8"/>')
+w(f'    <rect x="{lx0 + 12}" y="{ly0 + 13}" width="16" height="11" fill="{REACH}" stroke="rgba(255,255,255,.3)" stroke-width=".6"/>')
+w(f'    <rect x="{lx0 + 12}" y="{ly0 + 37}" width="16" height="11" fill="{GOLD}" stroke="{GOLD_LIGHT}" stroke-width=".6"/>')
+w(f'    <g font-family="{FONT}" font-size="10" fill="rgba(255,255,255,.85)" letter-spacing=".5">')
+w(f'      <text x="{lx0 + 36}" y="{ly0 + 22}">受信エリアの目安（送信所から約50km）</text>')
+w(f'      <text x="{lx0 + 36}" y="{ly0 + 46}">放送対象地域（東京都）</text>')
 w("    </g>")
 
 # 縮尺（右下）
-sx, sy = W - 30 - 20 * KM, H - 26
-w(f'    <g stroke="{GOLD_LIGHT}" stroke-width="1.2" fill="none">')
-w(f'      <path d="M{sx:.1f} {sy - 5} V{sy} H{sx + 20 * KM:.1f} V{sy - 5} M{sx + 10 * KM:.1f} {sy} V{sy - 3.5}"/>')
-w("    </g>")
-w(f'    <g font-family="{NUM}" font-size="8.5" fill="{GOLD_LIGHT}" text-anchor="middle" letter-spacing=".5">')
+sx, sy = W - 24 - 20 * KM, H - 22
+w(f'    <path d="M{sx:.1f} {sy - 4} V{sy} H{sx + 20 * KM:.1f} V{sy - 4} M{sx + 10 * KM:.1f} {sy} V{sy - 3}" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1"/>')
+w(f'    <g font-family="{NUM}" font-size="8.5" fill="rgba(255,255,255,.7)" text-anchor="middle">')
 for km in (0, 10, 20):
-    label = "20km" if km == 20 else str(km)
-    w(f'      <text x="{sx + km * KM:.1f}" y="{sy - 9}">{label}</text>')
-w("    </g>")
-
-# 方位（右上）
-nx, ny = W - 34, 34
-w(f'    <g fill="{GOLD_LIGHT}">')
-w(f'      <path d="M{nx} {ny - 14} L{nx + 6} {ny + 4} L{nx} {ny} L{nx - 6} {ny + 4} Z"/>')
-w(f'      <text x="{nx}" y="{ny + 19}" text-anchor="middle" font-family="{NUM}" font-size="10" font-weight="700" letter-spacing="1">N</text>')
+    w(f'      <text x="{sx + km * KM:.1f}" y="{sy - 8}">{"20km" if km == 20 else km}</text>')
 w("    </g>")
 
 w("  </g>")
-# 枠
-w(f'  <rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="6" fill="none" stroke="{GOLD}" stroke-opacity=".55"/>')
+w(f'  <rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" fill="none" stroke="rgba(255,255,255,.18)"/>')
 w("</svg>")
 
 SVG.write_text("\n".join(out) + "\n", encoding="utf-8")
