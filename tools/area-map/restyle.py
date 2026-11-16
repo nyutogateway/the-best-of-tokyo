@@ -23,6 +23,11 @@ CX, CY = 340.0, 245.0
 KM = 3.953
 R50 = 50 * KM
 LON0, LAT0 = 139.8107, 35.7101
+# 図の大きさ（680×490）は変えずに、送信所を中心に寄って50kmの円を大きく見せる倍率。
+# 形の座標はそのままで、viewBox だけを狭める（文字も同じ倍率で少し大きくなる）
+ZOOM = 1.12
+VW, VH = W / ZOOM, H / ZOOM
+VX, VY = CX - VW / 2, CY - VH / 2
 PX_LON, PX_LAT = 357.3, 440.0
 
 GOLD = "#c9a45a"
@@ -78,7 +83,7 @@ mcy = sum(p[1] for p in pts) / len(pts)
 KEEP = ["さいたま市", "川越市", "所沢市", "千葉市", "横浜市", "横須賀市", "木更津市", "つくば市", "成田市"]
 cities = [c for c in cities if c[2] in KEEP]
 
-w(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" '
+w(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{VX:.1f} {VY:.1f} {VW:.1f} {VH:.1f}" width="{W}" height="{H}" role="img" '
   'aria-label="TOKYO MX の放送エリア図。放送対象地域の東京都と、東京スカイツリーから約50kmの受信エリアの目安">')
 w("""  <!-- 放送エリア図。**県境は実データから起こしている**
        （国土数値情報（国土交通省）の行政区域データ。dataofjapan/land 経由で取得し、
@@ -87,12 +92,12 @@ w("""  <!-- 放送エリア図。**県境は実データから起こしている
        投影は正距円筒。経度に cos(35.71度) を掛けてあるので「円＝送信所から等距離」として扱える。
        中心は東京スカイツリー（北緯35.7101/東経139.8107）、縮尺は 1km = 3.953px -->""")
 w(f"""  <defs>
-    <clipPath id="frame"><rect width="{W}" height="{H}"/></clipPath>
+    <clipPath id="frame"><rect x="{VX:.1f}" y="{VY:.1f}" width="{VW:.1f}" height="{VH:.1f}"/></clipPath>
     <clipPath id="reachClip"><circle cx="{CX}" cy="{CY}" r="{R50:.1f}"/></clipPath>
   </defs>""")
 
 w('  <g clip-path="url(#frame)">')
-w(f'    <rect width="{W}" height="{H}" fill="{SEA}"/>')
+w(f'    <rect x="{VX:.1f}" y="{VY:.1f}" width="{VW:.1f}" height="{VH:.1f}" fill="{SEA}"/>')
 d_land = " ".join(land)
 # 陸：地と同じ紺。県境と海岸は金の髪の毛ほどの線
 w(f'    <path d="{d_land}" fill="{LAND}"/>')
@@ -143,7 +148,7 @@ w(f'      <text x="{CX + 22}" y="{CY + 8}" font-size="8.5" letter-spacing="2" fi
 w("    </g>")
 
 # 凡例（左下。箱は付けない）
-lx0, ly0 = 22, 444
+lx0, ly0 = VX + 20, VY + VH - 42
 w(f'    <g font-family="{FONT}" font-size="9" letter-spacing="1.5" fill="#fff" fill-opacity=".72">')
 w(f'      <rect x="{lx0}" y="{ly0}" width="14" height="8" fill="{GOLD}" fill-opacity=".24" stroke="{GOLD_LIGHT}" stroke-width=".7"/>')
 w(f'      <text x="{lx0 + 22}" y="{ly0 + 7.5}">放送対象地域（東京都）</text>')
@@ -152,7 +157,7 @@ w(f'      <text x="{lx0 + 22}" y="{ly0 + 26.5}">受信エリアの目安（送�
 w("    </g>")
 
 # 縮尺（右下）
-sx, sy = W - 26 - 20 * KM, H - 24
+sx, sy = VX + VW - 24 - 20 * KM, VY + VH - 22
 w(f'    <path d="M{sx:.1f} {sy - 3} V{sy} H{sx + 20 * KM:.1f} V{sy - 3}" fill="none" stroke="{GOLD_LIGHT}" stroke-opacity=".7" stroke-width=".7"/>')
 w(f'    <text x="{sx + 10 * KM:.1f}" y="{sy - 7}" text-anchor="middle" font-family="{FONT}" font-size="8.5" letter-spacing="1" fill="{GOLD_LIGHT}" fill-opacity=".8">20km</text>')
 
