@@ -119,7 +119,7 @@
   content: "THE BEST OF";
 }
 
-/* 左上の日輪マークは置かない。マークはジャケットの周りを回る1つ（.p-article__jacket::before）が代わり */
+/* 左上の日輪マークは置かない。ジャケットの周りを回る大きな日輪（.p-article__ring）がその代わり */
 
 .p-article__visual img {
   position: absolute;
@@ -132,8 +132,11 @@
     0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-/* ベスト盤の世界観：金の日輪マークが1つ、土星の衛星のようにジャケットの周りを回る（ジャケット左上のマークの代わり）。
-   .p-article__jacket の幅＝ジャケットの1.5倍（マークの通り道のぶん）。ジャケットは真ん中に置く */
+/* ベスト盤の世界観：ジャケット左上にあった金の日輪マークを大きくし、土星の輪のように寝かせてジャケットの周りで回す。
+   輪は奥の半分（--back）と手前の半分（--front）に分け、奥はジャケットの後ろ、手前は前に置く
+   （3D の面の交差に任せるとブラウザによって前後が崩れるので、重なり順は z-index で決めている）。
+   外側の span で寝かせて半分に切り、内側の span（日輪）だけを回す。切るのは寝かせる前の座標なので、上半分＝奥、下半分＝手前。
+   .p-article__jacket の幅＝ジャケットの1.5倍。輪の直径はジャケットの1.75倍で、列から少し左右にはみ出す */
 .p-article__jacket {
   position: relative;
 }
@@ -144,49 +147,44 @@
   margin-inline: auto;
 }
 
-/* 通り道は水平の楕円（offset-path）。奥を通る間はジャケットの後ろ（z-index 0）、手前を通る間は前（z-index 2）に切り替える */
-.p-article__jacket::before {
+.p-article__ring {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 56%;
+  left: -8.33%;
   z-index: 0;
-  width: 18%;
+  width: 116.67%;
   aspect-ratio: 1 / 1;
+  translate: 0 -50%;
+  clip-path: inset(0 0 49.4% 0); /* 手前の半分と少し重ねて、切れ目の細い線を出さない */
+  transform: perspective(1600px) rotateX(72deg);
+  pointer-events: none;
+  animation: ringIn 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s both;
+}
+
+.p-article__ring--front {
+  z-index: 2;
+  clip-path: inset(50% 0 0 0);
+}
+
+.p-article__ring > span {
+  position: absolute;
+  inset: 0;
   background: var(--gold-grad);
   -webkit-mask: var(--mark-mask) center / contain no-repeat;
   mask: var(--mark-mask) center / contain no-repeat;
-  offset-path: ellipse(49.6% 16.3% at 50% 56%);
-  offset-rotate: 0deg;
-  pointer-events: none;
-  animation:
-    markIn 1.2s ease 2s both,
-    markOrbit 9s linear infinite;
-  content: "";
+  animation: ringSpin 24s linear infinite;
 }
 
-@keyframes markIn {
+@keyframes ringIn {
   from {
     opacity: 0;
+    scale: 0.55;
   }
 }
 
-@keyframes markOrbit {
-  0% {
-    z-index: 2;
-    offset-distance: 0%;
-  }
-
-  50% {
-    z-index: 2;
-  }
-
-  50.01% {
-    z-index: 0;
-  }
-
-  100% {
-    z-index: 0;
-    offset-distance: 100%;
+@keyframes ringSpin {
+  to {
+    rotate: 1turn;
   }
 }
 
@@ -1065,7 +1063,8 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .p-article__jacket::before {
+  .p-article__ring,
+    .p-article__ring > span {
       animation: none;
     }
 
