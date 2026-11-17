@@ -56,10 +56,10 @@
       href="https://fonts.googleapis.com/css2?family=Anton&family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="assets/css/foundation.css?v=2de6d58b" />
-    <link rel="stylesheet" href="assets/css/layout.css?v=2de6d58b" />
-    <link rel="stylesheet" href="assets/css/component.css?v=2de6d58b" />
-    <link rel="stylesheet" href="assets/css/project-top.css?v=2de6d58b" />
+    <link rel="stylesheet" href="assets/css/foundation.css?v=fdfbaf27" />
+    <link rel="stylesheet" href="assets/css/layout.css?v=fdfbaf27" />
+    <link rel="stylesheet" href="assets/css/component.css?v=fdfbaf27" />
+    <link rel="stylesheet" href="assets/css/project-top.css?v=fdfbaf27" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -373,6 +373,9 @@
             <img src="assets/img/sample/logo-26.svg" alt="" width="420" height="420">
           </div>
         </div>
+        <div class="p-hero__movie" aria-hidden="true">
+          <video class="p-hero__video" src="video/tbt-tokyo-night-web-v2.mp4" poster="assets/img/movie/tbt-tokyo-night-v2-poster.jpg" width="1920" height="1080" autoplay muted loop playsinline preload="auto"></video>
+        </div>
       </section>
 
       <section class="p-concept" id="concept">
@@ -416,23 +419,6 @@
           </div>
         </div>
       </section>
-
-      <div class="p-movie" data-movie>
-        <div class="p-movie__inner">
-          <video class="p-movie__video" src="video/tbt-tokyo-night-web-v2.mp4" poster="assets/img/movie/tbt-tokyo-night-v2-poster.jpg" width="1920" height="1080" autoplay muted loop playsinline preload="auto" aria-label="東京の夜の街の映像"></video>
-          <span class="p-movie__veil" aria-hidden="true"></span>
-          <svg class="p-movie__mask" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs>
-              <mask id="movie-mask" maskUnits="userSpaceOnUse" x="-8000" y="-8000" width="17600" height="16900">
-                <rect x="-8000" y="-8000" width="17600" height="16900" fill="#fff" />
-                <text class="p-movie__word" x="800" y="450" text-anchor="middle" dominant-baseline="central" fill="#000">TOKYO</text>
-              </mask>
-            </defs>
-            <rect class="p-movie__cover" x="-8000" y="-8000" width="17600" height="16900" mask="url(#movie-mask)" />
-            <text class="p-movie__word p-movie__outline" x="800" y="450" text-anchor="middle" dominant-baseline="central">TOKYO</text>
-          </svg>
-        </div>
-      </div>
 
       <section class="p-stories" id="stories">
         <div class="p-stories__masthead">
@@ -1436,6 +1422,6 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=2de6d58b"></script>
+    <script src="assets/js/main.js?v=fdfbaf27"></script>
   </body>
 </html>

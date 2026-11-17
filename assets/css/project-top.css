@@ -43,7 +43,6 @@
    各セクションの中身をマーク（z-index: 40）より上に出す。中身の地のない所（余白・文字のすき間）では
    マークが今までどおり見え、カードなど地を塗った所ではカードの色がそのまま出る。ヘッダー（50）より下 */
 .p-concept__inner,
-.p-movie__inner,
 .p-stories__masthead,
 .p-stories__inner,
 .p-index__inner,
@@ -697,6 +696,74 @@
   }
 }
 
+/* FVの映像。ロゴの升目（左の列）のすぐ右に、縦長の列として置く（PCだけ。タブレット・SPは出さない）。
+   音なしで自動再生・ループ。升目と同じく、幕開けで升目が出るのに合わせて現れる。
+   色は彩度を落としてコントラストを上げ、地の藍に寄せる */
+.p-hero__movie {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .p-hero {
+      --hero-movie-w: clamp(180px, calc(15 * var(--vw)), 300px);
+      grid-template-columns: var(--hero-tiles-w) var(--hero-movie-w) 1fr;
+    }
+
+  .p-hero__inner {
+      grid-column: 3;
+    }
+
+  /* 映像の列ぶん文字の段が狭くなるので、リードは一回り小さくし、<br> の位置でだけ折る
+     （折れると「を、」だけが次の行に落ちる） */
+  .p-hero__text {
+      font-size: clamp(15px, calc(1.3 * var(--vw)), 19px);
+      white-space: nowrap;
+    }
+
+  .p-hero__movie {
+      position: relative;
+      display: block;
+      grid-column: 2;
+      grid-row: 1;
+      margin: var(--header-h) 0 0 6px;
+      overflow: hidden;
+      opacity: 0;
+      animation: heroMovieShow 1.6s ease 3s forwards;
+    }
+
+  /* 升目と同じく、下の端は地へ沈める */
+  .p-hero__movie::after {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(14, 25, 50, 0) 62%, var(--c-indigo-deep) 100%),
+        rgba(14, 25, 50, 0.22);
+      pointer-events: none;
+      content: "";
+    }
+}
+
+.p-hero__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.7) contrast(1.1) brightness(0.9);
+}
+
+@keyframes heroMovieShow {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p-hero__movie {
+      opacity: 1;
+      animation: none;
+    }
+}
+
 /* 2. ABOUT（企画について） ----------------------------- */
 
 /* ロゴ帯とセットで1画面（calc(100 * var(--vh))）に収まるよう、余白は画面の高さ基準 */
@@ -787,155 +854,6 @@
   font-size: clamp(1rem, calc(1.55 * var(--vw)), 1.18rem);
   font-weight: 600;
   line-height: 2.1;
-}
-
-/* 2.5 映像（ABOUT と STORIES のあいだ） ------------------------------
-   画面いっぱいの太字「TOKYO」の字の形に映像を見せ、スクロールすると文字が手前へ迫って広がり、
-   最後は画面全体が映像になる。
-   ・塊は画面の2.6倍の高さ。中身（.p-movie__inner）は画面に貼り付いたまま（sticky）、
-     その間のスクロール量を main.js が 0〜1 にして、文字の大きさ（--movie-scale）と覆いの濃さ（--movie-cover）に渡す
-   ・覆いは SVG。墨の面から「TOKYO」の字を抜いた形で、字の縁に金の細い線を引く
-   ・映像は音なしで自動再生・ループ。彩度を落としてコントラストを上げ、明るい所にだけ金を差す（映画の色調）。
-     フィルムの粒を重ね、ごくゆっくり寄り引きし続ける。上下は墨へ溶かす */
-.p-movie {
-  --movie-scale: 1;
-  --movie-cover: 1;
-  height: calc(260 * var(--svh));
-  background: var(--c-indigo-deep);
-}
-
-.p-movie__inner {
-  position: sticky;
-  top: 0;
-  height: calc(100 * var(--svh));
-  overflow: hidden;
-}
-
-.p-movie__video {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* 彩度を落とし、締まった黒に */
-  filter: saturate(0.62) contrast(1.14) brightness(0.92);
-  animation: movieDrift 26s ease-in-out infinite alternate;
-}
-
-@keyframes movieDrift {
-  from {
-    transform: scale(1) translate(0, 0);
-  }
-
-  to {
-    transform: scale(1.07) translate(-1.2%, -0.8%);
-  }
-}
-
-/* 明るい所にだけ金を差す（soft-light は暗い所をほとんど変えない） */
-.p-movie__inner::after {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, rgba(212, 176, 96, 0.55), rgba(239, 217, 154, 0.25) 50%, rgba(212, 176, 96, 0.5));
-  mix-blend-mode: soft-light;
-  pointer-events: none;
-  content: "";
-}
-
-/* 藍の薄い膜＋四隅の影＋上下の墨への溶け込み＋フィルムの粒 */
-.p-movie__veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(14, 25, 50, 0.7) 0%, rgba(14, 25, 50, 0) 20%, rgba(14, 25, 50, 0) 78%, rgba(14, 25, 50, 0.7) 100%),
-    radial-gradient(ellipse 75% 70% at 50% 50%, rgba(14, 25, 50, 0) 40%, rgba(8, 14, 30, 0.72) 100%),
-    rgba(14, 25, 50, 0.28);
-  pointer-events: none;
-}
-
-.p-movie__veil::after {
-  position: absolute;
-  inset: -50%;
-  background: var(--grain);
-  opacity: 0.55;
-  animation: movieGrain 0.9s steps(4) infinite;
-  pointer-events: none;
-  content: "";
-}
-
-@keyframes movieGrain {
-  0% { translate: 0 0; }
-  25% { translate: -3% 2%; }
-  50% { translate: 2% -3%; }
-  75% { translate: -2% -1%; }
-  100% { translate: 0 0; }
-}
-
-/* 「TOKYO」の字を抜いた墨の覆い。字の大きさはスクロールで手前へ迫る */
-.p-movie__mask {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  transform: scale(var(--movie-scale));
-  transform-origin: 50% 50%;
-  opacity: var(--movie-cover);
-  will-change: transform, opacity;
-  pointer-events: none;
-}
-
-.p-movie__cover {
-  fill: var(--c-indigo-deep);
-}
-
-.p-movie__word {
-  font-family: var(--f-display);
-  font-size: 400px;
-  letter-spacing: 6px;
-}
-
-/* 字の縁の金の細い線。迫ってくると太く見えすぎるので、線の太さは拡大に合わせて細らせない（non-scaling-stroke） */
-.p-movie__outline {
-  fill: none;
-  stroke: rgba(239, 217, 154, 0.85);
-  stroke-width: 1.2px;
-  vector-effect: non-scaling-stroke;
-}
-
-/* SPは画面が縦長なので、字を大きめに（横幅いっぱいまで） */
-@media (max-width: 767px) {
-  .p-movie {
-      height: calc(220 * var(--svh));
-    }
-
-  .p-movie__mask {
-      scale: 1.25;
-    }
-}
-
-/* 動きを止める設定のときは、文字の覆いを出さず映像をそのまま1画面で見せる */
-@media (prefers-reduced-motion: reduce) {
-  .p-movie {
-      height: auto;
-    }
-
-  .p-movie__inner {
-      position: relative;
-    }
-
-  .p-movie__mask {
-      display: none;
-    }
-
-  .p-movie__video,
-  .p-movie__veil::after {
-      animation: none;
-    }
 }
 
 /* 3. STORIES（中扉・グループ・カード） ----------------- */
