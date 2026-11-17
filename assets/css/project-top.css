@@ -809,8 +809,9 @@
 
 /* 5行。1行にグループを2つ重ねて置き、数秒ごとに塊ごと入れ替える */
 .p-stories__inner {
+  --row-gap: clamp(34px, 4vw, 56px);
   display: grid;
-  row-gap: clamp(34px, 4vw, 56px);
+  row-gap: var(--row-gap);
   max-width: var(--w-max);
   margin-inline: auto;
 }
@@ -823,6 +824,32 @@
 .p-grouprow + .p-grouprow {
   padding-top: clamp(34px, 4vw, 56px);
   border-top: 1px solid rgba(201, 164, 90, 0.45);
+}
+
+/* 1段おきに、画面の幅いっぱいの一段明るい紺の帯を敷く（帯の上下に金の細い線）。
+   帯のある段とない段が交互に来て、同じ並びが続いて見えないようにする。カードには手を入れない。
+   帯は段の上の線から、次の段の上の線まで（段のあいだの余白 --row-gap ぶん下へ伸ばす） */
+.p-grouprow:nth-child(even) {
+  position: relative;
+  isolation: isolate;
+  border-top-color: transparent;
+}
+
+.p-grouprow:nth-child(even)::before {
+  position: absolute;
+  top: 0;
+  bottom: calc(-1 * var(--row-gap));
+  left: 50%;
+  z-index: -1;
+  width: 100vw;
+  translate: -50% 0;
+  border-block: 1px solid rgba(201, 164, 90, 0.45);
+  background: var(--grain), #17264f;
+  content: "";
+}
+
+.p-grouprow:nth-child(even) + .p-grouprow {
+  border-top-color: transparent;
 }
 
 .p-grouprow > .p-group {
