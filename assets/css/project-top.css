@@ -793,6 +793,8 @@
    映像を画面いっぱい（画面の幅×画面の高さ）に置く。音なしで自動再生・ループ。
    ・上下は墨へ溶かし、ABOUT・STORIES の地とつなげる（帯の継ぎ目を見せない）
    ・映像に藍を薄く掛け、四隅を沈めて、サイトの黒と金に色を寄せる
+   ・映像の色は、彩度を落としてコントラストを上げ、明るい所（ネオン・窓明かり）にだけ金を差す（映画の色調）
+   ・フィルムの粒を重ね、映像はごくゆっくり寄り引きし続ける
    文字は載せない（FV と同じ言葉のくり返しになるため）。
    画面に入ると、少し内側に切り取られた映像が画面いっぱいへ開く（main.js が .is-inview を付ける） */
 .p-movie {
@@ -811,11 +813,53 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* 彩度を落とし、締まった黒に */
+  filter: saturate(0.62) contrast(1.14) brightness(0.92);
   clip-path: inset(9% 7% round 4px);
   scale: 1.12;
+  /* 開く動き（scale）とは別に、ごくゆっくり寄り引きし続ける（transform） */
+  animation: movieDrift 26s ease-in-out infinite alternate;
   transition:
     clip-path 1.8s cubic-bezier(0.7, 0, 0.2, 1),
     scale 2.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes movieDrift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+
+  to {
+    transform: scale(1.07) translate(-1.2%, -0.8%);
+  }
+}
+
+/* 明るい所にだけ金を差す（soft-light は暗い所をほとんど変えない）＋フィルムの粒 */
+.p-movie__inner::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(212, 176, 96, 0.55), rgba(239, 217, 154, 0.25) 50%, rgba(212, 176, 96, 0.5));
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  content: "";
+}
+
+.p-movie__veil::after {
+  position: absolute;
+  inset: -50%;
+  background: var(--grain);
+  opacity: 0.55;
+  animation: movieGrain 0.9s steps(4) infinite;
+  pointer-events: none;
+  content: "";
+}
+
+@keyframes movieGrain {
+  0% { translate: 0 0; }
+  25% { translate: -3% 2%; }
+  50% { translate: 2% -3%; }
+  75% { translate: -2% -1%; }
+  100% { translate: 0 0; }
 }
 
 .p-movie.is-inview .p-movie__video {
@@ -827,6 +871,8 @@
 .p-movie__veil {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  overflow: hidden;
   background:
     linear-gradient(180deg, var(--c-indigo-deep) 0%, rgba(14, 25, 50, 0) 22%, rgba(14, 25, 50, 0) 74%, var(--c-indigo-deep) 100%),
     radial-gradient(ellipse 75% 70% at 50% 50%, rgba(14, 25, 50, 0) 40%, rgba(8, 14, 30, 0.72) 100%),
@@ -839,9 +885,12 @@
   .p-movie__video {
       clip-path: none;
       scale: 1;
-      opacity: 1;
-      translate: none;
+      animation: none;
       transition: none;
+    }
+
+  .p-movie__veil::after {
+      animation: none;
     }
 }
 
