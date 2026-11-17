@@ -23,9 +23,9 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* FVの映像（.p-hero__video）は音なしで自動再生・ループする。
+  /* TOPの映像（.p-movie__video）は音なしで自動再生・ループする。
      動きを止める設定のときは止めて、最初の画（poster）だけを見せる */
-  var movie = document.querySelector('.p-hero__video');
+  var movie = document.querySelector('.p-movie__video');
   if (movie && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     movie.removeAttribute('autoplay');
     movie.pause();
