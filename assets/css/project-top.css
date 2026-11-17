@@ -809,7 +809,8 @@
 
 /* 5行。1行にグループを2つ重ねて置き、数秒ごとに塊ごと入れ替える */
 .p-stories__inner {
-  --row-gap: clamp(34px, 4vw, 56px);
+  /* 段と段のあいだ。段の上の余白も同じだけ取る */
+  --row-gap: clamp(64px, 7.5vw, 120px);
   display: grid;
   row-gap: var(--row-gap);
   max-width: var(--w-max);
@@ -817,12 +818,14 @@
 }
 
 .p-grouprow {
+  position: relative;
+  isolation: isolate; /* 後ろに透かす大きな番号（.p-group::before）を、この段の中に収める */
   display: grid;
 }
 
 /* 行と行は、面ではなく細い金の線で区切る（白地と余白で見せるほうが上品に見えるため） */
 .p-grouprow + .p-grouprow {
-  padding-top: clamp(34px, 4vw, 56px);
+  padding-top: var(--row-gap);
   border-top: 1px solid rgba(201, 164, 90, 0.45);
 }
 
@@ -830,8 +833,6 @@
    帯のある段とない段が交互に来て、同じ並びが続いて見えないようにする。カードには手を入れない。
    帯は段の上の線から、次の段の上の線まで（段のあいだの余白 --row-gap ぶん下へ伸ばす） */
 .p-grouprow:nth-child(even) {
-  position: relative;
-  isolation: isolate;
   border-top-color: transparent;
 }
 
@@ -1084,7 +1085,37 @@
 }
 
 .p-group {
+  position: relative;
   min-width: 0;
+}
+
+/* 段の後ろに、その分野の番号（data-no）をとても大きく、金の細い袋文字で透かして置く。
+   置く場所は段ごとに左右交互（奇数段は左、偶数段は右）。グループが切り替わると番号も一緒に入れ替わる */
+.p-group::before {
+  position: absolute;
+  top: 50%;
+  left: -0.06em;
+  z-index: -1;
+  color: transparent;
+  font-family: var(--f-display);
+  font-size: clamp(220px, 30vw, 440px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  -webkit-text-stroke: 1.2px rgba(201, 164, 90, 0.4);
+  translate: 0 -46%;
+  pointer-events: none;
+  content: attr(data-no);
+}
+
+.p-grouprow:nth-child(even) .p-group::before {
+  right: -0.06em;
+  left: auto;
+}
+
+@media (max-width: 767px) {
+  .p-group::before {
+      font-size: 56vw;
+    }
 }
 
 /* 袋文字がページ幅を広げないように */
