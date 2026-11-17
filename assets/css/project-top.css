@@ -1035,31 +1035,6 @@
     }
 }
 
-/* 見出しの行は段ごとに左右を入れ替える（PC・タブレット）。
-   奇数の段（01・02 / 05・06 / 09・10）は今までどおり 見出しが左・NEXT が右。
-   偶数の段（03・04 / 07・08）は NEXT を左に置き、矢印も左向きにする。
-   見出しの中（番号 → 分野名、金の線は左から）の向きはどの段も変えない */
-@media (min-width: 768px) {
-  .p-grouprow:nth-child(even) .p-group__head {
-      flex-direction: row-reverse;
-    }
-
-  .p-grouprow:nth-child(even) .p-group__next {
-      padding: 8px 14px 8px 2px;
-    }
-
-  .p-grouprow:nth-child(even) .p-group__head .p-group__arrow {
-      order: -1;
-      transform: rotate(-135deg);
-    }
-}
-
-@media (min-width: 768px) and (hover: hover) {
-  .p-grouprow:nth-child(even) .p-group__head .p-group__next:hover .p-group__arrow {
-      translate: -3px 0;
-    }
-}
-
 /* 動きを止める設定のときは、重ねずに縦に並べてすべて見せる */
 @media (prefers-reduced-motion: reduce) {
   .p-grouprow > .p-group .p-cards > li {
