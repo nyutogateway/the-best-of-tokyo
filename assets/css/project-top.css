@@ -991,6 +991,19 @@
     }
 }
 
+/* 偶数の分野（02・04…）の NEXT は、ひとつ前の奇数の分野へ戻るので、矢印を左向きにして文字の左に置く。
+   奇数の分野（01・03…）は今までどおり右向きの矢印を右に置く */
+.p-grouprow > .p-group:nth-child(even) .p-group__arrow {
+  order: -1;
+  transform: rotate(-135deg);
+}
+
+@media (hover: hover) {
+  .p-grouprow > .p-group:nth-child(even) .p-group__next:hover .p-group__arrow {
+      translate: -3px 0;
+    }
+}
+
 /* 動きを止める設定のときは、重ねずに縦に並べてすべて見せる */
 @media (prefers-reduced-motion: reduce) {
   .p-grouprow > .p-group .p-cards > li {
