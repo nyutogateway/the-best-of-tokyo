@@ -1336,6 +1336,17 @@
   font-size: clamp(19px, 1.6vw, 23px);
 }
 
+/* 大きい1枚の位置を段ごとに変えて、同じ並びが続かないようにする（大きさの比率 1.22 は変えない）。
+   段の順に 中央 → 左端 → 右端 → 左端 → 中央。PCだけ（タブレット・SPは段の組み方が別） */
+.p-grouprow:nth-child(2) .p-cards,
+.p-grouprow:nth-child(4) .p-cards {
+  grid-template-columns: 1.22fr 1fr 1fr 1fr 1fr;
+}
+
+.p-grouprow:nth-child(3) .p-cards {
+  grid-template-columns: 1fr 1fr 1fr 1fr 1.22fr;
+}
+
 /* カードは1グループ5名ぶん。ホバーで少し持ち上がる */
 .p-card {
   display: block;
