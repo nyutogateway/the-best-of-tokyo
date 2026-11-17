@@ -696,48 +696,42 @@
   }
 }
 
-/* FVの映像。ロゴの升目（左の列）のすぐ右に、縦長の列として置く（PCだけ。タブレット・SPは出さない）。
-   音なしで自動再生・ループ。升目と同じく、幕開けで升目が出るのに合わせて現れる。
-   色は彩度を落としてコントラストを上げ、地の藍に寄せる */
+/* FVの映像。ロゴの升目（左の列）の下に、列と同じ幅の横長（16:9）で置く（PCだけ。タブレット・SPは出さない）。
+   升目はそのぶん下を空け、映像は FV の下端から少し浮かせる。
+   升目の上下を地へ溶かす影（.p-hero::before、z-index: 1）より手前に出す。
+   音なしで自動再生・ループ。升目が出るのに合わせて現れる。色は彩度を落として地の藍に寄せる */
 .p-hero__movie {
   display: none;
 }
 
 @media (min-width: 1024px) {
   .p-hero {
-      --hero-movie-w: clamp(180px, calc(15 * var(--vw)), 300px);
-      grid-template-columns: var(--hero-tiles-w) var(--hero-movie-w) 1fr;
+      --hero-movie-h: calc(var(--hero-tiles-w) * 9 / 16);
+      --hero-movie-gap: clamp(24px, calc(3.4 * var(--vw)), 44px);
     }
 
-  .p-hero__inner {
-      grid-column: 3;
-    }
-
-  /* 映像の列ぶん文字の段が狭くなるので、リードは一回り小さくし、<br> の位置でだけ折る
-     （折れると「を、」だけが次の行に落ちる） */
-  .p-hero__text {
-      font-size: clamp(15px, calc(1.3 * var(--vw)), 19px);
-      white-space: nowrap;
+  .p-hero__tiles {
+      margin-bottom: calc(var(--hero-movie-h) + var(--hero-movie-gap) + 6px);
     }
 
   .p-hero__movie {
       position: relative;
+      z-index: 2;
       display: block;
-      grid-column: 2;
+      grid-column: 1;
       grid-row: 1;
-      margin: var(--header-h) 0 0 6px;
+      align-self: end;
+      height: var(--hero-movie-h);
+      margin-bottom: var(--hero-movie-gap);
       overflow: hidden;
       opacity: 0;
       animation: heroMovieShow 1.6s ease 3s forwards;
     }
 
-  /* 升目と同じく、下の端は地へ沈める */
   .p-hero__movie::after {
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(180deg, rgba(14, 25, 50, 0) 62%, var(--c-indigo-deep) 100%),
-        rgba(14, 25, 50, 0.22);
+      background: rgba(14, 25, 50, 0.18);
       pointer-events: none;
       content: "";
     }
