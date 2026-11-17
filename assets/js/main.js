@@ -23,34 +23,13 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* 記事の動画（.p-movie）。再生ボタンを押したら、写真とボタンを消して動画を再生する。
-     動画ファイル（<video>）があればそれを、無ければ data-youtube の YouTube を埋め込む。
-     どちらも無いあいだは「動画が入ります」を出すだけ */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-movie]'), function (frame) {
-    var play = frame.querySelector('.p-movie__play');
-    if (!play) return;
-    play.addEventListener('click', function () {
-      var video = frame.querySelector('.p-movie__video');
-      if (video) {
-        frame.classList.add('is-playing');
-        video.controls = true;
-        video.play();
-        return;
-      }
-      var id = frame.getAttribute('data-youtube');
-      if (!id) {
-        frame.classList.add('is-soon');
-        return;
-      }
-      var iframe = document.createElement('iframe');
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
-      iframe.title = '番組の映像';
-      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-      iframe.allowFullscreen = true;
-      frame.innerHTML = '';
-      frame.appendChild(iframe);
-    });
-  });
+  /* TOPの映像（.p-movie__video）は音なしで自動再生・ループする。
+     動きを止める設定のときは止めて、最初の画（poster）だけを見せる */
+  var movie = document.querySelector('.p-movie__video');
+  if (movie && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    movie.removeAttribute('autoplay');
+    movie.pause();
+  }
 
   /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
   var main = document.getElementById('main');

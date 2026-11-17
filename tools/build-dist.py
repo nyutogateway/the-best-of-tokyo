@@ -46,7 +46,7 @@ def collect():
         base = pathlib.PurePosixPath(rel).parent
         text = path.read_text(encoding="utf-8", errors="ignore")
 
-        found = re.findall(r'(?:src|href)="([^"]+)"', text)
+        found = re.findall(r'(?:src|href|poster)="([^"]+)"', text)
         found += re.findall(r'url\("?([^")]+)"?\)', text)
         # OGP画像や構造化データのように、属性名が src/href でないものもある。
         # 本番URLで書かれたものは、どこに出てきても拾う
