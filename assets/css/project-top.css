@@ -1024,25 +1024,11 @@
 
 /* 見出しの行は段ごとに左右を入れ替える（PC・タブレット）。
    奇数の段（01・02 / 05・06 / 09・10）は今までどおり 見出しが左・NEXT が右。
-   偶数の段（03・04 / 07・08）は NEXT を左、見出しを右に置き、番号・金の線・矢印の向きも左右を逆にする */
+   偶数の段（03・04 / 07・08）は NEXT を左に置き、矢印も左向きにする。
+   見出しの中（番号 → 分野名、金の線は左から）の向きはどの段も変えない */
 @media (min-width: 768px) {
   .p-grouprow:nth-child(even) .p-group__head {
       flex-direction: row-reverse;
-    }
-
-  .p-grouprow:nth-child(even) .p-group__title {
-      grid-template-areas:
-        "label no"
-        "rule no";
-      grid-template-columns: 1fr auto;
-    }
-
-  .p-grouprow:nth-child(even) .p-group__label {
-      justify-content: flex-end;
-    }
-
-  .p-grouprow:nth-child(even) .p-group__title::after {
-      background: linear-gradient(270deg, var(--g), color-mix(in srgb, var(--g) 12%, transparent));
     }
 
   .p-grouprow:nth-child(even) .p-group__next {
