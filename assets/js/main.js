@@ -31,7 +31,7 @@
     movie.pause();
   }
 
-  /* 映像が画面に入ったら .is-inview を付ける（映像が画面いっぱいへ開き、金の鉤が現れる合図） */
+  /* 映像が画面に入ったら .is-inview を付ける（映像が画面いっぱいへ開く合図） */
   var movieWrap = document.querySelector('[data-movie]');
   if (movieWrap) {
     if ('IntersectionObserver' in window) {

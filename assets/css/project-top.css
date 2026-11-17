@@ -793,9 +793,8 @@
    映像を画面いっぱい（画面の幅×画面の高さ）に置く。音なしで自動再生・ループ。
    ・上下は墨へ溶かし、ABOUT・STORIES の地とつなげる（帯の継ぎ目を見せない）
    ・映像に藍を薄く掛け、四隅を沈めて、サイトの黒と金に色を寄せる
-   ・四隅に金の細い鉤（かぎ）を置き、額に収めたように見せる
    文字は載せない（FV と同じ言葉のくり返しになるため）。
-   画面に入ると、少し内側に切り取られた映像が画面いっぱいへ開き、金の鉤が現れる（main.js が .is-inview を付ける） */
+   画面に入ると、少し内側に切り取られた映像が画面いっぱいへ開く（main.js が .is-inview を付ける） */
 .p-movie {
   background: var(--c-indigo-deep);
 }
@@ -835,35 +834,9 @@
   pointer-events: none;
 }
 
-/* 四隅の金の鉤。線は背景で描く（要素を増やさない） */
-.p-movie__frame {
-  --len: clamp(28px, calc(4 * var(--vw)), 64px);
-  --line: rgba(239, 217, 154, 0.75);
-  position: absolute;
-  inset: clamp(20px, calc(3.2 * var(--vw)), 48px);
-  background:
-    linear-gradient(var(--line) 0 0) left top / var(--len) 1px,
-    linear-gradient(var(--line) 0 0) left top / 1px var(--len),
-    linear-gradient(var(--line) 0 0) right top / var(--len) 1px,
-    linear-gradient(var(--line) 0 0) right top / 1px var(--len),
-    linear-gradient(var(--line) 0 0) left bottom / var(--len) 1px,
-    linear-gradient(var(--line) 0 0) left bottom / 1px var(--len),
-    linear-gradient(var(--line) 0 0) right bottom / var(--len) 1px,
-    linear-gradient(var(--line) 0 0) right bottom / 1px var(--len);
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 1.2s ease 1.2s;
-  pointer-events: none;
-}
-
-.p-movie.is-inview .p-movie__frame {
-  opacity: 1;
-}
-
 /* 動きを止める設定のときは、最初から開いた形で見せる */
 @media (prefers-reduced-motion: reduce) {
-  .p-movie__video,
-  .p-movie__frame {
+  .p-movie__video {
       clip-path: none;
       scale: 1;
       opacity: 1;
