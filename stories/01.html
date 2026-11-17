@@ -46,10 +46,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/foundation.css?v=baf9734c">
-<link rel="stylesheet" href="../assets/css/layout.css?v=baf9734c">
-<link rel="stylesheet" href="../assets/css/component.css?v=baf9734c">
-<link rel="stylesheet" href="../assets/css/project-article.css?v=baf9734c">
+<link rel="stylesheet" href="../assets/css/foundation.css?v=f11b6038">
+<link rel="stylesheet" href="../assets/css/layout.css?v=f11b6038">
+<link rel="stylesheet" href="../assets/css/component.css?v=f11b6038">
+<link rel="stylesheet" href="../assets/css/project-article.css?v=f11b6038">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -144,8 +144,9 @@
 
       <section class="p-movie" aria-label="番組の映像">
         <p class="p-movie__label">MOVIE</p>
-        <div class="p-movie__frame" data-movie data-youtube="">
-          <img class="p-movie__poster" src="../assets/img/trial/chiba-01-b2.jpg" alt="" width="1000" height="1000" loading="lazy" decoding="async">
+        <div class="p-movie__frame" data-movie>
+          <video class="p-movie__video" src="../video/tbt-tokyo-night-web.mp4" preload="none" playsinline></video>
+          <img class="p-movie__poster" src="../assets/img/movie/tbt-tokyo-night-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
           <button class="p-movie__play" type="button" aria-label="動画を再生する">
             <span class="p-movie__icon" aria-hidden="true"></span>
             <span class="p-movie__text">PLAY</span>
@@ -280,6 +281,6 @@
   </div>
 </footer>
 
-<script src="../assets/js/main.js?v=baf9734c"></script>
+<script src="../assets/js/main.js?v=f11b6038"></script>
 </body>
 </html>

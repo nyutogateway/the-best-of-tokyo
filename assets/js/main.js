@@ -23,12 +23,20 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  /* 記事の動画（.p-movie）。再生ボタンを押したら YouTube の埋め込みに差し替える。
-     data-youtube に動画のIDが無いあいだは「動画が入ります」を出すだけ */
+  /* 記事の動画（.p-movie）。再生ボタンを押したら、写真とボタンを消して動画を再生する。
+     動画ファイル（<video>）があればそれを、無ければ data-youtube の YouTube を埋め込む。
+     どちらも無いあいだは「動画が入ります」を出すだけ */
   Array.prototype.forEach.call(document.querySelectorAll('[data-movie]'), function (frame) {
     var play = frame.querySelector('.p-movie__play');
     if (!play) return;
     play.addEventListener('click', function () {
+      var video = frame.querySelector('.p-movie__video');
+      if (video) {
+        frame.classList.add('is-playing');
+        video.controls = true;
+        video.play();
+        return;
+      }
       var id = frame.getAttribute('data-youtube');
       if (!id) {
         frame.classList.add('is-soon');

@@ -366,6 +366,7 @@
     0 20px 40px rgba(0, 0, 0, 0.45);
 }
 
+.p-movie__video,
 .p-movie__poster,
 .p-movie__frame iframe {
   position: absolute;
@@ -373,6 +374,15 @@
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+.p-movie__video {
+  object-fit: cover;
+}
+
+/* 再生が始まったら、写真と再生ボタンを消して動画だけにする */
+.p-movie__frame.is-playing :is(.p-movie__poster, .p-movie__play, .p-movie__soon) {
+  display: none;
 }
 
 .p-movie__poster {
