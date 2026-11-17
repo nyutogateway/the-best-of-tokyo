@@ -56,10 +56,10 @@
       href="https://fonts.googleapis.com/css2?family=Anton&family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="assets/css/foundation.css?v=f11b6038" />
-    <link rel="stylesheet" href="assets/css/layout.css?v=f11b6038" />
-    <link rel="stylesheet" href="assets/css/component.css?v=f11b6038" />
-    <link rel="stylesheet" href="assets/css/project-top.css?v=f11b6038" />
+    <link rel="stylesheet" href="assets/css/foundation.css?v=7879313d" />
+    <link rel="stylesheet" href="assets/css/layout.css?v=7879313d" />
+    <link rel="stylesheet" href="assets/css/component.css?v=7879313d" />
+    <link rel="stylesheet" href="assets/css/project-top.css?v=7879313d" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -417,6 +417,20 @@
         </div>
       </section>
 
+      <section class="p-movie" id="movie" aria-label="映像">
+        <div class="p-movie__inner">
+          <p class="p-movie__label">MOVIE</p>
+          <div class="p-movie__frame" data-movie>
+            <video class="p-movie__video" src="video/tbt-tokyo-night-web.mp4" preload="none" playsinline></video>
+            <img class="p-movie__poster" src="assets/img/movie/tbt-tokyo-night-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
+            <button class="p-movie__play" type="button" aria-label="動画を再生する">
+              <span class="p-movie__icon" aria-hidden="true"></span>
+              <span class="p-movie__text">PLAY</span>
+            </button>
+            <p class="p-movie__soon">動画が入ります</p>
+          </div>
+        </div>
+      </section>
 
       <section class="p-stories" id="stories">
         <div class="p-stories__masthead">
@@ -1420,6 +1434,6 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=f11b6038"></script>
+    <script src="assets/js/main.js?v=7879313d"></script>
   </body>
 </html>
