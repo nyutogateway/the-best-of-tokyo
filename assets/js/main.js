@@ -23,6 +23,17 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
+  var main = document.getElementById('main');
+  var concept = document.getElementById('concept');
+  if (main && concept) {
+    var onMarkScroll = function () {
+      main.classList.toggle('is-mark', concept.getBoundingClientRect().top < window.innerHeight * 0.5);
+    };
+    onMarkScroll();
+    window.addEventListener('scroll', onMarkScroll, { passive: true });
+  }
+
   /* カードは最初に企業ロゴを出し、カーソルを乗せると写真に変わる（CSSの :hover）。
      **SPはカーソルが無いので、画面に入ったカードから順に写真へ切り替える**。
      付けるのはクラスだけ。切り替わるのは opacity と clip-path なので、

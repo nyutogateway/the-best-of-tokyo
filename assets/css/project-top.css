@@ -16,21 +16,27 @@
 
 /* 日輪マークを薄く置き、スクロールしても画面に留まらせる（お問い合わせ・記事と同じもの）。
    下層ページは地の後ろ（z-index: -1）に敷いているが、TOPは各セクションが地を塗っていて隠れるため、
-   中身の上に重ね、クリックは素通りさせる。ヘッダー（z-index: 50）より下 */
+   中身の上に重ね、クリックは素通りさせる。ヘッダー（z-index: 50）より下。
+   TOPでは画面の右に置き、FVの上では出さず ABOUT まで来たら出す（main.js が .is-mark を付ける） */
 #main::after {
   position: fixed;
   top: 50%;
-  left: 8%;
+  left: 92%;
   z-index: 40;
   width: min(calc(60 * var(--vh)), calc(42 * var(--vw)));
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
   filter: brightness(0) invert(1);
-  opacity: 0.05;
+  opacity: 0;
   animation: markSpin 120s linear infinite;
+  transition: opacity 1s ease;
   pointer-events: none;
   content: "";
+}
+
+#main.is-mark::after {
+  opacity: 0.05;
 }
 
 @keyframes markSpin {
