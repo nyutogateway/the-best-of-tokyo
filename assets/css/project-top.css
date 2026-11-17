@@ -2168,6 +2168,119 @@
     }
 }
 
+/* PC（1024px以上）は、カードの段を**画面の幅に比例して**組む。
+   どの横幅でも 1375px のときと同じ比率（文字・余白・カードの大きさの釣り合い）に見えるようにする。
+   --u は「1375px の画面での 1px」。幅の上限（--w-max）は外し、左右の余白も幅に比例させる */
+@media (min-width: 1024px) {
+  .p-stories {
+      --u: calc(100vw / 1375);
+      padding-inline: calc(97.5 * var(--u));
+    }
+
+  .p-stories__inner {
+      --row-gap: calc(120 * var(--u));
+      max-width: none;
+    }
+
+  .p-stories .p-cards {
+      gap: calc(30 * var(--u));
+    }
+
+  .p-stories .p-group__head {
+      gap: calc(28 * var(--u));
+      margin-bottom: calc(30 * var(--u));
+    }
+
+  .p-stories .p-group__no {
+      font-size: calc(48 * var(--u));
+    }
+
+  .p-stories .p-group__title {
+      column-gap: calc(24 * var(--u));
+    }
+
+  .p-stories .p-group__label {
+      gap: calc(18 * var(--u));
+      font-size: calc(17 * var(--u));
+    }
+
+  .p-stories .p-group__ja {
+      font-size: calc(12 * var(--u));
+    }
+
+  .p-stories .p-group__next {
+      gap: calc(14 * var(--u));
+    }
+
+  .p-stories .p-group__nextLead {
+      font-size: calc(10 * var(--u));
+    }
+
+  .p-stories .p-group__nextNo {
+      font-size: calc(16 * var(--u));
+    }
+
+  .p-stories .p-group__nextName {
+      gap: calc(8 * var(--u));
+      font-size: calc(12 * var(--u));
+    }
+
+  .p-stories .p-group__nextJa {
+      font-size: calc(10.5 * var(--u));
+    }
+
+  .p-stories .p-group__arrow {
+      width: calc(9 * var(--u));
+      height: calc(9 * var(--u));
+    }
+
+  .p-stories .p-group::before {
+      font-size: calc(412 * var(--u));
+    }
+
+  /* 見出し（STORIES）と分野の一覧も、カードの段と同じ幅・同じ比率で */
+  .p-stories__masthead {
+      max-width: none;
+      margin-bottom: calc(82 * var(--u));
+    }
+
+  .p-stories__head {
+      margin-bottom: calc(52 * var(--u));
+      padding-bottom: calc(20 * var(--u));
+    }
+
+  .p-stories__label {
+      font-size: calc(57.6 * var(--u));
+    }
+
+  .p-stories__title {
+      margin-top: calc(10 * var(--u));
+      font-size: calc(17 * var(--u));
+    }
+
+  .p-spotnav ul {
+      column-gap: calc(69 * var(--u));
+    }
+
+  .p-spotnav a {
+      gap: calc(24.75 * var(--u));
+      padding: calc(15 * var(--u)) calc(2 * var(--u));
+    }
+
+  .p-spotnav__label {
+      gap: calc(10 * var(--u));
+      font-size: calc(12.2 * var(--u));
+    }
+
+  .p-spotnav__ja {
+      font-size: calc(10.5 * var(--u));
+    }
+
+  .p-spotnav__no {
+      font-size: calc(24.8 * var(--u));
+    }
+}
+
 /* 7. SP（767px以下） ------------------------------------ */
 
 @media (max-width: 767px) {
