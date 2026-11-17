@@ -31,6 +31,23 @@
     movie.pause();
   }
 
+  /* 映像が画面に入ったら .is-inview を付ける（映像が画面いっぱいへ開き、金の鉤が現れる合図） */
+  var movieWrap = document.querySelector('[data-movie]');
+  if (movieWrap) {
+    if ('IntersectionObserver' in window) {
+      var movieIo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          movieWrap.classList.add('is-inview');
+          movieIo.disconnect();
+        });
+      }, { threshold: 0.35 });
+      movieIo.observe(movieWrap);
+    } else {
+      movieWrap.classList.add('is-inview');
+    }
+  }
+
   /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
   var main = document.getElementById('main');
   var concept = document.getElementById('concept');
