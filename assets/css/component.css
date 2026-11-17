@@ -258,10 +258,10 @@
   display: grid;
   flex: none;
   place-items: center;
-  width: clamp(150px, 14vw, 210px);
-  height: clamp(70px, 8.8vh, 104px);
+  width: clamp(150px, calc(14 * var(--vw)), 210px);
+  height: clamp(70px, calc(8.8 * var(--vh)), 104px);
   margin-inline: 7px;
-  padding-inline: clamp(14px, 1.8vw, 26px);
+  padding-inline: clamp(14px, calc(1.8 * var(--vw)), 26px);
   background: #fff;
 }
 
@@ -270,7 +270,7 @@
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: clamp(44px, 5.6vh, 68px);
+  max-height: clamp(44px, calc(5.6 * var(--vh)), 68px);
 }
 
 @keyframes logoFlow {
@@ -286,7 +286,7 @@
 /* 上（INDEX の終わり）と下（BROADCASTER の墨の帯）の余白を同じにする。
    INDEX 側には下の余白を持たせず、帯の上下の余白はここだけで取る */
 .p-ticker {
-  padding: clamp(48px, 6vw, 88px) 0;
+  padding: clamp(48px, calc(6 * var(--vw)), 88px) 0;
 }
 
 .p-ticker__viewport {
@@ -306,7 +306,7 @@
   flex: none;
   color: transparent;
   font-family: var(--f-display);
-  font-size: clamp(4.2rem, 9.6vw, 9.5rem);
+  font-size: clamp(4.2rem, calc(9.6 * var(--vw)), 9.5rem);
   letter-spacing: 0.03em;
   line-height: 1.1;
   white-space: nowrap;
@@ -317,9 +317,9 @@
 /* 語と語のあいだの小さな色玉。局の配色をひと粒だけ置く */
 .p-ticker__mark {
   flex: none;
-  width: clamp(10px, 1vw, 14px);
-  height: clamp(10px, 1vw, 14px);
-  margin-inline: clamp(26px, 3.4vw, 56px);
+  width: clamp(10px, calc(1 * var(--vw)), 14px);
+  height: clamp(10px, calc(1 * var(--vw)), 14px);
+  margin-inline: clamp(26px, calc(3.4 * var(--vw)), 56px);
   background: var(--rainbow);
   border-radius: 50%;
 }

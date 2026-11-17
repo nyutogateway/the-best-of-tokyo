@@ -31,7 +31,7 @@
 .p-hero {
   position: relative;
   /* 升目の壁の幅。グリッドの1列目に使う */
-  --hero-tiles-w: clamp(170px, 24vw, 420px);
+  --hero-tiles-w: clamp(170px, calc(24 * var(--vw)), 420px);
   /* ここに置くのは**動かないものだけ**（粒・床・斜めの陰り・地の紺）。
      光は上に挙げた専用の要素に入れること */
   background-image:
@@ -71,7 +71,7 @@
   /* 升目の壁を左、文字組みとトロフィーを右に置く */
   grid-template-columns: var(--hero-tiles-w) 1fr;
   align-items: stretch;
-  height: 100svh;
+  height: calc(100 * var(--svh));
   min-height: 560px;
   overflow: hidden;
 }
@@ -83,12 +83,12 @@
   align-items: stretch;
   /* コピーは写真の側へ寄せ、ロゴとリードは左端に置いて対角に配置する */
   justify-content: space-between;
-  gap: clamp(16px, 2.2vw, 34px);
+  gap: clamp(16px, calc(2.2 * var(--vw)), 34px);
   /* 上下の余白は、トロフィーの大きさに回すぶんだけ詰めてある
      （この段の高さがそのまま --crest の上限になる。下の計算式もあわせて直すこと） */
   grid-column: 2;
   grid-row: 1;
-  padding: calc(var(--header-h) + 4px) var(--pad-x) clamp(24px, 3.4vw, 44px) clamp(26px, 4vw, 68px);
+  padding: calc(var(--header-h) + 4px) var(--pad-x) clamp(24px, calc(3.4 * var(--vw)), 44px) clamp(26px, calc(4 * var(--vw)), 68px);
 }
 
 /* 左のライト。画面の左上の隅（＝この要素の左上）からロゴの塊へ差し込む筋。
@@ -173,7 +173,7 @@
   order: 2;
   align-self: center;
   flex: 1 1 auto;
-  max-width: min(650px, 46vw);
+  max-width: min(650px, calc(46 * var(--vw)));
 }
 
 
@@ -193,7 +193,7 @@
   display: block;
   width: 84px;
   height: 3px;
-  margin-top: clamp(18px, 2.4vw, 28px);
+  margin-top: clamp(18px, calc(2.4 * var(--vw)), 28px);
   background: var(--rainbow);
   scale: 1 1;
   transform-origin: left;
@@ -219,7 +219,7 @@
   /* 余った幅を左右に等しく割り振って、**この段の真ん中に立たせる**
      （画面の右端に寄せると、端に貼り付いて見える） */
   margin-inline: auto;
-  width: min(262px, 16.5vw, calc(54svh - 100px));
+  width: min(262px, calc(16.5 * var(--vw)), calc(calc(54 * var(--svh)) - 100px));
   aspect-ratio: 1100 / 1387;
   background: url("../img/trophy.webp") no-repeat center top / contain;
   /* **奥に置くための処理**。遠くのものは、空気に透けて地の色に寄り、明暗の幅が縮み、
@@ -295,7 +295,7 @@
   overflow-wrap: normal;
   /* 3つ並びになったぶん段が狭いので、指定の位置だけで折れる大きさに落とす
      （画面幅に連動させないと、1280前後で「ストーリーを、」が割れる） */
-  font-size: clamp(17px, 1.55vw, 22px);
+  font-size: clamp(17px, calc(1.55 * var(--vw)), 22px);
   letter-spacing: 0.04em;
   line-height: 2.2;
   opacity: 0;
@@ -630,7 +630,7 @@
 
 @keyframes colInUp {
   from {
-    translate: 0 110svh;
+    translate: 0 calc(110 * var(--svh));
   }
 
   to {
@@ -654,7 +654,7 @@
 
 /* 2. ABOUT（企画について） ----------------------------- */
 
-/* ロゴ帯とセットで1画面（100vh）に収まるよう、余白は画面の高さ基準 */
+/* ロゴ帯とセットで1画面（calc(100 * var(--vh))）に収まるよう、余白は画面の高さ基準 */
 /* 墨の面は、どこも画面幅いっぱいの帯にそろえる（ABOUT / STORIES / BROADCASTER）。
    白地の中に箱で置くと、帯の STORIES と形が揃わず統一感が出ないため。
    上下の余白も STORIES と同じ値。上だけ見出しと本文1行目の行送りぶん差し引いてある */
@@ -671,8 +671,8 @@
 /* 左に見出し、右に本文の2欄組み。文字は白抜き */
 .p-concept__inner {
   display: grid;
-  grid-template-columns: clamp(180px, 22vw, 280px) 1fr;
-  gap: clamp(24px, 5vw, 70px);
+  grid-template-columns: clamp(180px, calc(22 * var(--vw)), 280px) 1fr;
+  gap: clamp(24px, calc(5 * var(--vw)), 70px);
   width: 100%;
   max-width: var(--w-max);
   margin-inline: auto;
@@ -687,7 +687,7 @@
 .p-concept__en {
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  font-size: clamp(2.3rem, calc(4.8 * var(--vw)), 3.6rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -722,24 +722,24 @@
 }
 
 .p-concept__lead {
-  font-size: clamp(1.15rem, 2.1vw, 1.62rem);
+  font-size: clamp(1.15rem, calc(2.1 * var(--vw)), 1.62rem);
   font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1.95;
 }
 
 .p-concept__manifesto {
-  margin-top: clamp(22px, 3.2vh, 40px);
-  font-size: clamp(0.94rem, 1.4vw, 1.08rem);
+  margin-top: clamp(22px, calc(3.2 * var(--vh)), 40px);
+  font-size: clamp(0.94rem, calc(1.4 * var(--vw)), 1.08rem);
   letter-spacing: 0.08em;
   line-height: 2.35;
 }
 
 .p-concept__closing {
-  margin-top: clamp(22px, 3.2vh, 40px);
-  padding-top: clamp(20px, 2.6vh, 34px);
+  margin-top: clamp(22px, calc(3.2 * var(--vh)), 40px);
+  padding-top: clamp(20px, calc(2.6 * var(--vh)), 34px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: clamp(1rem, 1.55vw, 1.18rem);
+  font-size: clamp(1rem, calc(1.55 * var(--vw)), 1.18rem);
   font-weight: 600;
   line-height: 2.1;
 }
@@ -760,7 +760,7 @@
 /* STORIES は章ごと墨の面にする（見出しからカードの並びまで）。
    白地に黒い文字と細い線だけだと寂しいため。写真が墨に映え、文字は白、区切りは金の細線 */
 .p-stories {
-  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
+  padding: clamp(56px, calc(8 * var(--vw)), 110px) var(--pad-x) clamp(64px, calc(8 * var(--vw)), 110px);
   overflow-x: clip;
   background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
@@ -810,7 +810,7 @@
 /* 5行。1行にグループを2つ重ねて置き、数秒ごとに塊ごと入れ替える */
 .p-stories__inner {
   /* 段と段のあいだ。段の上の余白も同じだけ取る */
-  --row-gap: clamp(64px, 7.5vw, 120px);
+  --row-gap: clamp(64px, calc(7.5 * var(--vw)), 120px);
   display: grid;
   row-gap: var(--row-gap);
   max-width: var(--w-max);
@@ -842,7 +842,7 @@
   bottom: calc(-1 * var(--row-gap));
   left: 50%;
   z-index: -1;
-  width: 100vw;
+  width: calc(100 * var(--vw));
   translate: -50% 0;
   border-block: 1px solid rgba(201, 164, 90, 0.45);
   background: var(--grain), #17264f;
@@ -955,7 +955,7 @@
 .p-group__next {
   display: flex;
   align-items: baseline;
-  gap: clamp(8px, 1vw, 14px);
+  gap: clamp(8px, calc(1 * var(--vw)), 14px);
   padding: 8px 2px 8px 14px;
   border: 0;
   background: none;
@@ -1027,7 +1027,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .p-grouprow {
-      row-gap: clamp(46px, 6vw, 88px);
+      row-gap: clamp(46px, calc(6 * var(--vw)), 88px);
     }
 
   .p-grouprow > .p-group,
@@ -1049,7 +1049,7 @@
 /* セクションの見出し。ABOUT / INDEX / BROADCASTER と同じ組み方 */
 .p-stories__head {
   position: relative;
-  margin-bottom: clamp(30px, 4.5vw, 52px);
+  margin-bottom: clamp(30px, calc(4.5 * var(--vw)), 52px);
   padding-bottom: 20px;
 }
 
@@ -1066,7 +1066,7 @@
 .p-stories__label {
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  font-size: clamp(2.3rem, calc(4.8 * var(--vw)), 3.6rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -1074,7 +1074,7 @@
 /* 見出しと業種の一覧をまとめる枠。章全体が墨の面なので、枠自体には面を敷かない */
 .p-stories__masthead {
   max-width: var(--w-max);
-  margin: 0 auto clamp(48px, 6vw, 84px);
+  margin: 0 auto clamp(48px, calc(6 * var(--vw)), 84px);
 }
 
 .p-stories__title {
@@ -1098,7 +1098,7 @@
   z-index: -1;
   color: transparent;
   font-family: var(--f-display);
-  font-size: clamp(220px, 30vw, 440px);
+  font-size: clamp(220px, calc(30 * var(--vw)), 440px);
   line-height: 1;
   letter-spacing: -0.02em;
   -webkit-text-stroke: 1.2px rgba(201, 164, 90, 0.4);
@@ -1114,7 +1114,7 @@
 
 @media (max-width: 767px) {
   .p-group::before {
-      font-size: 56vw;
+      font-size: calc(56 * var(--vw));
     }
 }
 
@@ -1123,7 +1123,7 @@
 .p-group__head {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 2.5vw, 28px);
+  gap: clamp(16px, calc(2.5 * var(--vw)), 28px);
   margin-bottom: 30px;
 }
 
@@ -1260,14 +1260,14 @@
 .p-spotnav ul {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  column-gap: clamp(30px, 5vw, 80px);
+  column-gap: clamp(30px, calc(5 * var(--vw)), 80px);
 }
 
 /* 1行ずつの目次。墨地の上なので罫と文字は白の半透明、番号は金 */
 .p-spotnav a {
   display: flex;
   align-items: baseline;
-  gap: clamp(14px, 1.8vw, 26px);
+  gap: clamp(14px, calc(1.8 * var(--vw)), 26px);
   padding: 15px 2px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.72);
@@ -1294,7 +1294,7 @@
   gap: 10px;
   min-width: 0;
   font-family: var(--f-display);
-  font-size: clamp(0.62rem, 0.9vw, 0.76rem);
+  font-size: clamp(0.62rem, calc(0.9 * var(--vw)), 0.76rem);
   letter-spacing: 0.14em;
   white-space: nowrap;
 }
@@ -1312,7 +1312,7 @@
   /* 番号には金を使わない。黒い面の上なので白 */
   color: #fff;
   font-family: var(--f-display);
-  font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+  font-size: clamp(1.2rem, calc(1.9 * var(--vw)), 1.55rem);
   letter-spacing: 0.02em;
   line-height: 1;
 }
@@ -1326,7 +1326,7 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   min-width: 0;
-  column-gap: clamp(14px, 2vw, 24px);
+  column-gap: clamp(14px, calc(2 * var(--vw)), 24px);
   row-gap: 6px;
   font-weight: 400;
 }
@@ -1334,12 +1334,12 @@
 .p-group__label {
   display: flex;
   align-items: baseline;
-  gap: clamp(10px, 1.4vw, 18px);
+  gap: clamp(10px, calc(1.4 * var(--vw)), 18px);
   grid-area: label;
   align-self: end;
   color: var(--g-ink);
   font-family: var(--f-display);
-  font-size: clamp(13px, 1.2vw, 17px);
+  font-size: clamp(13px, calc(1.2 * var(--vw)), 17px);
   letter-spacing: 0.14em;
 }
 
@@ -1357,7 +1357,7 @@
   /* 番号には金を使わない */
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  font-size: clamp(1.9rem, calc(3.4 * var(--vw)), 3rem);
   letter-spacing: 0;
   line-height: 0.86;
 }
@@ -1387,11 +1387,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1.22fr 1fr 1fr;
   align-items: end;
-  gap: clamp(14px, 1.8vw, 30px);
+  gap: clamp(14px, calc(1.8 * var(--vw)), 30px);
 }
 
 .p-cards > li:nth-child(3) .p-card__name {
-  font-size: clamp(19px, 1.6vw, 23px);
+  font-size: clamp(19px, calc(1.6 * var(--vw)), 23px);
 }
 
 /* カードは1グループ5名ぶん。ホバーで少し持ち上がる */
@@ -1520,7 +1520,7 @@
   opacity: 0.8;
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(18px, 2.2vw, 34px);
+  font-size: clamp(18px, calc(2.2 * var(--vw)), 34px);
   letter-spacing: 0.06em;
   line-height: 1;
   /* 右上の角から左下へ向かって覆う */
@@ -1569,7 +1569,7 @@
 .p-card__name {
   display: block;
   margin-top: 12px;
-  font-size: clamp(18px, 1.5vw, 21px);
+  font-size: clamp(18px, calc(1.5 * var(--vw)), 21px);
   font-weight: 600;
   letter-spacing: 0.14em;
   line-height: 1.5;
@@ -1765,7 +1765,7 @@
 /* STORIES（墨の面）のあと。上の余白は INDEX 側で取り、下は袋文字の帯（.p-ticker）の余白に任せる
    （両方で取ると、帯の上だけ余白が広くなる） */
 .p-index {
-  padding: clamp(56px, 8vw, 110px) var(--pad-x) 0;
+  padding: clamp(56px, calc(8 * var(--vw)), 110px) var(--pad-x) 0;
 }
 
 .p-index__inner {
@@ -1775,7 +1775,7 @@
 
 .p-index__head {
   position: relative;
-  margin-bottom: clamp(30px, 4.5vw, 52px);
+  margin-bottom: clamp(30px, calc(4.5 * var(--vw)), 52px);
   padding-bottom: 20px;
 }
 
@@ -1792,7 +1792,7 @@
 .p-index__label {
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  font-size: clamp(2.3rem, calc(4.8 * var(--vw)), 3.6rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -1882,8 +1882,8 @@
 .p-index__list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  column-gap: clamp(26px, 4vw, 64px);
-  padding: 0 var(--index-pad) clamp(18px, 2.4vw, 30px);
+  column-gap: clamp(26px, calc(4 * var(--vw)), 64px);
+  padding: 0 var(--index-pad) clamp(18px, calc(2.4 * var(--vw)), 30px);
   overflow: hidden;
 }
 
@@ -1968,8 +1968,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 100svh;
-  padding: clamp(56px, 8vw, 110px) var(--pad-x) clamp(64px, 8vw, 110px);
+  min-height: calc(100 * var(--svh));
+  padding: clamp(56px, calc(8 * var(--vw)), 110px) var(--pad-x) clamp(64px, calc(8 * var(--vw)), 110px);
   background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
 }
@@ -1983,7 +1983,7 @@
 /* 見出しは INDEX / ABOUT と同じ「大型欧文＋小さな日本語＋虹色の罫」 */
 .p-station__head {
   position: relative;
-  margin-bottom: clamp(30px, 4.5vw, 52px);
+  margin-bottom: clamp(30px, calc(4.5 * var(--vw)), 52px);
   padding-bottom: 20px;
 }
 
@@ -2000,7 +2000,7 @@
 .p-station__en {
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  font-size: clamp(2.3rem, calc(4.8 * var(--vw)), 3.6rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -2035,8 +2035,8 @@
 }
 
 .p-station__name {
-  margin-top: clamp(24px, 3vw, 34px);
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  margin-top: clamp(24px, calc(3 * var(--vw)), 34px);
+  font-size: clamp(1.05rem, calc(2 * var(--vw)), 1.3rem);
   font-weight: 600;
   letter-spacing: 0.1em;
 }
@@ -2061,7 +2061,7 @@
    （正確な地形で描くと、実際の受信範囲と食い違ったときに誤解を生むため。
    図の中でも、放送対象地域の東京都だけを金で起こしている） */
 .p-station__area {
-  margin: clamp(36px, 4.4vw, 54px) 0 0;
+  margin: clamp(36px, calc(4.4 * var(--vw)), 54px) 0 0;
 }
 
 /* 図は紺地に溶けるベクターなので、白い面には載せない */
@@ -2091,8 +2091,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(28px, 5vw, 76px);
-  margin-top: clamp(28px, 3.4vw, 40px);
+  gap: clamp(28px, calc(5 * var(--vw)), 76px);
+  margin-top: clamp(28px, calc(3.4 * var(--vw)), 40px);
 }
 
 .p-station__data > div {
@@ -2135,12 +2135,12 @@
      余った2枚は中央に寄せる（グリッドでは端に寄るので flex で組む）。
      真ん中の1枚を大きく取る比率（1.22）はPCと同じ */
   .p-cards {
-      --gap: clamp(14px, 1.8vw, 30px);
+      --gap: clamp(14px, calc(1.8 * var(--vw)), 30px);
       --unit: calc((100% - 2 * var(--gap)) / 3.22);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: clamp(22px, 3vw, 34px) var(--gap);
+      gap: clamp(22px, calc(3 * var(--vw)), 34px) var(--gap);
     }
 
   .p-cards > li {
@@ -2156,15 +2156,15 @@
     }
 
   .p-hero__inner {
-      padding-right: clamp(16px, 2.4vw, 32px);
+      padding-right: clamp(16px, calc(2.4 * var(--vw)), 32px);
     }
 
   .p-index__list {
-      column-gap: clamp(20px, 3vw, 40px);
+      column-gap: clamp(20px, calc(3 * var(--vw)), 40px);
     }
 
   .p-logos__item {
-      width: clamp(130px, 18vw, 170px);
+      width: clamp(130px, calc(18 * var(--vw)), 170px);
     }
 }
 
@@ -2173,7 +2173,7 @@
    --u は「1375px の画面での 1px」。幅の上限（--w-max）は外し、左右の余白も幅に比例させる */
 @media (min-width: 1024px) {
   .p-stories {
-      --u: calc(100vw / 1375);
+      --u: calc(calc(100 * var(--vw)) / 1375);
       padding-inline: calc(97.5 * var(--u));
     }
 
@@ -2290,13 +2290,13 @@
       /* SPは升目が画面の幅いっぱいなので、地の溶かしも全幅に広げる。
          高さも影を当てる位置に使うので変数で持つ */
       --hero-tiles-w: 100%;
-      --hero-tiles-h: min(92vw, 40svh);
+      --hero-tiles-h: min(calc(92 * var(--vw)), calc(40 * var(--svh)));
       /* 正方形の写真が3段ぶん入る高さ（画面幅の1倍）＋ 溶かしぶん */
       /* 2行目は余りいっぱい。auto のままだと、縦組みのコピーを外して文字が減ったぶん、
          下に大きな余白が残る */
       grid-template-rows: var(--hero-tiles-h) 1fr;
       height: auto;
-      min-height: 100svh;
+      min-height: calc(100 * var(--svh));
       /* ヘッダーは常に地色を敷いているので、写真がその下から始まるようにする */
       padding-top: var(--header-h);
     }
@@ -2332,7 +2332,7 @@
 
   /* SPでもトロフィーは出す。文字組みの下が大きく空くので、右下に小さく立たせる */
   .p-hero__trophy {
-      width: min(124px, 32vw);
+      width: min(124px, calc(32 * var(--vw)));
       margin: auto 0 0 auto;
     }
 
@@ -2409,7 +2409,7 @@
       /* 文字は上寄せ、トロフィーは下。あいだは余りで空ける */
       justify-content: flex-start;
       gap: 0;
-      padding: clamp(22px, 4svh, 40px) var(--pad-x) clamp(18px, 3svh, 30px);
+      padding: clamp(22px, calc(4 * var(--svh)), 40px) var(--pad-x) clamp(18px, calc(3 * var(--svh)), 30px);
     }
 
   .p-hero__meta {
@@ -2420,7 +2420,7 @@
     }
 
   .p-hero__wordmark img {
-      width: min(380px, 80vw);
+      width: min(380px, calc(80 * var(--vw)));
     }
 
   .p-hero__meta {
@@ -2428,11 +2428,11 @@
     }
 
   .p-hero__meta::after {
-      margin-top: clamp(14px, 2.4svh, 22px);
+      margin-top: clamp(14px, calc(2.4 * var(--svh)), 22px);
     }
 
   .p-hero__text {
-      margin-top: clamp(12px, 2.2svh, 20px);
+      margin-top: clamp(12px, calc(2.2 * var(--svh)), 20px);
       font-size: 15px;
       line-height: 2;
     }

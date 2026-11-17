@@ -11,7 +11,7 @@
 .p-page {
   position: relative;
   isolation: isolate;
-  padding: calc(var(--header-h) + clamp(40px, 7vw, 90px)) var(--pad-x) clamp(70px, 10vw, 120px);
+  padding: calc(var(--header-h) + clamp(40px, calc(7 * var(--vw)), 90px)) var(--pad-x) clamp(70px, calc(10 * var(--vw)), 120px);
   background: var(--grain), var(--fold), var(--c-indigo-deep);
   color: #fff;
   color-scheme: dark;
@@ -23,7 +23,7 @@
   top: 50%;
   left: 8%;
   z-index: -1;
-  width: min(60vh, 42vw);
+  width: min(calc(60 * var(--vh)), calc(42 * var(--vw)));
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
@@ -66,7 +66,7 @@
 .p-page__en {
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+  font-size: clamp(2.3rem, calc(4.8 * var(--vw)), 3.6rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -104,7 +104,7 @@
 }
 
 .p-page__block {
-  margin-top: clamp(38px, 5vw, 54px);
+  margin-top: clamp(38px, calc(5 * var(--vw)), 54px);
 }
 
 .p-page__heading {
@@ -145,7 +145,7 @@
 /* form ---------------------------------------------------- */
 
 .p-form {
-  margin-top: clamp(34px, 5vw, 56px);
+  margin-top: clamp(34px, calc(5 * var(--vw)), 56px);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -153,9 +153,9 @@
 .p-form__row {
   display: grid;
   grid-template-columns: clamp(200px, 25%, 270px) 1fr;
-  gap: clamp(14px, 2.4vw, 34px);
+  gap: clamp(14px, calc(2.4 * var(--vw)), 34px);
   align-items: start;
-  padding: clamp(20px, 2.6vw, 30px) 0;
+  padding: clamp(20px, calc(2.6 * var(--vw)), 30px) 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -240,7 +240,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-top: clamp(26px, 3.4vw, 40px);
+  margin-top: clamp(26px, calc(3.4 * var(--vw)), 40px);
 }
 
 .p-form__check {
@@ -256,7 +256,7 @@
   position: relative;
   display: block;
   min-width: 300px;
-  margin: clamp(28px, 3.4vw, 40px) auto 0;
+  margin: clamp(28px, calc(3.4 * var(--vw)), 40px) auto 0;
   padding: 20px 44px;
   overflow: hidden;
   border: 1px solid rgba(201, 164, 90, 0.75);
@@ -317,7 +317,7 @@
 }
 
 .p-form__note {
-  margin-top: clamp(20px, 2.4vw, 28px);
+  margin-top: clamp(20px, calc(2.4 * var(--vw)), 28px);
   padding: 16px 20px;
   border-left: 3px solid var(--c-accent);
   background: rgba(255, 255, 255, 0.06);
@@ -341,7 +341,7 @@
 
   .p-page::before {
       left: 50%;
-      width: 92vw;
+      width: calc(92 * var(--vw));
       opacity: 0.05;
     }
 

@@ -53,7 +53,7 @@
 /* ロゴも最初から出す（以前はスクロールするまで隠していた） */
 .l-header__logo img {
   width: auto;
-  height: clamp(34px, 3vw, 42px);
+  height: clamp(34px, calc(3 * var(--vw)), 42px);
 }
 
 /* PCでは英字だけを横並びに。日本語・グループ番号・局ロゴはSPメニュー専用 */
@@ -66,9 +66,9 @@
 
 .l-nav__list {
   display: flex;
-  gap: clamp(18px, 2.6vw, 40px);
+  gap: clamp(18px, calc(2.6 * var(--vw)), 40px);
   font-family: var(--f-display);
-  font-size: clamp(14px, 1.15vw, 16px);
+  font-size: clamp(14px, calc(1.15 * var(--vw)), 16px);
   letter-spacing: 0.1em;
 }
 
@@ -108,7 +108,7 @@
 /* フッターはサイトの背景と同じ紺。上端の虹色の線が境目。ロゴは白金（logo-white-gold） */
 .l-footer {
   position: relative;
-  padding: clamp(56px, 8vw, 96px) var(--pad-x) 40px;
+  padding: clamp(56px, calc(8 * var(--vw)), 96px) var(--pad-x) 40px;
   background: var(--grain), var(--c-indigo-deep);
   color: #fff;
   text-align: center;
@@ -142,7 +142,7 @@
 }
 
 .l-footer__logo img {
-  width: min(360px, 76vw);
+  width: min(360px, calc(76 * var(--vw)));
   margin-inline: auto;
 }
 

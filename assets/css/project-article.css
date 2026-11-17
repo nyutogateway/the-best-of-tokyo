@@ -27,7 +27,7 @@
      丸くて回るものが同じ場所に2つ並んでうるさいので */
   left: 87%;
   z-index: -1;
-  width: min(64vh, 44vw);
+  width: min(calc(64 * var(--vh)), calc(44 * var(--vw)));
   aspect-ratio: 1;
   translate: -50% -50%;
   background: url("../img/mark.svg") no-repeat center / contain;
@@ -57,10 +57,10 @@
   display: grid;
   /* 左の列＝ジャケットの1.5倍（周りを回る金の輪のぶん）。ジャケットの幅は clamp のまま */
   grid-template-columns: calc(clamp(320px, 34%, 400px) * 1.5) 1fr;
-  gap: clamp(28px, 4.5vw, 56px);
+  gap: clamp(28px, calc(4.5 * var(--vw)), 56px);
   align-items: start;
-  padding-top: calc(var(--header-h) + clamp(40px, 7vw, 90px));
-  padding-bottom: clamp(40px, 6vw, 66px);
+  padding-top: calc(var(--header-h) + clamp(40px, calc(7 * var(--vw)), 90px));
+  padding-bottom: clamp(40px, calc(6 * var(--vw)), 66px);
 }
 
 .p-article__head::after {
@@ -255,7 +255,7 @@
 }
 
 .p-article__title {
-  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
+  font-size: clamp(1.35rem, calc(2.6 * var(--vw)), 1.95rem);
   font-weight: 600;
   line-height: 1.8;
   letter-spacing: 0.1em;
@@ -265,7 +265,7 @@
   margin-top: 26px;
   padding-top: 22px;
   border-top: 1px solid var(--c-line-thin);
-  font-size: clamp(22px, 2vw, 28px);
+  font-size: clamp(22px, calc(2 * var(--vw)), 28px);
   font-weight: 600;
   letter-spacing: 0.1em;
 }
@@ -330,7 +330,7 @@
 }
 
 .p-chapter {
-  padding: clamp(50px, 7vw, 84px) 0 0;
+  padding: clamp(50px, calc(7 * var(--vw)), 84px) 0 0;
   display: flow-root;
 }
 
@@ -340,7 +340,7 @@
   gap: 18px;
   color: var(--c-accent);
   font-family: var(--f-display);
-  font-size: clamp(16px, 1.4vw, 19px);
+  font-size: clamp(16px, calc(1.4 * var(--vw)), 19px);
   letter-spacing: 0.22em;
 }
 
@@ -396,8 +396,8 @@
 }
 
 .p-chapter__title {
-  margin-top: clamp(30px, 4.6vw, 52px);
-  font-size: clamp(1.2rem, 2.3vw, 1.6rem);
+  margin-top: clamp(30px, calc(4.6 * var(--vw)), 52px);
+  font-size: clamp(1.2rem, calc(2.3 * var(--vw)), 1.6rem);
   font-weight: 600;
   line-height: 1.95;
   letter-spacing: 0.13em;
@@ -464,14 +464,14 @@
   float: right;
   width: 50%;
   /* 本文（.p-qa）の書き出しと写真の天を合わせる */
-  margin: 34px 0 22px clamp(24px, 3.4vw, 44px);
+  margin: 34px 0 22px clamp(24px, calc(3.4 * var(--vw)), 44px);
 }
 
 /* 写真は出てくる順に右・左・右…と交互に置く（偶数番目に .p-figure--left）。
    タブレット・SPは回り込みをやめるので、下の @media で左右とも float: none に戻る */
 .p-figure--left {
   float: left;
-  margin: 34px clamp(24px, 3.4vw, 44px) 22px 0;
+  margin: 34px clamp(24px, calc(3.4 * var(--vw)), 44px) 22px 0;
 }
 
 .p-figure img {
@@ -492,14 +492,14 @@
 /* 結びの言葉。章とまったく同じ組み立て（ラベル → 見出し → 本文）で、本文と同じ墨地に置く。
    下の余白で、白の MORE STORIES との間を取る */
 .p-chapter--message {
-  margin-top: clamp(56px, 8vw, 96px);
-  padding-bottom: clamp(64px, 9vw, 110px);
+  margin-top: clamp(56px, calc(8 * var(--vw)), 96px);
+  padding-bottom: clamp(64px, calc(9 * var(--vw)), 110px);
 }
 
 /* 締めの言葉。本文より一段大きく組む */
 .p-chapter__text {
-  margin-top: clamp(26px, 4vw, 44px);
-  font-size: clamp(17px, 1.4vw, 19px);
+  margin-top: clamp(26px, calc(4 * var(--vw)), 44px);
+  font-size: clamp(17px, calc(1.4 * var(--vw)), 19px);
   letter-spacing: 0.06em;
   line-height: 2.3;
 }
@@ -510,7 +510,7 @@
 .p-related {
   --g: var(--c-red);
   --g-ink: var(--c-red-deep);
-  padding-top: clamp(56px, 8vw, 96px);
+  padding-top: clamp(56px, calc(8 * var(--vw)), 96px);
 }
 
 /* 墨地に合わせたカードの文字色（白地向けの指定を上書き） */
@@ -543,7 +543,7 @@
 
 .p-related__head {
   position: relative;
-  margin-bottom: clamp(24px, 3.4vw, 38px);
+  margin-bottom: clamp(24px, calc(3.4 * var(--vw)), 38px);
   padding-bottom: 14px;
 }
 
@@ -561,7 +561,7 @@
   font-weight: 400;
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(1.5rem, 3.2vw, 2.3rem);
+  font-size: clamp(1.5rem, calc(3.2 * var(--vw)), 2.3rem);
   letter-spacing: 0.06em;
   line-height: 1;
 }
@@ -569,7 +569,7 @@
 .p-related__list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: clamp(14px, 1.8vw, 24px);
+  gap: clamp(14px, calc(1.8 * var(--vw)), 24px);
 }
 
 .p-related__card {
@@ -687,7 +687,7 @@
   opacity: 0.8;
   color: var(--c-ink);
   font-family: var(--f-display);
-  font-size: clamp(16px, 1.9vw, 28px);
+  font-size: clamp(16px, calc(1.9 * var(--vw)), 28px);
   letter-spacing: 0.06em;
   line-height: 1;
   /* 右上の角から左下へ向かって覆う */
@@ -725,7 +725,7 @@
 .p-related__name {
   display: block;
   margin-top: 10px;
-  font-size: clamp(18px, 1.5vw, 22px);
+  font-size: clamp(18px, calc(1.5 * var(--vw)), 22px);
   font-weight: 600;
   letter-spacing: 0.14em;
   line-height: 1.5;
@@ -909,13 +909,13 @@
 
 /* 一覧へ戻る。記事の締め */
 .p-article__foot {
-  padding: clamp(34px, 4.6vw, 56px) 0 clamp(70px, 10vw, 120px);
+  padding: clamp(34px, calc(4.6 * var(--vw)), 56px) 0 clamp(70px, calc(10 * var(--vw)), 120px);
   text-align: center;
 }
 
 .p-marquee {
-  width: 100vw;
-  margin: clamp(50px, 7vw, 84px) 0 0 calc(50% - 50vw);
+  width: calc(100 * var(--vw));
+  margin: clamp(50px, calc(7 * var(--vw)), 84px) 0 0 calc(50% - calc(50 * var(--vw)));
   overflow: hidden;
 }
 
@@ -946,11 +946,11 @@
   display: flex;
 }
 
-/* 1画面に5枚。幅を 20vw に固定して枚数をそろえる（写真の縦横比に左右されない） */
+/* 1画面に5枚。幅を calc(20 * var(--vw)) に固定して枚数をそろえる（写真の縦横比に左右されない） */
 /* 高さを決めて、幅は 4:3 から出す */
 .p-marquee__set img {
   width: auto;
-  height: clamp(170px, 16vw, 300px);
+  height: clamp(170px, calc(16 * var(--vw)), 300px);
   max-width: none;
   aspect-ratio: 4 / 3;
   object-fit: cover;
@@ -972,12 +972,12 @@
       float: none;
       width: min(100%, 620px);
       /* 見出しにくっつかないよう、上にも余白を取る */
-      margin: clamp(24px, 3.4vw, 36px) auto clamp(26px, 3.4vw, 36px);
+      margin: clamp(24px, calc(3.4 * var(--vw)), 36px) auto clamp(26px, calc(3.4 * var(--vw)), 36px);
     }
 
   .p-article__head {
       grid-template-columns: calc(clamp(240px, 38%, 320px) * 1.5) 1fr;
-      gap: clamp(22px, 3.4vw, 40px);
+      gap: clamp(22px, calc(3.4 * var(--vw)), 40px);
     }
 
   .p-related__list {
@@ -985,18 +985,18 @@
     }
 
   .p-marquee__set img {
-      height: clamp(150px, 20vw, 210px);
+      height: clamp(150px, calc(20 * var(--vw)), 210px);
     }
 }
 
 @media (max-width: 767px) {
   .p-article::before {
       left: 50%;
-      width: 92vw;
+      width: calc(92 * var(--vw));
       opacity: 0.04;
     }
   .p-marquee__set img {
-      height: clamp(130px, 30vw, 190px);
+      height: clamp(130px, calc(30 * var(--vw)), 190px);
     }
 
   .p-article__head {

@@ -18,6 +18,14 @@
    --------------------------------------------------------- */
 
 :root {
+  /* PC（1024px以上）はページ全体を「1375px の画面と同じ比率」で拡大縮小する（各HTMLの <head> の小さなスクリプトが html に zoom を掛ける）。
+     zoom を掛けると画面単位（vw・vh）までその倍率で大きくなり、横にはみ出すので、
+     CSS の vw・vh・svh はすべて var(--vw) などを通し、倍率 --z で割って打ち消している。**新しく vw を書くときも var(--vw) を使うこと** */
+  --z: 1;
+  --vw: calc(1vw / var(--z));
+  --vh: calc(1vh / var(--z));
+  --svh: calc(1svh / var(--z));
+
   --c-red: #a2302c;
   --c-red-deep: #6e1c19;
   --c-ink: #211c1b;
@@ -36,8 +44,8 @@
   --w-max: 1180px;
   /* 墨の帯どうしの間（ロゴ帯の上下・ABOUT の上下・STORIES の上）で使う余白。
      どこも同じ値にして、帯の上下の余白感をそろえる */
-  --band-gap: clamp(56px, 8vw, 110px);
-  --pad-x: 6vw;
+  --band-gap: clamp(56px, calc(8 * var(--vw)), 110px);
+  --pad-x: calc(6 * var(--vw));
   --header-h: 96px;
 
   /* TOKYO MX ロゴ（tokyo-mx.svg）から抜き出した実配色 */

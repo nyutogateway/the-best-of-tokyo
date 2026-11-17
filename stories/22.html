@@ -2,6 +2,34 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<script>
+/* PC（1024px以上）は、ページ全体を 1375px の画面と同じ比率で拡大縮小する（どの横幅でも同じ釣り合いに見えるように）。
+   zoom で画面単位（vw）も大きくなるブラウザでは、その倍率を --z に渡して CSS 側で打ち消す（foundation.css の --vw）。
+   どちらの振る舞いかは、100vw と 100px の箱を実際に測って確かめる */
+(function () {
+  var d = document.documentElement, BASE = 1375;
+  function fit() {
+    var w = window.innerWidth, z = w >= 1024 ? w / BASE : 1;
+    d.style.zoom = z;
+    var k = 1;
+    if (z !== 1 && document.body) {
+      var a = document.createElement('div'), b = document.createElement('div');
+      a.style.cssText = 'position:absolute;visibility:hidden;width:100vw;height:0';
+      b.style.cssText = 'position:absolute;visibility:hidden;width:100px;height:0';
+      document.body.appendChild(a); document.body.appendChild(b);
+      var r = (a.getBoundingClientRect().width / b.getBoundingClientRect().width) / (w / 100);
+      a.remove(); b.remove();
+      k = Math.abs(r - 1) < Math.abs(r - 1 / z) ? z : 1;
+    } else if (z !== 1) {
+      k = z;
+    }
+    d.style.setProperty('--z', k);
+  }
+  fit();
+  document.addEventListener('DOMContentLoaded', fit);
+  window.addEventListener('resize', fit);
+})();
+</script>
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>夢を形にする男 ｜ THE BEST OF TOKYO</title>
@@ -19,10 +47,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Shippori+Mincho+B1:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/foundation.css?v=a4b4d0a8">
-<link rel="stylesheet" href="../assets/css/layout.css?v=a4b4d0a8">
-<link rel="stylesheet" href="../assets/css/component.css?v=a4b4d0a8">
-<link rel="stylesheet" href="../assets/css/project-article.css?v=a4b4d0a8">
+<link rel="stylesheet" href="../assets/css/foundation.css?v=d8c3b7ef">
+<link rel="stylesheet" href="../assets/css/layout.css?v=d8c3b7ef">
+<link rel="stylesheet" href="../assets/css/component.css?v=d8c3b7ef">
+<link rel="stylesheet" href="../assets/css/project-article.css?v=d8c3b7ef">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -231,6 +259,6 @@
   </div>
 </footer>
 
-<script src="../assets/js/main.js?v=a4b4d0a8"></script>
+<script src="../assets/js/main.js?v=d8c3b7ef"></script>
 </body>
 </html>
