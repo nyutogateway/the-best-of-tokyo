@@ -39,6 +39,19 @@
   opacity: 0.05;
 }
 
+/* **カードには重ねない**（カードに日輪が透けて見えないように）。
+   各セクションの中身をマーク（z-index: 40）より上に出す。中身の地のない所（余白・文字のすき間）では
+   マークが今までどおり見え、カードなど地を塗った所ではカードの色がそのまま出る。ヘッダー（50）より下 */
+.p-concept__inner,
+.p-stories__masthead,
+.p-stories__inner,
+.p-index__inner,
+.p-ticker,
+.p-station__inner {
+  position: relative;
+  z-index: 41;
+}
+
 @keyframes markSpin {
   to {
     rotate: 360deg;
