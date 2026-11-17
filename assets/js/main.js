@@ -23,6 +23,27 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  /* 記事の動画（.p-movie）。再生ボタンを押したら YouTube の埋め込みに差し替える。
+     data-youtube に動画のIDが無いあいだは「動画が入ります」を出すだけ */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-movie]'), function (frame) {
+    var play = frame.querySelector('.p-movie__play');
+    if (!play) return;
+    play.addEventListener('click', function () {
+      var id = frame.getAttribute('data-youtube');
+      if (!id) {
+        frame.classList.add('is-soon');
+        return;
+      }
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
+      iframe.title = '番組の映像';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      iframe.allowFullscreen = true;
+      frame.innerHTML = '';
+      frame.appendChild(iframe);
+    });
+  });
+
   /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
   var main = document.getElementById('main');
   var concept = document.getElementById('concept');
