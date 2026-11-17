@@ -818,8 +818,6 @@
 }
 
 .p-grouprow {
-  position: relative;
-  isolation: isolate; /* 後ろに透かす大きな番号（.p-group::before）を、この段の中に収める */
   display: grid;
 }
 
@@ -1063,36 +1061,6 @@
 .p-group {
   position: relative;
   min-width: 0;
-}
-
-/* 段の後ろに、その分野の番号（data-no）をとても大きく、金の細い袋文字で透かして置く。
-   置く場所は分野の番号で決める（奇数 01・03… は右、偶数 02・04… は左）。
-   1段に奇数と偶数の分野が1つずつ重なっているので、切り替わるたびに番号が左右を行き来する */
-.p-group::before {
-  position: absolute;
-  top: 50%;
-  right: -0.06em;
-  z-index: -1;
-  color: transparent;
-  font-family: var(--f-display);
-  font-size: clamp(220px, calc(30 * var(--vw)), 440px);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  -webkit-text-stroke: 1.2px rgba(201, 164, 90, 0.4);
-  translate: 0 -46%;
-  pointer-events: none;
-  content: attr(data-no);
-}
-
-.p-grouprow > .p-group:nth-child(even)::before {
-  right: auto;
-  left: -0.06em;
-}
-
-@media (max-width: 767px) {
-  .p-group::before {
-      font-size: calc(56 * var(--vw));
-    }
 }
 
 /* 袋文字がページ幅を広げないように */
@@ -2209,10 +2177,6 @@
   .p-stories .p-group__arrow {
       width: calc(9 * var(--u));
       height: calc(9 * var(--u));
-    }
-
-  .p-stories .p-group::before {
-      font-size: calc(412 * var(--u));
     }
 
   /* 見出し（STORIES）と分野の一覧も、カードの段と同じ幅・同じ比率で */
