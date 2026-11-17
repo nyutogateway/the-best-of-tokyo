@@ -790,18 +790,23 @@
 }
 
 /* 2.5 映像（ABOUT と STORIES のあいだ） ------------------------------
-   映像を画面いっぱい（画面の幅×画面の高さ）に置く。音なしで自動再生・ループ。
-   ・上下は墨へ溶かし、ABOUT・STORIES の地とつなげる（帯の継ぎ目を見せない）
-   ・映像に藍を薄く掛け、四隅を沈めて、サイトの黒と金に色を寄せる
-   ・映像の色は、彩度を落としてコントラストを上げ、明るい所（ネオン・窓明かり）にだけ金を差す（映画の色調）
-   ・フィルムの粒を重ね、映像はごくゆっくり寄り引きし続ける
-   文字は載せない（FV と同じ言葉のくり返しになるため）。
-   画面に入ると、少し内側に切り取られた映像が画面いっぱいへ開く（main.js が .is-inview を付ける） */
+   画面いっぱいの太字「TOKYO」の字の形に映像を見せ、スクロールすると文字が手前へ迫って広がり、
+   最後は画面全体が映像になる。
+   ・塊は画面の2.6倍の高さ。中身（.p-movie__inner）は画面に貼り付いたまま（sticky）、
+     その間のスクロール量を main.js が 0〜1 にして、文字の大きさ（--movie-scale）と覆いの濃さ（--movie-cover）に渡す
+   ・覆いは SVG。墨の面から「TOKYO」の字を抜いた形で、字の縁に金の細い線を引く
+   ・映像は音なしで自動再生・ループ。彩度を落としてコントラストを上げ、明るい所にだけ金を差す（映画の色調）。
+     フィルムの粒を重ね、ごくゆっくり寄り引きし続ける。上下は墨へ溶かす */
 .p-movie {
+  --movie-scale: 1;
+  --movie-cover: 1;
+  height: calc(260 * var(--svh));
   background: var(--c-indigo-deep);
 }
 
 .p-movie__inner {
+  position: sticky;
+  top: 0;
   height: calc(100 * var(--svh));
   overflow: hidden;
 }
@@ -815,13 +820,7 @@
   object-fit: cover;
   /* 彩度を落とし、締まった黒に */
   filter: saturate(0.62) contrast(1.14) brightness(0.92);
-  clip-path: inset(9% 7% round 4px);
-  scale: 1.12;
-  /* 開く動き（scale）とは別に、ごくゆっくり寄り引きし続ける（transform） */
   animation: movieDrift 26s ease-in-out infinite alternate;
-  transition:
-    clip-path 1.8s cubic-bezier(0.7, 0, 0.2, 1),
-    scale 2.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 @keyframes movieDrift {
@@ -834,7 +833,7 @@
   }
 }
 
-/* 明るい所にだけ金を差す（soft-light は暗い所をほとんど変えない）＋フィルムの粒 */
+/* 明るい所にだけ金を差す（soft-light は暗い所をほとんど変えない） */
 .p-movie__inner::after {
   position: absolute;
   inset: 0;
@@ -842,6 +841,19 @@
   mix-blend-mode: soft-light;
   pointer-events: none;
   content: "";
+}
+
+/* 藍の薄い膜＋四隅の影＋上下の墨への溶け込み＋フィルムの粒 */
+.p-movie__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(14, 25, 50, 0.7) 0%, rgba(14, 25, 50, 0) 20%, rgba(14, 25, 50, 0) 78%, rgba(14, 25, 50, 0.7) 100%),
+    radial-gradient(ellipse 75% 70% at 50% 50%, rgba(14, 25, 50, 0) 40%, rgba(8, 14, 30, 0.72) 100%),
+    rgba(14, 25, 50, 0.28);
+  pointer-events: none;
 }
 
 .p-movie__veil::after {
@@ -862,33 +874,65 @@
   100% { translate: 0 0; }
 }
 
-.p-movie.is-inview .p-movie__video {
-  clip-path: inset(0 0 round 0);
-  scale: 1;
-}
-
-/* 藍の薄い膜＋四隅の影＋上下の墨への溶け込み */
-.p-movie__veil {
+/* 「TOKYO」の字を抜いた墨の覆い。字の大きさはスクロールで手前へ迫る */
+.p-movie__mask {
   position: absolute;
   inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, var(--c-indigo-deep) 0%, rgba(14, 25, 50, 0) 22%, rgba(14, 25, 50, 0) 74%, var(--c-indigo-deep) 100%),
-    radial-gradient(ellipse 75% 70% at 50% 50%, rgba(14, 25, 50, 0) 40%, rgba(8, 14, 30, 0.72) 100%),
-    rgba(14, 25, 50, 0.28);
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: scale(var(--movie-scale));
+  transform-origin: 50% 50%;
+  opacity: var(--movie-cover);
+  will-change: transform, opacity;
   pointer-events: none;
 }
 
-/* 動きを止める設定のときは、最初から開いた形で見せる */
-@media (prefers-reduced-motion: reduce) {
-  .p-movie__video {
-      clip-path: none;
-      scale: 1;
-      animation: none;
-      transition: none;
+.p-movie__cover {
+  fill: var(--c-indigo-deep);
+}
+
+.p-movie__word {
+  font-family: var(--f-display);
+  font-size: 400px;
+  letter-spacing: 6px;
+}
+
+/* 字の縁の金の細い線。迫ってくると太く見えすぎるので、線の太さは拡大に合わせて細らせない（non-scaling-stroke） */
+.p-movie__outline {
+  fill: none;
+  stroke: rgba(239, 217, 154, 0.85);
+  stroke-width: 1.2px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* SPは画面が縦長なので、字を大きめに（横幅いっぱいまで） */
+@media (max-width: 767px) {
+  .p-movie {
+      height: calc(220 * var(--svh));
     }
 
+  .p-movie__mask {
+      scale: 1.25;
+    }
+}
+
+/* 動きを止める設定のときは、文字の覆いを出さず映像をそのまま1画面で見せる */
+@media (prefers-reduced-motion: reduce) {
+  .p-movie {
+      height: auto;
+    }
+
+  .p-movie__inner {
+      position: relative;
+    }
+
+  .p-movie__mask {
+      display: none;
+    }
+
+  .p-movie__video,
   .p-movie__veil::after {
       animation: none;
     }

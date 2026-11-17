@@ -31,21 +31,32 @@
     movie.pause();
   }
 
-  /* 映像が画面に入ったら .is-inview を付ける（映像が画面いっぱいへ開く合図） */
+  /* TOPの映像の「TOKYO」の字。塊（.p-movie）が画面に貼り付いている間のスクロール量を 0〜1 にし、
+     字の大きさ（--movie-scale）と墨の覆いの濃さ（--movie-cover）を CSS に渡す。
+     はじめの1割は止めて字を読ませ、そこから字を手前へ迫らせ、後半で覆いを消して映像だけにする */
   var movieWrap = document.querySelector('[data-movie]');
-  if (movieWrap) {
-    if ('IntersectionObserver' in window) {
-      var movieIo = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          movieWrap.classList.add('is-inview');
-          movieIo.disconnect();
-        });
-      }, { threshold: 0.35 });
-      movieIo.observe(movieWrap);
-    } else {
-      movieWrap.classList.add('is-inview');
-    }
+  if (movieWrap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var movieTick = false;
+    var clamp01 = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var updateMovie = function () {
+      movieTick = false;
+      var r = movieWrap.getBoundingClientRect();
+      var range = r.height - window.innerHeight;
+      var p = range > 0 ? clamp01(-r.top / range) : 0;
+      var grow = clamp01((p - 0.1) / 0.75);
+      var fade = clamp01((p - 0.5) / 0.35);
+      movieWrap.style.setProperty('--movie-scale', (1 + Math.pow(grow, 2.2) * 22).toFixed(3));
+      movieWrap.style.setProperty('--movie-cover', (1 - fade).toFixed(3));
+    };
+    var requestMovie = function () {
+      if (!movieTick) {
+        movieTick = true;
+        window.requestAnimationFrame(updateMovie);
+      }
+    };
+    updateMovie();
+    window.addEventListener('scroll', requestMovie, { passive: true });
+    window.addEventListener('resize', requestMovie);
   }
 
   /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
