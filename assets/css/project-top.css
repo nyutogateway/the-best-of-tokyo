@@ -790,27 +790,21 @@
 }
 
 /* 2.5 映像（ABOUT と STORIES のあいだ） ------------------------------
-   見出しは付けず、映像だけを置く。音なしで自動再生し、ループする。
-   幅は STORIES のカードの段と同じ（PC は下の @media (min-width: 1024px) で画面幅に比例） */
+   見出しは付けず、映像だけを画面いっぱい（横は画面の幅、縦は画面の高さ）に置く。
+   音なしで自動再生し、ループする。画面の縦横比と合わないぶんは端を切って埋める（cover） */
 .p-movie {
-  padding: 0 var(--pad-x);
-  background: var(--grain), var(--fold), var(--c-indigo-deep);
+  background: #000;
 }
 
 .p-movie__inner {
-  max-width: var(--w-max);
-  margin-inline: auto;
+  height: calc(100 * var(--svh));
 }
 
 .p-movie__video {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   object-fit: cover;
-  border-radius: 3px;
-  background: #000;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
 }
 
 /* 3. STORIES（中扉・グループ・カード） ----------------- */
@@ -2193,15 +2187,6 @@
 
   .p-stories__inner {
       --row-gap: calc(120 * var(--u));
-      max-width: none;
-    }
-
-  /* MOVIE も STORIES のカードの段と同じ幅に */
-  .p-movie {
-      padding-inline: calc(97.5 * calc(calc(100 * var(--vw)) / 1375));
-    }
-
-  .p-movie__inner {
       max-width: none;
     }
 
