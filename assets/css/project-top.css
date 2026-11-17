@@ -14,6 +14,31 @@
    8. 動きを止める設定（prefers-reduced-motion）
    ========================================================= */
 
+/* 日輪マークを薄く置き、スクロールしても画面に留まらせる（お問い合わせ・記事と同じもの）。
+   下層ページは地の後ろ（z-index: -1）に敷いているが、TOPは各セクションが地を塗っていて隠れるため、
+   中身の上に重ね、クリックは素通りさせる。ヘッダー（z-index: 50）より下 */
+#main::after {
+  position: fixed;
+  top: 50%;
+  left: 8%;
+  z-index: 40;
+  width: min(calc(60 * var(--vh)), calc(42 * var(--vw)));
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: url("../img/mark.svg") no-repeat center / contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.05;
+  animation: markSpin 120s linear infinite;
+  pointer-events: none;
+  content: "";
+}
+
+@keyframes markSpin {
+  to {
+    rotate: 360deg;
+  }
+}
+
 /* 1. FV（ヒーロー） -------------------------------------- */
 
 /* FVの光は5つ。**それぞれ「光だけを持つ要素」に入れて、opacity で出し入れする**
