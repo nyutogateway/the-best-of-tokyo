@@ -729,6 +729,59 @@
   }
 }
 
+/* 映画の黒帯。上下に黒い帯を置いてシネマスコープ（2.39:1）の画面に見せる。
+   --p（0→1）は JS がスクロールで渡す。0 で帯がほぼ閉じた細い隙間、1 で 2.39:1 まで開く。
+   JS が無いときは 1（開いたまま）。縦長の画面では帯を細めに止める */
+.p-movie__inner {
+  --p: 1;
+  --bar-end: clamp(calc(6 * var(--svh)), calc((100 * var(--svh) - 100 * var(--vw) / 2.39) / 2), calc(16 * var(--svh)));
+}
+
+.p-movie__bar {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: calc(var(--bar-end) + (46 * var(--svh) - var(--bar-end)) * (1 - var(--p)));
+  background: #000;
+}
+
+/* 上の帯は固定ヘッダーの下に隠れる分（--header-h）だけ足して、見える黒の厚みを上下でそろえる */
+.p-movie__bar--top {
+  top: 0;
+  height: calc(var(--header-h) + var(--bar-end) + (46 * var(--svh) - var(--bar-end)) * (1 - var(--p)));
+}
+
+.p-movie__bar--bottom {
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--pad-x);
+}
+
+/* 下の帯の隅の小さな文字（東京タワーの座標と、映像に合わせて進むタイムコード）。帯が開き切る手前で出す */
+.p-movie__cap {
+  color: rgba(255, 255, 255, 0.62);
+  font-family: var(--f-gothic);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.24em;
+  white-space: nowrap;
+  opacity: clamp(0, calc((var(--p) - 0.75) * 4), 1);
+}
+
+.p-movie__tc {
+  color: var(--c-accent);
+}
+
+@media (max-width: 767px) {
+  .p-movie__cap {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .p-movie__video {
     animation: none;

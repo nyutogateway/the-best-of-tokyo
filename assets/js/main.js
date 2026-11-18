@@ -31,6 +31,41 @@
     movie.pause();
   }
 
+  /* 映像の黒帯：映像の面が下から上がってくるあいだに、上下の帯が細い隙間から 2.39:1 まで開く。
+     下の帯のタイムコードは映像の再生位置をそのまま映す（画面に入っているときだけ回す） */
+  var movieInner = document.querySelector('.p-movie__inner');
+  var tc = document.getElementById('js-tc');
+  if (movie && movieInner) {
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var onMovieScroll = function () {
+      var t = 1 - movieInner.getBoundingClientRect().top / window.innerHeight;
+      t = Math.min(Math.max(t, 0), 1);
+      movieInner.style.setProperty('--p', still ? 1 : (t * t * (3 - 2 * t)).toFixed(4));
+    };
+    onMovieScroll();
+    window.addEventListener('scroll', onMovieScroll, { passive: true });
+    window.addEventListener('resize', onMovieScroll);
+
+    if (tc) {
+      var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+      var running = false;
+      var tick = function () {
+        var s = movie.currentTime || 0;
+        tc.textContent = '00:' + pad(Math.floor(s / 60)) + ':' + pad(Math.floor(s % 60)) + ':' + pad(Math.floor((s % 1) * 30));
+        if (running) { window.requestAnimationFrame(tick); }
+      };
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          var was = running;
+          running = entries[0].isIntersecting;
+          if (running && !was) { window.requestAnimationFrame(tick); }
+        }).observe(movieInner);
+      } else {
+        tick();
+      }
+    }
+  }
+
   /* TOPの日輪マーク（#main::after）は、ABOUT が画面の半分まで上がってきたら出す。FVの上では出さない */
   var main = document.getElementById('main');
   var concept = document.getElementById('concept');
