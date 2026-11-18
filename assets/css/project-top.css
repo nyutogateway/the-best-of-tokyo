@@ -748,9 +748,12 @@ html:has(.p-movie) {
   --bar-h: calc(var(--bar-end) + (46 * (var(--svh) * 100 - var(--header-h)) / 100 - var(--bar-end)) * (1 - var(--p)));
 }
 
+/* SP は縦長なので、2.39:1 に合わせると帯ばかり太くなって映像が細切れになる。
+   帯は文字が収まる最小の厚みに止め、画面いっぱいを映像に使う */
 @media (max-width: 767px) {
   .p-movie__inner {
-    --bar-min: 48px;
+    --bar-min: 52px;
+    --bar-end: var(--bar-min);
   }
 }
 
