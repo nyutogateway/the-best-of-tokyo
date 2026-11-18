@@ -742,7 +742,15 @@ html:has(.p-movie) {
    JS が無いときは 1（開いたまま）。縦長の画面では帯を細めに止める */
 .p-movie__inner {
   --p: 1;
-  --bar-end: clamp(calc(6 * var(--svh)), calc((100 * var(--svh) - var(--header-h) - 100 * var(--vw) / 2.39) / 2), calc(16 * var(--svh)));
+  /* 帯の厚みの下限は --bar-min（下の帯の文字が収まる厚み）。横に長い・背の低い画面でも文字が映像に被らない */
+  --bar-min: 84px;
+  --bar-end: clamp(max(calc(6 * var(--svh)), var(--bar-min)), calc((100 * var(--svh) - var(--header-h) - 100 * var(--vw) / 2.39) / 2), max(calc(16 * var(--svh)), var(--bar-min)));
+}
+
+@media (max-width: 767px) {
+  .p-movie__inner {
+    --bar-min: 64px;
+  }
 }
 
 .p-movie__bar {
