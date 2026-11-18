@@ -766,15 +766,81 @@ html:has(.p-movie) {
   padding: 0 var(--pad-x);
 }
 
-/* 下の帯の隅の小さな文字（東京タワーの座標と、映像に合わせて進むタイムコード）。帯が開き切る手前で出す */
+/* 下の帯の文字。左に場所（LOCATION と東京タワーの座標）、右に大きな「TOKYO」と、
+   赤い点が明滅する録画中のようなタイムコード。あいだを金の細い線でつなぐ。
+   帯が開き切る手前で、下から少し浮き上がりながら出す（--p） */
+.p-movie__bar--bottom {
+  gap: clamp(20px, calc(3 * var(--vw)), 48px);
+}
+
 .p-movie__cap {
-  color: rgba(255, 255, 255, 0.62);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  white-space: nowrap;
+  opacity: clamp(0, calc((var(--p) - 0.7) * 3.4), 1);
+  transform: translateY(calc((1 - var(--p)) * 40px));
+}
+
+.p-movie__cap--city {
+  align-items: flex-end;
+}
+
+.p-movie__label {
+  color: var(--c-accent);
+  font-family: var(--f-gothic);
+  font-size: 10px;
+  letter-spacing: 0.42em;
+}
+
+.p-movie__coord {
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--f-gothic);
+  font-size: clamp(12px, calc(1.1 * var(--vw)), 16px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3em;
+}
+
+/* 座標と TOKYO のあいだの金の細い線。両端は消えるように細らせ、帯が開くのに合わせて横へ伸びる */
+.p-movie__rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(201, 164, 90, 0), rgba(201, 164, 90, 0.7) 20%, rgba(201, 164, 90, 0.7) 80%, rgba(201, 164, 90, 0));
+  transform: scaleX(clamp(0, calc((var(--p) - 0.6) * 2.5), 1));
+}
+
+.p-movie__city {
+  margin-right: -0.5em;
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: clamp(24px, calc(2.6 * var(--vw)), 38px);
+  line-height: 1;
+  letter-spacing: 0.5em;
+}
+
+.p-movie__rec {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--f-gothic);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.24em;
-  white-space: nowrap;
-  opacity: clamp(0, calc((var(--p) - 0.75) * 4), 1);
+}
+
+.p-movie__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e2392f;
+  box-shadow: 0 0 8px rgba(226, 57, 47, 0.8);
+  animation: movieRec 1.2s steps(1) infinite;
+}
+
+@keyframes movieRec {
+  50% {
+    opacity: 0;
+  }
 }
 
 .p-movie__tc {
@@ -783,8 +849,39 @@ html:has(.p-movie) {
 
 @media (max-width: 767px) {
   .p-movie__cap {
-    font-size: 9px;
+    gap: 5px;
+  }
+
+  .p-movie__label {
+    font-size: 8px;
+  }
+
+  .p-movie__coord {
+    font-size: 10px;
     letter-spacing: 0.16em;
+  }
+
+  .p-movie__city {
+    font-size: 20px;
+    letter-spacing: 0.32em;
+    margin-right: -0.32em;
+  }
+
+  .p-movie__rec {
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .p-movie__dot {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p-movie__dot {
+    animation: none;
   }
 }
 
