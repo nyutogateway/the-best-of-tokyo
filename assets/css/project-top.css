@@ -699,8 +699,15 @@
 
 /* 1.5 映像（FV と ABOUT のあいだ） ------------------------------
    画面いっぱい（画面の幅×画面の高さ）に置く。音なしで自動再生・ループ。
-   色やもやは重ねず、映像そのままを見せる。ごくゆっくり寄り引きだけ続ける */
+   色やもやは重ねず、拡大もしない（拡大すると画が甘くなる）。映像そのままを見せる。
+   スクロールが映像の近くで止まったら、映像の上端がヘッダーの真下にぴったり来るよう吸い付かせる */
+html:has(.p-movie) {
+  scroll-snap-type: y proximity;
+}
+
 .p-movie {
+  scroll-margin-top: var(--header-h);
+  scroll-snap-align: start;
   background: var(--c-indigo-deep);
 }
 
@@ -717,17 +724,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: movieDrift 26s ease-in-out infinite alternate;
-}
-
-@keyframes movieDrift {
-  from {
-    transform: scale(1) translate(0, 0);
-  }
-
-  to {
-    transform: scale(1.07) translate(-1.2%, -0.8%);
-  }
 }
 
 /* 映画の黒帯。上下に黒い帯を置いてシネマスコープ（2.39:1）の画面に見せる。
@@ -781,11 +777,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .p-movie__video {
-    animation: none;
-  }
-}
 
 /* 2. ABOUT（企画について） ----------------------------- */
 
