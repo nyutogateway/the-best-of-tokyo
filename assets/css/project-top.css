@@ -699,9 +699,7 @@
 
 /* 1.5 映像（FV と ABOUT のあいだ） ------------------------------
    画面いっぱい（画面の幅×画面の高さ）に置く。音なしで自動再生・ループ。
-   ・彩度を落としてコントラストを上げ、明るい所にだけ金を差す（映画の色調）
-   ・藍を薄く掛けて四隅を沈め、上下は墨へ溶かして FV・ABOUT の地とつなげる
-   ・フィルムの粒を重ね、映像はごくゆっくり寄り引きし続ける */
+   色やもやは重ねず、映像そのままを見せる。ごくゆっくり寄り引きだけ続ける */
 .p-movie {
   background: var(--c-indigo-deep);
 }
@@ -718,7 +716,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.62) contrast(1.14) brightness(0.92);
   animation: movieDrift 26s ease-in-out infinite alternate;
 }
 
@@ -732,53 +729,10 @@
   }
 }
 
-/* 明るい所にだけ金を差す（soft-light は暗い所をほとんど変えない） */
-.p-movie__inner::after {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, rgba(212, 176, 96, 0.55), rgba(239, 217, 154, 0.25) 50%, rgba(212, 176, 96, 0.5));
-  mix-blend-mode: soft-light;
-  pointer-events: none;
-  content: "";
-}
-
-.p-movie__veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  background:
-    /* 上は FV の下端（影で墨より暗い）の色から、下は ABOUT の地（墨）の色へ溶かす */
-    linear-gradient(180deg, #080d1b 0%, rgba(8, 13, 27, 0) 22%),
-    linear-gradient(0deg, var(--c-indigo-deep) 0%, rgba(14, 25, 50, 0) 20%),
-    radial-gradient(ellipse 75% 70% at 50% 50%, rgba(14, 25, 50, 0) 40%, rgba(8, 14, 30, 0.72) 100%),
-    rgba(14, 25, 50, 0.28);
-  pointer-events: none;
-}
-
-.p-movie__veil::after {
-  position: absolute;
-  inset: -50%;
-  background: var(--grain);
-  opacity: 0.55;
-  animation: movieGrain 0.9s steps(4) infinite;
-  pointer-events: none;
-  content: "";
-}
-
-@keyframes movieGrain {
-  0% { translate: 0 0; }
-  25% { translate: -3% 2%; }
-  50% { translate: 2% -3%; }
-  75% { translate: -2% -1%; }
-  100% { translate: 0 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .p-movie__video,
-  .p-movie__veil::after {
-      animation: none;
-    }
+  .p-movie__video {
+    animation: none;
+  }
 }
 
 /* 2. ABOUT（企画について） ----------------------------- */
