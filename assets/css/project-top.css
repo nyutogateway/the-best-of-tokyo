@@ -766,7 +766,7 @@ html:has(.p-movie) {
   padding: 0 var(--pad-x);
 }
 
-/* 下の帯の文字。左に場所（LOCATION と東京タワーの座標）、右に大きな「TOKYO」と、
+/* 下の帯の文字。左に場所（LOCATION と東京タワーの座標）、右に細い明朝の「TOKYO」と、
    赤い点が明滅する録画中のようなタイムコード。あいだを金の細い線でつなぐ。
    帯が開き切る手前で、下から少し浮き上がりながら出す（--p） */
 .p-movie__bar--bottom {
@@ -794,9 +794,9 @@ html:has(.p-movie) {
 }
 
 .p-movie__coord {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.6);
   font-family: var(--f-gothic);
-  font-size: clamp(12px, calc(1.1 * var(--vw)), 16px);
+  font-size: clamp(11px, calc(0.95 * var(--vw)), 13px);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.3em;
 }
@@ -805,17 +805,19 @@ html:has(.p-movie) {
 .p-movie__rule {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, rgba(201, 164, 90, 0), rgba(201, 164, 90, 0.7) 20%, rgba(201, 164, 90, 0.7) 80%, rgba(201, 164, 90, 0));
+  background: linear-gradient(90deg, rgba(201, 164, 90, 0), rgba(201, 164, 90, 0.4) 20%, rgba(201, 164, 90, 0.4) 80%, rgba(201, 164, 90, 0));
   transform: scaleX(clamp(0, calc((var(--p) - 0.6) * 2.5), 1));
 }
 
+/* TOKYO は目立たせない。細い明朝を金で、字の間を大きく空けて静かに置く */
 .p-movie__city {
-  margin-right: -0.5em;
-  color: #fff;
-  font-family: var(--f-display);
-  font-size: clamp(24px, calc(2.6 * var(--vw)), 38px);
+  margin-right: -0.6em;
+  color: var(--c-accent);
+  font-family: var(--f-mincho);
+  font-size: clamp(16px, calc(1.5 * var(--vw)), 21px);
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: 0.5em;
+  letter-spacing: 0.6em;
 }
 
 .p-movie__rec {
@@ -862,9 +864,9 @@ html:has(.p-movie) {
   }
 
   .p-movie__city {
-    font-size: 20px;
-    letter-spacing: 0.32em;
-    margin-right: -0.32em;
+    font-size: 14px;
+    letter-spacing: 0.4em;
+    margin-right: -0.4em;
   }
 
   .p-movie__rec {
