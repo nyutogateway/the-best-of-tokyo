@@ -779,7 +779,7 @@ html:has(.p-movie) {
 }
 
 /* カメラの画面風。映像の四隅に細いカギ、中央に小さな十字。
-   下の帯には録画中の表示（赤い点が明滅する REC とタイムコード）と、場所・撮影の設定を1行で。
+   下の帯には録画中の表示（赤い点が明滅する REC とタイムコード）と、場所（TOKYO と座標）を1行で。
    どれも細い文字・細い線で静かに。帯が開き切る手前で出す（--p） */
 .p-movie__frame {
   position: absolute;
@@ -864,13 +864,6 @@ html:has(.p-movie) {
   color: var(--c-accent);
 }
 
-/* 区切りの細い縦線 */
-.p-movie__sep {
-  width: 1px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.25);
-}
-
 @media (max-width: 767px) {
   .p-movie__hud {
     gap: 10px;
@@ -878,8 +871,6 @@ html:has(.p-movie) {
     letter-spacing: 0.12em;
   }
 
-  .p-movie__hud--spec,
-  .p-movie__hud .p-movie__sep,
   .p-movie__coord {
     display: none;
   }
