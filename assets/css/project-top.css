@@ -743,13 +743,14 @@ html:has(.p-movie) {
 .p-movie__inner {
   --p: 1;
   /* 帯の厚みの下限は --bar-min（下の帯の文字が収まる厚み）。横に長い・背の低い画面でも文字が映像に被らない */
-  --bar-min: 84px;
+  --bar-min: 64px;
   --bar-end: clamp(max(calc(6 * var(--svh)), var(--bar-min)), calc((100 * var(--svh) - var(--header-h) - 100 * var(--vw) / 2.39) / 2), max(calc(16 * var(--svh)), var(--bar-min)));
+  --bar-h: calc(var(--bar-end) + (46 * (var(--svh) * 100 - var(--header-h)) / 100 - var(--bar-end)) * (1 - var(--p)));
 }
 
 @media (max-width: 767px) {
   .p-movie__inner {
-    --bar-min: 64px;
+    --bar-min: 48px;
   }
 }
 
@@ -758,7 +759,7 @@ html:has(.p-movie) {
   right: 0;
   left: 0;
   z-index: 1;
-  height: calc(var(--bar-end) + (46 * (var(--svh) * 100 - var(--header-h)) / 100 - var(--bar-end)) * (1 - var(--p)));
+  height: var(--bar-h);
   background: #000;
 }
 
@@ -774,73 +775,76 @@ html:has(.p-movie) {
   padding: 0 var(--pad-x);
 }
 
-/* 下の帯の文字。左に場所（LOCATION と東京タワーの座標）、右に細い明朝の「TOKYO」と、
-   赤い点が明滅する録画中のようなタイムコード。あいだを金の細い線でつなぐ。
-   帯が開き切る手前で、下から少し浮き上がりながら出す（--p） */
-.p-movie__bar--bottom {
-  gap: clamp(20px, calc(3 * var(--vw)), 48px);
+/* カメラの画面風。映像の四隅に細いカギ、中央に小さな十字。
+   下の帯には録画中の表示（赤い点が明滅する REC とタイムコード）と、場所・撮影の設定を1行で。
+   どれも細い文字・細い線で静かに。帯が開き切る手前で出す（--p） */
+.p-movie__frame {
+  position: absolute;
+  top: calc(var(--bar-h) + clamp(14px, calc(1.8 * var(--vw)), 28px));
+  right: clamp(14px, calc(1.8 * var(--vw)), 28px);
+  bottom: calc(var(--bar-h) + clamp(14px, calc(1.8 * var(--vw)), 28px));
+  left: clamp(14px, calc(1.8 * var(--vw)), 28px);
+  z-index: 1;
+  --k: rgba(255, 255, 255, 0.7);
+  --kl: clamp(16px, calc(2 * var(--vw)), 28px);
+  background:
+    linear-gradient(var(--k), var(--k)) 0 0 / var(--kl) 1px,
+    linear-gradient(var(--k), var(--k)) 0 0 / 1px var(--kl),
+    linear-gradient(var(--k), var(--k)) 100% 0 / var(--kl) 1px,
+    linear-gradient(var(--k), var(--k)) 100% 0 / 1px var(--kl),
+    linear-gradient(var(--k), var(--k)) 0 100% / var(--kl) 1px,
+    linear-gradient(var(--k), var(--k)) 0 100% / 1px var(--kl),
+    linear-gradient(var(--k), var(--k)) 100% 100% / var(--kl) 1px,
+    linear-gradient(var(--k), var(--k)) 100% 100% / 1px var(--kl);
+  background-repeat: no-repeat;
+  opacity: clamp(0, calc((var(--p) - 0.7) * 3.4), 1);
+  pointer-events: none;
 }
 
-.p-movie__cap {
+/* 中央の十字 */
+.p-movie__frame::before,
+.p-movie__frame::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  translate: -50% -50%;
+  content: "";
+}
+
+.p-movie__frame::before {
+  width: 18px;
+  height: 1px;
+}
+
+.p-movie__frame::after {
+  width: 1px;
+  height: 18px;
+}
+
+.p-movie__hud {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: clamp(14px, calc(2 * var(--vw)), 32px);
+  color: rgba(255, 255, 255, 0.62);
+  font-family: var(--f-gothic);
+  font-size: clamp(10px, calc(0.85 * var(--vw)), 12px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.22em;
   white-space: nowrap;
   opacity: clamp(0, calc((var(--p) - 0.7) * 3.4), 1);
-  transform: translateY(calc((1 - var(--p)) * 40px));
-}
-
-.p-movie__cap--city {
-  align-items: flex-end;
-}
-
-.p-movie__label {
-  color: var(--c-accent);
-  font-family: var(--f-gothic);
-  font-size: 10px;
-  letter-spacing: 0.42em;
-}
-
-.p-movie__coord {
-  color: rgba(255, 255, 255, 0.6);
-  font-family: var(--f-gothic);
-  font-size: clamp(11px, calc(0.95 * var(--vw)), 13px);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.3em;
-}
-
-/* 座標と TOKYO のあいだの金の細い線。両端は消えるように細らせ、帯が開くのに合わせて横へ伸びる */
-.p-movie__rule {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(201, 164, 90, 0), rgba(201, 164, 90, 0.4) 20%, rgba(201, 164, 90, 0.4) 80%, rgba(201, 164, 90, 0));
-  transform: scaleX(clamp(0, calc((var(--p) - 0.6) * 2.5), 1));
-}
-
-/* TOKYO は目立たせない。細い明朝を金で、字の間を大きく空けて静かに置く */
-.p-movie__city {
-  margin-right: -0.6em;
-  color: var(--c-accent);
-  font-family: var(--f-mincho);
-  font-size: clamp(16px, calc(1.5 * var(--vw)), 21px);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0.6em;
 }
 
 .p-movie__rec {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--f-gothic);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.24em;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .p-movie__dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #e2392f;
   box-shadow: 0 0 8px rgba(226, 57, 47, 0.8);
@@ -857,35 +861,29 @@ html:has(.p-movie) {
   color: var(--c-accent);
 }
 
+/* 区切りの細い縦線 */
+.p-movie__sep {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
 @media (max-width: 767px) {
-  .p-movie__cap {
-    gap: 5px;
-  }
-
-  .p-movie__label {
-    font-size: 8px;
-  }
-
-  .p-movie__coord {
-    font-size: 10px;
-    letter-spacing: 0.16em;
-  }
-
-  .p-movie__city {
-    font-size: 14px;
-    letter-spacing: 0.4em;
-    margin-right: -0.4em;
-  }
-
-  .p-movie__rec {
-    gap: 6px;
+  .p-movie__hud {
+    gap: 10px;
     font-size: 9px;
     letter-spacing: 0.12em;
   }
 
-  .p-movie__dot {
-    width: 5px;
-    height: 5px;
+  .p-movie__hud--spec,
+  .p-movie__hud .p-movie__sep,
+  .p-movie__coord {
+    display: none;
+  }
+
+  .p-movie__frame::before,
+  .p-movie__frame::after {
+    display: none;
   }
 }
 
