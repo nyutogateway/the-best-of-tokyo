@@ -704,8 +704,9 @@
   background: var(--c-indigo-deep);
 }
 
+/* 固定ヘッダーと合わせて1画面（ヘッダーの真下に映像の上端が来たとき、ヘッダー＋映像＝画面の高さ） */
 .p-movie__inner {
-  height: calc(100 * var(--svh));
+  height: calc(100 * var(--svh) - var(--header-h));
   overflow: hidden;
 }
 
@@ -734,7 +735,7 @@
    JS が無いときは 1（開いたまま）。縦長の画面では帯を細めに止める */
 .p-movie__inner {
   --p: 1;
-  --bar-end: clamp(calc(6 * var(--svh)), calc((100 * var(--svh) - 100 * var(--vw) / 2.39) / 2), calc(16 * var(--svh)));
+  --bar-end: clamp(calc(6 * var(--svh)), calc((100 * var(--svh) - var(--header-h) - 100 * var(--vw) / 2.39) / 2), calc(16 * var(--svh)));
 }
 
 .p-movie__bar {
@@ -742,14 +743,12 @@
   right: 0;
   left: 0;
   z-index: 1;
-  height: calc(var(--bar-end) + (46 * var(--svh) - var(--bar-end)) * (1 - var(--p)));
+  height: calc(var(--bar-end) + (46 * (var(--svh) * 100 - var(--header-h)) / 100 - var(--bar-end)) * (1 - var(--p)));
   background: #000;
 }
 
-/* 上の帯は固定ヘッダーの下に隠れる分（--header-h）だけ足して、見える黒の厚みを上下でそろえる */
 .p-movie__bar--top {
   top: 0;
-  height: calc(var(--header-h) + var(--bar-end) + (46 * var(--svh) - var(--bar-end)) * (1 - var(--p)));
 }
 
 .p-movie__bar--bottom {

@@ -31,14 +31,16 @@
     movie.pause();
   }
 
-  /* 映像の黒帯：映像の面が下から上がってくるあいだに、上下の帯が細い隙間から 2.39:1 まで開く。
+  /* 映像の黒帯：映像の面が下から上がってくるあいだに（上端がヘッダーの真下に来るまで）、上下の帯が細い隙間から 2.39:1 まで開く。
      下の帯のタイムコードは映像の再生位置をそのまま映す（画面に入っているときだけ回す） */
   var movieInner = document.querySelector('.p-movie__inner');
   var tc = document.getElementById('js-tc');
   if (movie && movieInner) {
     var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var onMovieScroll = function () {
-      var t = 1 - movieInner.getBoundingClientRect().top / window.innerHeight;
+      /* 映像の上端がヘッダーの真下に来たところで開き切る */
+      var hh = header ? header.getBoundingClientRect().height : 0;
+      var t = 1 - (movieInner.getBoundingClientRect().top - hh) / (window.innerHeight - hh);
       t = Math.min(Math.max(t, 0), 1);
       movieInner.style.setProperty('--p', still ? 1 : (t * t * (3 - 2 * t)).toFixed(4));
     };
